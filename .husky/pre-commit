@@ -1,0 +1,16 @@
+echo ''
+echo '🔍 Ejecutando validación del linter...'
+echo ''
+
+npx lint-staged ||
+(
+  echo '';
+  echo '❌ Error: Se encontraron problemas de estilo en el código.
+      Ejecuta `npm run lint` para más detalles y corrige los errores.';
+  echo '';
+  false;
+)
+
+echo ''
+echo '✅ Validación del linter exitosa: procediendo con el commit...'
+echo ''

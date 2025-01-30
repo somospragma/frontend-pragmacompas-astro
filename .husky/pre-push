@@ -1,0 +1,16 @@
+echo ''
+echo '🔍 Ejecutando validación de tests y cobertura...'
+echo ''
+
+npm run coverage ||
+(
+  echo ''
+  echo '❌ La validación de la cobertura ha fallado.
+      Ejecuta `npm run coverage` para más detalles y corrige los errores.'
+  echo ''
+  false
+)
+
+echo ''
+echo '✅ Tests y cobertura validados correctamente.'
+echo ''
