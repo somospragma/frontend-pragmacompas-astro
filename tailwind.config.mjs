@@ -23,6 +23,27 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          purple: {
+            50: "#E7DDF8",
+            300: "#AB88E7",
+            500: "#6429CD",
+            700: "#330072",
+            900: "#1F0D3F",
+          },
+          gray: {
+            50: "#D8D8D6",
+            300: "#75756D",
+            500: "#1D1D1B",
+            700: "#141413",
+            900: "#030302",
+          },
+          indigo: {
+            50: "#F6F6FC",
+            300: "#DFDFFF",
+            500: "#BDBDFF",
+            700: "#8A8AFF",
+            900: "#4646FF",
+          },
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -50,6 +71,9 @@ export default {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+      },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
       },
     },
   },
