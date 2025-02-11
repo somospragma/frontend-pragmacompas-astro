@@ -1,14 +1,15 @@
+// @vitest-exclude
 import { sequence } from "astro:middleware";
 import type { APIContext, MiddlewareNext } from "astro";
 import { getSession } from "auth-astro/server";
 
-async function logAccess(context: APIContext, next: MiddlewareNext) {
+export async function logAccess(context: APIContext, next: MiddlewareNext) {
   console.log(`Ruta solicitada: ${context.url.pathname}`);
   const response = await next();
   return response;
 }
 
-async function authMiddleware(context: APIContext, next: MiddlewareNext) {
+export async function authMiddleware(context: APIContext, next: MiddlewareNext) {
   const session = await getSession(context.request);
 
   // Si hay una sesión y el usuario intenta acceder a /login, redirigir a /protected

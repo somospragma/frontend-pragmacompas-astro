@@ -1,3 +1,4 @@
+// @vitest-exclude
 import { useErrorStore } from "@/store/errorStore";
 import { getSecret } from "astro:env/server";
 import axios from "axios";

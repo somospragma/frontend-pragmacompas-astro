@@ -25,7 +25,7 @@ export const ErrorModal = () => {
                     Error
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500">{error ?? "Ocurrio un error inesperado"}</p>
+                    <p className="text-sm text-gray-500">{error || "Ocurrio un error inesperado"}</p>
                   </div>
                 </div>
               </div>
