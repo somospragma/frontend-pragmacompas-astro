@@ -1,9 +1,11 @@
 ---
+import { ErrorModal } from "@/components/molecules/ModalError/ModalError.tsx";
 import Footer from "@/components/organisms/Footer.astro";
 import Header from "@/components/organisms/Header.astro";
 import BaseHead from "@/components/templates/BaseHead.astro";
 import "@/styles/global.css";
 import "@fontsource/poppins";
+import "remixicon/fonts/remixicon.css";
 
 interface Props {
   title?: string;
@@ -49,10 +51,11 @@ const {
     </script>
   </head>
   <body>
-    <div class="flex flex-col min-h-screen">
+    <div class="flex flex-col min-h-screen bg-primary-gray-900">
       <Header />
       <slot />
       <Footer />
+      <ErrorModal client:load />
     </div>
   </body>
 </html>
