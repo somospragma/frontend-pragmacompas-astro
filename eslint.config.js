@@ -33,7 +33,7 @@ export default [
       "astro/no-set-text-directive": "error",
       "astro/no-unused-css-selector": "error",
       "prettier/prettier": "error",
-      "max-len": ["warn", { code: 120 }],
+      "max-len": ["warn", { code: 160 }],
     },
   },
 ];

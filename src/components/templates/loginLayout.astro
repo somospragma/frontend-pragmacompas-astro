@@ -1,0 +1,42 @@
+---
+import { getSession } from "auth-astro/server";
+import { ButtonLoginGoogle } from "../atoms/ButtonLoginGoogle/ButtonLoginGoogle";
+
+const session = await getSession(Astro.request);
+if (session) {
+  return Astro.redirect("/protected");
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+  </head>
+  <body
+    ><main class="bg-primary-gray-900 flex flex-col items-center justify-center min-h-screen gap-5">
+      <div class="relative w-40 h-40 flex items-center justify-center">
+        <!-- Efecto de brillo -->
+        <div class="absolute w-full h-full rounded-full bg-purple-700 blur-2xl opacity-50">
+          <div class="absolute inset-0 bg-primary-purple-500 opacity-0 animate-lighthouse"></div>
+        </div>
+
+        <!-- Círculo exterior -->
+        <div class="relative w-full h-full rounded-full border-4 border-white flex items-center justify-center">
+          <!-- Logo interno -->
+          <svg width="60" height="150" viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="28" cy="22" r="22" stroke="white" stroke-width="5"></circle>
+            <circle cx="35" cy="60" r="15" stroke="white" stroke-width="5"></circle>
+            <circle cx="45" cy="-5" r="8" fill="white"></circle>
+          </svg>
+        </div>
+      </div>ƒ
+      <h1 class="text-primary-indigo-50 text-center text-2xl font-bold">
+        Bienvenido a Pragma<span class="text-purple-400 text-2xl font-bold">Compas</span>
+      </h1>
+      <ButtonLoginGoogle client:load />
+    </main>
+  </body>
+</html>

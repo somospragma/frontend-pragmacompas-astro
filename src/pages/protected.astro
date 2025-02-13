@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/components/templates/BaseLayout.astro";
 import { checkAuth } from "@/shared/utils/auth";
+import { SignOut } from "auth-astro/components";
 
 const redirect = await checkAuth(Astro.request);
 if (redirect) return redirect;
@@ -8,4 +9,5 @@ if (redirect) return redirect;
 
 <BaseLayout>
   <p>Ruta protegida</p>
+  <SignOut>Logout</SignOut>
 </BaseLayout>

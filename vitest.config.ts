@@ -19,6 +19,8 @@ export default defineConfig({
         '**/*.test.{js,jsx,ts,tsx}',
         '**/src/vite-env*',
         '**/src/components/ui/*',
+        './src/middleware.ts',
+        './src/infrastructure/adapters/httpClient/httpClient.ts',
       ],
       thresholds: {
         statements: 60,

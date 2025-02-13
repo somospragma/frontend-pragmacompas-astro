@@ -1,5 +1,5 @@
 {
-  "name": "astro-arquetip",
+  "name": "frontend-pragmacompas-astro",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -25,21 +25,26 @@
     "@radix-ui/react-slot": "^1.1.1",
     "astro": "^5.1.10",
     "auth-astro": "^4.2.0",
+    "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
     "nanostores": "^0.11.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "remixicon": "^4.6.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss": "^3.4.17",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
+    "@mswjs/interceptors": "^0.37.6",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@typescript-eslint/parser": "^8.22.0",
@@ -53,11 +58,13 @@
     "husky": "^9.1.7",
     "jsdom": "^26.0.0",
     "lint-staged": "^15.4.3",
+    "msw": "^2.7.0",
     "prettier": "^3.4.2",
     "prettier-plugin-astro": "^0.14.1",
     "rollup-plugin-visualizer": "^5.14.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0",
-    "vitest": "^3.0.5"
+    "vitest": "^3.0.5",
+    "vitest-axe": "^0.1.0"
   }
 }
