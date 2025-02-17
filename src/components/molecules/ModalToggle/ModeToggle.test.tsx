@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
-import { ModeToggle } from "../ModeToggle";
+import { ModeToggle } from "./ModeToggle";
 
 // Mock the lucide-react components
 vi.mock("lucide-react", () => ({

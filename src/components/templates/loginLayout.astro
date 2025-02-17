@@ -1,6 +1,7 @@
 ---
 import { getSession } from "auth-astro/server";
 import { ButtonLoginGoogle } from "../atoms/ButtonLoginGoogle/ButtonLoginGoogle";
+import BaseHead from "./BaseHead.astro";
 
 const session = await getSession(Astro.request);
 if (session) {
@@ -9,11 +10,16 @@ if (session) {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+
+    <BaseHead
+      title={"Iniciar sesión"}
+      description="Iniciar sesión con Google"
+      image="https://astro.build/og/astro.jpg"
+    />
   </head>
   <body
     ><main class="bg-primary-gray-900 flex flex-col items-center justify-center min-h-screen gap-5">
