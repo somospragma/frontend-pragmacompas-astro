@@ -8,7 +8,7 @@ vi.mock("auth-astro/server", () => ({
 }));
 
 describe("checkAuth", () => {
-  it("debe retornar Response con estado 404 si no hay sesión", async () => {
+  it("should return a 404 response if there is no session", async () => {
     (getSession as vi.Mock).mockResolvedValue(null);
 
     const request = new Request("https://example.com");
@@ -18,7 +18,7 @@ describe("checkAuth", () => {
     expect(response?.status).toBe(404);
   });
 
-  it("debe retornar null si hay una sesión activa", async () => {
+  it("should be return null if there is a session active", async () => {
     (getSession as vi.Mock).mockResolvedValue({ user: { name: "John Doe" } });
 
     const request = new Request("https://example.com");

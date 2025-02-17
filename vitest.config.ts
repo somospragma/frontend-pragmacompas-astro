@@ -21,6 +21,7 @@ export default defineConfig({
         '**/src/components/ui/*',
         './src/middleware.ts',
         './src/infrastructure/adapters/httpClient/httpClient.ts',
+        './src/utils/enums/paths.ts',
       ],
       thresholds: {
         statements: 60,

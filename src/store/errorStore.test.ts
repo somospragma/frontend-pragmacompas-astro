@@ -3,12 +3,12 @@ import { act } from "react";
 import { useErrorStore } from "./errorStore";
 
 describe("useErrorStore", () => {
-  it("debe tener un estado inicial con error null", () => {
+  it("should return the initial state", () => {
     const state = useErrorStore.getState();
     expect(state.error).toBeNull();
   });
 
-  it("debe actualizar el error correctamente", () => {
+  it("should set the error state", () => {
     act(() => {
       useErrorStore.getState().setError("Error de prueba");
     });
@@ -17,7 +17,7 @@ describe("useErrorStore", () => {
     expect(state.error).toBe("Error de prueba");
   });
 
-  it("debe poder resetear el error a null", () => {
+  it("should clear the error state", () => {
     act(() => {
       useErrorStore.getState().setError("Otro error");
       useErrorStore.getState().setError(null);
