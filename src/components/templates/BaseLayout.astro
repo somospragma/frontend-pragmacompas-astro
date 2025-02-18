@@ -49,12 +49,26 @@ const {
         });
       }
     </script>
+    <style>
+      .background {
+        background: #d3d8ed;
+        opacity: 1;
+        background-image: radial-gradient(#cbccea 2px, #d3d8ed 2px);
+        background-size: 40px 40px;
+        width: 100%;
+        height: auto;
+        position: relative;
+        flex-grow: 1;
+      }
+    </style>
   </head>
   <body>
-    <div class="flex flex-col min-h-screen bg-primary-gray-900">
+    <div class="flex items-center flex-col background min-h-screen w-full">
       <Header />
-      <slot />
-      <Footer />
+      <main class="w-full max-w-7xl">
+        <slot />
+        <Footer />
+      </main>
       <ErrorModal client:load />
     </div>
   </body>
