@@ -1,25 +1,267 @@
 ---
+import { UserCardsGrid } from "@/components/organisms/UserCardsGrid/UserCardsGrid";
 import BaseLayout from "@/components/templates/BaseLayout.astro";
+import { SENIORITY, type User } from "@/shared/entities/user";
+import { type Account } from "@/shared/entities/account";
+import { mapArrayToRecord } from "@/shared/utils/helpers/mapArrayToRecord";
 import "@/styles/global.css";
-import type { Session } from "@auth/core/types";
-import { Auth, SignIn, SignOut } from "auth-astro/components";
+
+export const users: User[] = [
+  {
+    id: "1",
+    name: "Alice Johnson",
+    seniority: SENIORITY.SENIOR,
+    accountId: 101,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=AJ",
+    skills: ["React", "TypeScript", "Node.js"],
+    location: "New York, USA",
+    email: "alice.johnson@example.com",
+    startDate: new Date("2016-07-15"),
+    aiTools: ["ChatGPT", "Copilot"],
+    birthday: new Date("1990-05-12"),
+  },
+  {
+    id: "2",
+    name: "Bob Smith",
+    seniority: SENIORITY.JUNIOR,
+    accountId: 102,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=BS",
+    skills: ["Angular", "RxJS", "Firebase"],
+    location: "London, UK",
+    email: "bob.smith@example.com",
+    startDate: new Date("2021-03-10"),
+    aiTools: ["Midjourney", "Bard"],
+    birthday: new Date("1998-11-30"),
+  },
+  {
+    id: "3",
+    name: "Charlie Davis",
+    seniority: SENIORITY.MID,
+    accountId: 103,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=CD",
+    skills: ["Vue", "Pinia", "GraphQL"],
+    location: "Berlin, Germany",
+    email: "charlie.davis@example.com",
+    startDate: new Date("2018-09-05"),
+    aiTools: ["Stable Diffusion", "Copilot"],
+    birthday: new Date("1993-06-21"),
+  },
+  {
+    id: "4",
+    name: "Diana Torres",
+    seniority: SENIORITY.MASTER,
+    accountId: 104,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=DT",
+    skills: ["Python", "Django", "PostgreSQL"],
+    location: "Madrid, Spain",
+    email: "diana.torres@example.com",
+    startDate: new Date("2012-02-18"),
+    aiTools: ["ChatGPT", "Claude"],
+    birthday: new Date("1985-09-17"),
+  },
+  {
+    id: "5",
+    name: "Ethan Walker",
+    seniority: SENIORITY.TRAINEE,
+    accountId: 105,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=EW",
+    skills: ["HTML", "CSS", "JavaScript"],
+    location: "Sydney, Australia",
+    email: "ethan.walker@example.com",
+    startDate: new Date("2023-06-01"),
+    aiTools: ["Bard"],
+    birthday: new Date("2001-04-05"),
+  },
+  {
+    id: "6",
+    name: "Fiona Green",
+    seniority: SENIORITY.SENIOR,
+    accountId: 106,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=FG",
+    skills: ["Java", "Spring Boot", "Kubernetes"],
+    location: "San Francisco, USA",
+    email: "fiona.green@example.com",
+    startDate: new Date("2015-10-23"),
+    aiTools: ["Copilot", "ChatGPT"],
+    birthday: new Date("1989-07-29"),
+  },
+  {
+    id: "7",
+    name: "George Baker",
+    seniority: SENIORITY.MID,
+    accountId: 107,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=GB",
+    skills: ["Go", "Microservices", "Docker"],
+    location: "Toronto, Canada",
+    email: "george.baker@example.com",
+    startDate: new Date("2019-01-12"),
+    aiTools: ["Claude", "Stable Diffusion"],
+    birthday: new Date("1995-02-10"),
+  },
+  {
+    id: "8",
+    name: "Hannah Lee",
+    seniority: SENIORITY.JUNIOR,
+    accountId: 108,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=HL",
+    skills: ["Flutter", "Dart", "Firebase"],
+    location: "Seoul, South Korea",
+    email: "hannah.lee@example.com",
+    startDate: new Date("2022-05-14"),
+    aiTools: ["ChatGPT"],
+    birthday: new Date("1999-12-08"),
+  },
+  {
+    id: "9",
+    name: "Isaac White",
+    seniority: SENIORITY.TRAINEE,
+    accountId: 109,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=IW",
+    skills: ["PHP", "Laravel", "MySQL"],
+    location: "Mexico City, Mexico",
+    email: "isaac.white@example.com",
+    startDate: new Date("2023-07-10"),
+    aiTools: ["Bard"],
+    birthday: new Date("2002-09-22"),
+  },
+  {
+    id: "10",
+    name: "Julia Adams",
+    seniority: SENIORITY.SENIOR,
+    accountId: 110,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=JA",
+    skills: ["Swift", "iOS Development", "UI/UX"],
+    location: "Paris, France",
+    email: "julia.adams@example.com",
+    startDate: new Date("2014-11-05"),
+    aiTools: ["Copilot", "ChatGPT"],
+    birthday: new Date("1988-03-19"),
+  },
+  {
+    id: "11",
+    name: "Kevin Harris",
+    seniority: SENIORITY.MID,
+    accountId: 111,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=KH",
+    skills: ["C#", ".NET Core", "Azure"],
+    location: "Chicago, USA",
+    email: "kevin.harris@example.com",
+    startDate: new Date("2017-08-25"),
+    aiTools: ["Stable Diffusion"],
+    birthday: new Date("1992-06-30"),
+  },
+  {
+    id: "12",
+    name: "Laura Scott",
+    seniority: SENIORITY.JUNIOR,
+    accountId: 112,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=LS",
+    skills: ["Kotlin", "Android", "Jetpack Compose"],
+    location: "Tokyo, Japan",
+    email: "laura.scott@example.com",
+    startDate: new Date("2020-10-01"),
+    aiTools: ["ChatGPT"],
+    birthday: new Date("1997-01-25"),
+  },
+  {
+    id: "13",
+    name: "Mark Evans",
+    seniority: SENIORITY.MASTER,
+    accountId: 113,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=ME",
+    skills: ["Rust", "Wasm", "Blockchain"],
+    location: "Amsterdam, Netherlands",
+    email: "mark.evans@example.com",
+    startDate: new Date("2010-04-10"),
+    aiTools: ["Claude"],
+    birthday: new Date("1983-05-03"),
+  },
+  {
+    id: "14",
+    name: "Natalie Brooks",
+    seniority: SENIORITY.TRAINEE,
+    accountId: 114,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=NB",
+    skills: ["SQL", "MongoDB", "NoSQL"],
+    location: "Buenos Aires, Argentina",
+    email: "natalie.brooks@example.com",
+    startDate: new Date("2023-02-15"),
+    aiTools: ["Bard"],
+    birthday: new Date("2000-08-11"),
+  },
+  {
+    id: "15",
+    name: "Oliver Hall",
+    seniority: SENIORITY.SENIOR,
+    accountId: 115,
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=OH",
+    skills: ["DevOps", "Terraform", "AWS"],
+    location: "Singapore",
+    email: "oliver.hall@example.com",
+    startDate: new Date("2013-06-20"),
+    aiTools: ["Copilot", "ChatGPT"],
+    birthday: new Date("1987-10-14"),
+  },
+];
+
+const accounts: Account[] = [
+  {
+    id: "101",
+    bannerColorClass: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+    name: "Bancolombia",
+
+    totalFrontedsDevs: 30,
+    iaTools: ["ChatGPT", "Stable Diffusion"],
+  },
+  {
+    id: "102",
+    bannerColorClass: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+    name: "Davivienda",
+
+    totalFrontedsDevs: 45,
+    iaTools: ["ChatGPT", "Copilot", "Midjourney"],
+  },
+  {
+    id: "103",
+    bannerColorClass: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+    name: "Grupo Éxito",
+
+    totalFrontedsDevs: 20,
+    iaTools: ["Copilot", "Claude"],
+  },
+  {
+    id: "104",
+    bannerColorClass: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
+    name: "Rappi",
+
+    totalFrontedsDevs: 35,
+    iaTools: ["Bard", "Copilot"],
+  },
+  {
+    id: "105",
+    bannerColorClass: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+    name: "Ecopetrol",
+
+    totalFrontedsDevs: 25,
+    iaTools: ["Claude", "Stable Diffusion"],
+  },
+  {
+    id: "106",
+    bannerColorClass: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+    name: "Avianca",
+
+    totalFrontedsDevs: 15,
+    iaTools: ["ChatGPT", "Midjourney"],
+  },
+];
+
+const accountsRecord = mapArrayToRecord(accounts, "id");
 ---
 
 <BaseLayout>
-  <Auth>
-    {
-      (session: Session | null) => (
-        <main>
-          <h1>Astro + AuthJS</h1>
-          <p>
-            <a href="/protected">Protected Route</a>
-          </p>
-          <SignIn provider="github">Login</SignIn>
-          <SignOut>Logout</SignOut>
-
-          <p>{session ? `Logged in as ${session.user?.name}` : "Not logged in"}</p>
-        </main>
-      )
-    }
-  </Auth>
+  <main class="max-w-screen-xl flex flex-col justify-center gap-y-12 mx-auto">
+    <!-- Filter -->
+    <div class="w-full bg-gray-700">Fitler</div>
+    <UserCardsGrid users={users} accountsRecord={accountsRecord} client:load />
+  </main>
 </BaseLayout>
