@@ -1,6 +1,6 @@
 // @vitest-exclude
 import { useErrorStore } from "@/store/errorStore";
-import { ROUTE_PATHS } from "@/utils/enums/paths";
+import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
 import { getSecret } from "astro:env/server";
 import axios from "axios";
 
