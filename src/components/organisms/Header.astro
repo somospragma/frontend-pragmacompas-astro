@@ -1,5 +1,13 @@
 ---
+import { Image } from "astro:assets";
 import { ModeToggle } from "@/components/molecules/ModalToggle/ModeToggle";
 ---
 
-<ModeToggle client:load />
+<header class="bg-white dark:bg-gray-400 p-8 mb-12 flex justify-between items-center w-full">
+  <div class="container m-auto flex justify-between items-center w-full">
+    <div>
+      <Image src="/PragmaCompas.png" alt="Pragmacompas logo" width={200} height={70} />
+    </div>
+    <ModeToggle client:load />
+  </div>
+</header>
