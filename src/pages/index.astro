@@ -18,7 +18,7 @@ const accountsRecord = mapArrayToRecord(accounts, "id");
 ---
 
 <BaseLayout>
-  <main class="max-w-screen-xl flex flex-col justify-center gap-y-12 mx-auto">
+  <main class="max-w-screen-xl flex flex-col justify-center gap-y-12 mx-auto mb-32">
     <!-- Filter -->
     <div class="w-full bg-gray-700">Fitler</div>
     <UserCardsGrid users={users} accountsRecord={accountsRecord} client:load />
