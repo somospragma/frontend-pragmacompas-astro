@@ -1,0 +1,55 @@
+---
+import { PuzzleGrid } from "@/components/organisms/PuzzleGrid/PuzzleGrid";
+import WorldPragmaLayout from "@/components/templates/WorldPragmaLayout.astro";
+import { contentfulClient } from "@/lib/contentful";
+import type { Account } from "@/shared/entities/account";
+import type { IJson } from "@/shared/entities/IJson";
+
+const entries = await contentfulClient.getEntries<IJson>({
+  content_type: "json",
+});
+
+const accounts = entries.items.filter((item) => item.fields.name === "accounts")[0].fields.json as unknown as Account[];
+---
+
+<WorldPragmaLayout title="Mundo Pragma" description="Conoce nuestro mundo y cómo estamos ubicados">
+  <main
+    class="flex min-h-screen flex-col items-center justify-center bg-[#12121f] text-white p-4 relative overflow-hidden w-full max-w-7xl"
+  >
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-[10%] left-[5%] w-64 h-64 rounded-full bg-purple-500/5 blur-3xl"></div>
+      <div class="absolute bottom-[15%] right-[10%] w-80 h-80 rounded-full bg-blue-500/5 blur-3xl"></div>
+
+      <svg width="100%" height="100%" class="absolute inset-0 opacity-10">
+        <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"></path>
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#grid-pattern)"></rect>
+      </svg>
+
+      <div
+        class="absolute top-[30%] left-[80%] w-20 h-20 border border-orange-300/20 rounded-lg transform rotate-12 animate-float"
+      >
+      </div>
+      <div
+        class="absolute top-[70%] left-[20%] w-16 h-16 border border-blue-300/20 rounded-full transform -rotate-6 animate-float"
+        style="animation-delay: 1s;"
+      >
+      </div>
+      <div
+        class="absolute top-[20%] left-[30%] w-24 h-24 border border-purple-300/20 rounded-lg transform rotate-45 animate-float"
+        style="animation-delay: 2s;"
+      >
+      </div>
+    </div>
+
+    <div class="max-w-5xl w-full space-y-8 relative z-10">
+      <div class="text-center space-y-4 mb-12">
+        <h1 class="text-4xl font-bold text-purple-400">Mundo Pragma</h1>
+        <p class="text-xl text-gray-300">Conoce nuestro mundo y cómo estamos ubicados</p>
+      </div>
+
+      <PuzzleGrid accounts={accounts} client:load />
+    </div>
+  </main>
+</WorldPragmaLayout>

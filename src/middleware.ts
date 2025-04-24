@@ -12,12 +12,12 @@ export async function logAccess(context: APIContext, next: MiddlewareNext): Prom
 export async function authMiddleware(context: APIContext, next: MiddlewareNext): Promise<Response> {
   const session = await getSession(context.request);
 
-  if (session && context.url.pathname === ROUTE_PATHS.LOGIN) {
-    return context.redirect(ROUTE_PATHS.HOME);
+  if (session && context.url.pathname === ROUTE_PATHS.LOGIN.getHref()) {
+    return context.redirect(ROUTE_PATHS.HOME.getHref());
   }
 
-  if (!session && PROTECTED_ROUTES.includes(context.url.pathname)) {
-    return context.redirect(ROUTE_PATHS.LOGIN);
+  if (!session && PROTECTED_ROUTES.some((path) => context.url.pathname.startsWith(path))) {
+    return context.redirect(ROUTE_PATHS.LOGIN.getHref());
   }
 
   return next();

@@ -1,0 +1,34 @@
+---
+import { HeaderAccount } from "@/components/organisms/HeaderAccount/HeaderAccount";
+import { contentfulClient } from "@/lib/contentful";
+import type { IJson } from "@/shared/entities/IJson";
+import WorldPragmaLayout from "@/components/templates/WorldPragmaLayout.astro";
+import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
+import type { Account } from "@/shared/entities/account";
+
+const entries = await contentfulClient.getEntries<IJson>({
+  content_type: "json",
+});
+
+const accounts = entries.items.filter((item) => item.fields.name === "accounts")[0].fields.json as unknown as Account[];
+
+const { id } = Astro.params;
+const account = accounts.find((account) => account.id === id);
+
+if (!account) {
+  return Astro.redirect(ROUTE_PATHS.WORLD_PRAGMA.getHref());
+}
+
+export function getStaticPaths() {
+  return accounts.map((account) => ({ id: account.id }));
+}
+---
+
+<WorldPragmaLayout
+  title={`${account.name} - Mundo Pragma`}
+  description={`Conoce como la cuenta ${account.name} está conformado`}
+>
+  <main class="w-full max-w-7xl">
+    <HeaderAccount client:load name={account.name} description={account.description} color={account.bannerColorHex} />
+  </main>
+</WorldPragmaLayout>

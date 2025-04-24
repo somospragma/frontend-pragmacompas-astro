@@ -1,0 +1,44 @@
+---
+import Footer from "@/components/organisms/Footer.astro";
+import Header from "@/components/organisms/Header.astro";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
+}
+
+const {
+  title = "Arquetipo Astro",
+  description = "Arquetipo construido con Astro y React",
+  image = "https://astro.build/og/astro.jpg",
+  hideHeader = false,
+  hideFooter = false,
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image}>
+  <style slot="head">
+    .background {
+      background: #d3d8ed;
+      opacity: 1;
+      background-image: radial-gradient(#cbccea 2px, #d3d8ed 2px);
+      background-size: 40px 40px;
+      width: 100%;
+      height: auto;
+      position: relative;
+      flex-grow: 1;
+    }
+  </style>
+
+  <div class="flex items-center flex-col background min-h-screen w-full">
+    {!hideHeader && <Header />}
+    <main class="w-full max-w-7xl">
+      <slot />
+      {!hideFooter && <Footer />}
+    </main>
+  </div>
+</BaseLayout>

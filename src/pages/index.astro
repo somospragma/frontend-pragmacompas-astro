@@ -1,6 +1,6 @@
 ---
 import { UserCardsGrid } from "@/components/organisms/UserCardsGrid/UserCardsGrid";
-import BaseLayout from "@/components/templates/BaseLayout.astro";
+import MainLayout from "@/components/templates/MainLayout.astro";
 import { contentfulClient } from "@/lib/contentful";
 import { type Account } from "@/shared/entities/account";
 import type { IJson } from "@/shared/entities/IJson";
@@ -17,10 +17,10 @@ const accounts = entries.items.filter((item) => item.fields.name === "accounts")
 const accountsRecord = mapArrayToRecord(accounts, "id");
 ---
 
-<BaseLayout>
+<MainLayout>
   <main class="max-w-screen-xl flex flex-col justify-center gap-y-12 mx-auto mb-32">
     <!-- Filter -->
     <div class="w-full bg-gray-700">Fitler</div>
     <UserCardsGrid users={users} accountsRecord={accountsRecord} client:load />
   </main>
-</BaseLayout>
+</MainLayout>
