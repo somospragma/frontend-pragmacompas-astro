@@ -16,7 +16,15 @@ export async function authMiddleware(context: APIContext, next: MiddlewareNext):
     return context.redirect(ROUTE_PATHS.HOME.getHref());
   }
 
-  if (!session && PROTECTED_ROUTES.some((path) => context.url.pathname.startsWith(path))) {
+  console.log(session, PROTECTED_ROUTES, context.url.pathname);
+
+  if (
+    !session &&
+    PROTECTED_ROUTES.some(
+      (path) =>
+        context.url.pathname === path || (!["", "/", "*"].includes(path) && context.url.pathname.startsWith(path))
+    )
+  ) {
     return context.redirect(ROUTE_PATHS.LOGIN.getHref());
   }
 
