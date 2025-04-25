@@ -147,7 +147,23 @@ export default function TriviaGame({
     <div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-purple-600 hover:bg-purple-700 text-white">Iniciar Trivia Frontend</Button>
+          <div
+            role="button"
+            className={`w-[190px] h-[100px] mx-auto bg-[#6366F1] rounded-[10px] relative z-[1] hover:scale-110 transition-transform`}
+          >
+            <div className="flex items-center p-[9px]">
+              <div className="px-1">
+                <span className="inline-block w-[10px] h-[10px] rounded-full bg-[#ff605c]"></span>
+              </div>
+              <div className="px-1">
+                <span className="inline-block w-[10px] h-[10px] rounded-full bg-[#ffbd44]"></span>
+              </div>
+              <div className="px-1">
+                <span className="inline-block w-[10px] h-[10px] rounded-full bg-[#00ca4e]"></span>
+              </div>
+            </div>
+            <div className="py-1 px-4">{title}</div>
+          </div>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[550px] bg-[#121218] border-purple-800 text-white">
           {/* Decorative circles */}

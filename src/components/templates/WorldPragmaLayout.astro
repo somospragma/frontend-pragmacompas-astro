@@ -1,0 +1,21 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title = "Mundo Pragma",
+  description = "Mundo Pragma",
+  image = "https://astro.build/og/astro.jpg",
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image}>
+  <div class="flex items-center flex-col background min-h-screen w-full">
+    <slot />
+  </div>
+</BaseLayout>
