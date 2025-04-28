@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowDown, ArrowLeft, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
 
 interface Props {
   name: string;
@@ -36,7 +37,7 @@ export const HeaderAccount = ({ name, description, color }: Props) => {
         </svg>
       </div>
 
-      <div className="relative z-10 h-full flex flex-col justify-end p-6">
+      <div className="relative z-10 h-full justify-end p-6 grid grid-cols-1 gap-4 md:grid-cols-2 items-end">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -50,6 +51,20 @@ export const HeaderAccount = ({ name, description, color }: Props) => {
             {name}
           </h1>
           <p className="text-lg text-gray-300 max-w-2xl mt-2">{description}</p>
+        </motion.div>
+        <motion.div
+          className="mt-8"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
+          <a href={ROUTE_PATHS.TRIVIA_SCRIPT.getHref()}>
+            <Button type="button" size="lg" className="group" style={{ backgroundColor: color, color: "white" }}>
+              <PlayCircle className="mr-2 h-5 w-5" />
+              Prueba tu conocimiento
+              <ArrowDown className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-1" />
+            </Button>
+          </a>
         </motion.div>
       </div>
     </motion.header>

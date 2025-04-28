@@ -1,10 +1,10 @@
 ---
 import { HeaderAccount } from "@/components/organisms/HeaderAccount/HeaderAccount";
-import { contentfulClient } from "@/lib/contentful";
-import type { IJson } from "@/shared/entities/IJson";
 import WorldPragmaLayout from "@/components/templates/WorldPragmaLayout.astro";
-import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
+import { contentfulClient } from "@/lib/contentful";
 import type { Account } from "@/shared/entities/account";
+import type { IJson } from "@/shared/entities/IJson";
+import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
 
 const entries = await contentfulClient.getEntries<IJson>({
   content_type: "json",
@@ -30,5 +30,10 @@ export function getStaticPaths() {
 >
   <main class="w-full max-w-7xl">
     <HeaderAccount client:load name={account.name} description={account.description} color={account.bannerColorHex} />
+    <!-- </header> -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div class="md:col-span-1 row-span-5"></div>
+      <div class="col-span-4 row-span-5"></div>
+    </div>
   </main>
 </WorldPragmaLayout>

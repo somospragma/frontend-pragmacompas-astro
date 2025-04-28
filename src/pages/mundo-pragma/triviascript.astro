@@ -1,0 +1,41 @@
+---
+import { HeaderTriviaScript } from "@/components/organisms/HeaderTriviaScript";
+import TriviaPage from "@/components/page/triviaPage";
+import WorldPragmaLayout from "@/components/templates/WorldPragmaLayout.astro";
+import { contentfulClient } from "@/lib/contentful";
+import type { FeedbackRecommendationsQuiz } from "@/shared/entities/FeedbackRecommendations";
+import type { IJson } from "@/shared/entities/IJson";
+import type { QuizQuestion } from "@/shared/entities/quizQuestions";
+
+const entries = await contentfulClient.getEntries<IJson>({
+  content_type: "json",
+});
+
+const questionsCollection = entries.items.filter((item) => item.fields.name === "questions")[0].fields
+  .json as unknown as QuizQuestion;
+
+const tipsCollection = entries.items.filter((item) => item.fields.name === "Tips")[0].fields
+  .json as unknown as FeedbackRecommendationsQuiz;
+---
+
+<WorldPragmaLayout
+  title={`triviascript  - Mundo Pragma`}
+  description={`Conoce como la cuenta triviascriptestá conformado`}
+>
+  <main class="w-full max-w-7xl">
+    <HeaderTriviaScript
+      name="Preguntas de Programación"
+      description="Pon a prueba tus conocimientos de desarrollo con nuestra colección de preguntas sobre JavaScript, React, y más."
+      color="#6366F1"
+      questionsCollection={questionsCollection}
+      tipsCollection={tipsCollection}
+      client:load
+    />
+
+    {
+      questionsCollection && tipsCollection && (
+        <TriviaPage questions={questionsCollection} tips={tipsCollection} client:load />
+      )
+    }
+  </main>
+</WorldPragmaLayout>
