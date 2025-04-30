@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { PuzzlePiece } from "./PuzzlePiece/PuzzlePiece";
 import type { Account } from "@/shared/entities/account";
+import { generateShapeForIndex } from "@/shared/utils/helpers/generate-piece-shape";
 
 interface Props {
   accounts: Account[];
@@ -17,13 +18,14 @@ export const PuzzleGrid = ({ accounts }: Props) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      {accounts.map((account) => (
+      {accounts.map((account, index) => (
         <PuzzlePiece
           key={account.id}
           account={account}
           isActive={activeId === account.id}
           onHover={() => setActiveId(account.id)}
           onLeave={() => setActiveId(null)}
+          shape={generateShapeForIndex(index, accounts.length)}
         />
       ))}
 
