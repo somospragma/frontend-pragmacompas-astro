@@ -6,6 +6,7 @@ import { contentfulClient } from "@/lib/contentful";
 import type { FeedbackRecommendationsQuiz } from "@/shared/entities/FeedbackRecommendations";
 import type { IJson } from "@/shared/entities/IJson";
 import type { QuizQuestion } from "@/shared/entities/quizQuestions";
+import { getSession } from "auth-astro/server";
 
 const entries = await contentfulClient.getEntries<IJson>({
   content_type: "json",
@@ -16,6 +17,8 @@ const questionsCollection = entries.items.filter((item) => item.fields.name === 
 
 const tipsCollection = entries.items.filter((item) => item.fields.name === "Tips")[0].fields
   .json as unknown as FeedbackRecommendationsQuiz;
+
+const session = await getSession(Astro.request);
 ---
 
 <WorldPragmaLayout
@@ -34,7 +37,7 @@ const tipsCollection = entries.items.filter((item) => item.fields.name === "Tips
 
     {
       questionsCollection && tipsCollection && (
-        <TriviaPage questions={questionsCollection} tips={tipsCollection} client:load />
+        <TriviaPage questions={questionsCollection} tips={tipsCollection} client:load session={session} />
       )
     }
   </main>
