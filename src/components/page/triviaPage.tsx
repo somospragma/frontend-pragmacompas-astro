@@ -2,8 +2,17 @@ import type { FeedbackRecommendationsQuiz } from "@/shared/entities/FeedbackReco
 import type { Question } from "@/shared/entities/questions";
 import type { QuizQuestion } from "@/shared/entities/quizQuestions";
 import TriviaModal from "../organisms/TriviaModal/TriviaModal";
+import type { Session } from "@auth/core/types";
 
-const TriviaPage = ({ questions, tips }: { questions: QuizQuestion; tips: FeedbackRecommendationsQuiz }) => {
+const TriviaPage = ({
+  questions,
+  tips,
+  session,
+}: {
+  questions: QuizQuestion;
+  tips: FeedbackRecommendationsQuiz;
+  session: Session | null;
+}) => {
   const getRandomInt = (max: number) => {
     return Math.floor(Math.random() * max);
   };
@@ -42,7 +51,7 @@ const TriviaPage = ({ questions, tips }: { questions: QuizQuestion; tips: Feedba
       {questions &&
         tips &&
         Object.entries(questions).map(([key, value]) => (
-          <TriviaModal user="Anderson Castaño" title={key} questions={mixQuestions(value)} tips={tips[key]} />
+          <TriviaModal user={session?.user?.name ?? ""} title={key} questions={mixQuestions(value)} tips={tips[key]} />
         ))}
     </div>
   );
