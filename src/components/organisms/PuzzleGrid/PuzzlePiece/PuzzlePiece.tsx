@@ -2,19 +2,23 @@ import type { Account } from "@/shared/entities/account";
 import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
 import { hexToRgba } from "@/shared/utils/helpers/hextToRgba";
 import { motion } from "framer-motion";
+import { Brain, Globe, User } from "lucide-react";
 
 interface Props {
   account: Account;
   isActive: boolean;
   onHover: () => void;
   onLeave: () => void;
+  shape: {
+    hasTopTab: boolean;
+    hasRightTab: boolean;
+    hasBottomTab: boolean;
+    hasLeftTab: boolean;
+  };
 }
 
-export const PuzzlePiece = ({ account, isActive, onHover, onLeave }: Props) => {
-  const hasTopTab = true;
-  const hasRightTab = true;
-  const hasBottomTab = false;
-  const hasLeftTab = false;
+export const PuzzlePiece = ({ account, isActive, onHover, onLeave, shape }: Props) => {
+  const { hasTopTab, hasBottomTab, hasLeftTab, hasRightTab } = shape;
 
   return (
     <a href={ROUTE_PATHS.WORLD_PRAGMA_ACCOUNT.getHref({ id: account.id })}>
@@ -72,7 +76,7 @@ export const PuzzlePiece = ({ account, isActive, onHover, onLeave }: Props) => {
           />
 
           <motion.div
-            className="z-10 text-center px-4"
+            className="z-10 text-center px-4 max-w-[200px]"
             variants={{
               initial: { y: 0, opacity: 1 },
               hover: { y: -5, opacity: 1, transition: { type: "spring", stiffness: 500, damping: 20 } },
@@ -87,6 +91,38 @@ export const PuzzlePiece = ({ account, isActive, onHover, onLeave }: Props) => {
             >
               {account.name}
             </motion.span>
+
+            <motion.ul
+              className="space-y-2 text-sm text-white list-none opacity-0 pointer-events-none "
+              variants={{
+                initial: {
+                  opacity: 0,
+                  marginTop: "0",
+                  pointerEvents: "none",
+                  height: "0px",
+                  overflow: "hidden",
+                },
+                hover: {
+                  opacity: 1,
+                  marginTop: "0.4rem",
+                  pointerEvents: "auto",
+                  transition: { delay: 0.1 },
+                  height: "auto",
+                },
+              }}
+            >
+              <li className="flex items-center justify-start gap-2 opacity-80">
+                <Brain className="w-4 h-4 min-w-4" />{" "}
+                <span className="text-start">IA tools: {account.iaTools.join(", ")}</span>
+              </li>
+              <li className="flex items-center justify-start  gap-2 opacity-80">
+                <User className="w-4 h-4 min-w-4" />{" "}
+                <span className="text-start">Fronteños: {account.totalFrontedsDevs}</span>
+              </li>
+              <li className="flex items-center justify-start  gap-2 opacity-80">
+                <Globe className="w-4 h-4 min-w-4" /> <span className="text-start">País: ???</span>
+              </li>
+            </motion.ul>
           </motion.div>
         </motion.div>
       </div>

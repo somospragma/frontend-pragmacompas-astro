@@ -29,7 +29,7 @@ export function getStaticPaths() {
   description={`Conoce como la cuenta ${account.name} está conformado`}
 >
   <main class="w-full max-w-7xl">
-    <HeaderAccount client:load name={account.name} description={account.description} color={account.bannerColorHex} />
+    <HeaderAccount client:load account={account} description={account.description} color={account.bannerColorHex} />
     <!-- </header> -->
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
       <div class="md:col-span-1 row-span-5"></div>
