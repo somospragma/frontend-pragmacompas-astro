@@ -1,11 +1,15 @@
 // @vitest-exclude
 import { useErrorStore } from "@/store/errorStore";
 import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
-import { getSecret } from "astro:env/server";
 import axios from "axios";
 
+const baseURL =
+  typeof window === "undefined"
+    ? (await import("astro:env/server")).getSecret("API_URL")
+    : import.meta.env.PUBLIC_API_URL;
+
 export const httpClient = axios.create({
-  baseURL: getSecret("API_URL"),
+  baseURL,
   timeout: 5000,
   headers: { "Content-Type": "application/json" },
 });
