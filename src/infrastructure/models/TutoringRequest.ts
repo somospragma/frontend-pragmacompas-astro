@@ -19,6 +19,11 @@ export interface User {
 export interface Skill {
   id: string;
   name: string;
+  categories: SkillCategory[];
+}
+
+export interface SkillCategory {
+  id: string;
 }
 
 export interface TutoringRequest {

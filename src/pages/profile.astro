@@ -1,0 +1,9 @@
+---
+import ProfileForm from "@/components/organisms/ProfileForm/ProfileForm";
+import MainLayout from "@/components/templates/MainLayout.astro";
+---
+
+<MainLayout showNotCreatedUser={true}>
+  <h1>Profile Page</h1>
+  <ProfileForm client:load />
+</MainLayout>

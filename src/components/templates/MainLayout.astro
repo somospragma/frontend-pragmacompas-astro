@@ -1,6 +1,7 @@
 ---
 import Footer from "@/components/organisms/Footer.astro";
 import Header from "@/components/organisms/Header.astro";
+import ProfileAlert from "@/components/organisms/ProfileAlert/ProfileAlert.tsx";
 import BaseLayout from "./BaseLayout.astro";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
   image?: string;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  showNotCreatedUser?: boolean;
 }
 
 const {
@@ -17,15 +19,16 @@ const {
   image = "https://astro.build/og/astro.jpg",
   hideHeader = false,
   hideFooter = false,
+  showNotCreatedUser,
 } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} image={image}>
   <style slot="head">
     .background {
-      background: #d3d8ed;
+      background: hsl(var(--background));
       opacity: 1;
-      background-image: radial-gradient(#cbccea 2px, #d3d8ed 2px);
+      background-image: radial-gradient(hsl(var(--muted)) 1px, transparent 1px);
       background-size: 40px 40px;
       width: 100%;
       height: auto;
@@ -36,6 +39,15 @@ const {
 
   <div class="flex items-center flex-col background min-h-screen w-full">
     {!hideHeader && <Header />}
+
+    {
+      showNotCreatedUser && (
+        <div class="w-full max-w-7xl px-4 pt-4">
+          <ProfileAlert client:load />
+        </div>
+      )
+    }
+
     <main class="w-full max-w-7xl">
       <slot />
       {!hideFooter && <Footer />}

@@ -6,6 +6,7 @@ export interface UpdateUserBody {
   firstName?: string;
   lastName?: string;
   chapterId?: string;
+  seniority?: string;
 }
 
 export async function updateUser(body: UpdateUserBody) {
