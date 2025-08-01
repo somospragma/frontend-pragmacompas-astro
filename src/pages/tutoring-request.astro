@@ -1,0 +1,12 @@
+---
+import MentorshipForm from "@/components/organisms/MentorshipForm/MentorshipForm";
+import MainLayout from "@/components/templates/MainLayout.astro";
+---
+
+<MainLayout>
+  <main class="flex flex-col items-center pt-8 pb-8 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <div class="w-full max-w-lg flex-1 flex items-start justify-center pt-16">
+      <MentorshipForm client:load />
+    </div>
+  </main>
+</MainLayout>
