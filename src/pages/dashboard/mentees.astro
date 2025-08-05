@@ -1,0 +1,41 @@
+---
+import DashboardLayout from "@/components/templates/DashboardLayout.astro";
+import MenteesGrid from "@/components/organisms/MenteesGrid/MenteesGrid";
+
+const mentees = [
+  {
+    id: 1,
+    name: "Juan Pérez",
+    level: "Junior Developer",
+    interests: ["React", "JavaScript", "CSS"],
+    joinDate: "2024-01-15",
+    progress: 75,
+    img: "/avatar_m.jpg",
+    status: "Activo",
+  },
+  {
+    id: 2,
+    name: "Sofia Martínez",
+    level: "Estudiante",
+    interests: ["Python", "Data Science", "Machine Learning"],
+    joinDate: "2024-02-20",
+    progress: 45,
+    img: "/avatar_m.jpg",
+    status: "En pausa",
+  },
+  {
+    id: 3,
+    name: "Diego Torres",
+    level: "Junior Developer",
+    interests: ["Node.js", "Express", "MongoDB"],
+    joinDate: "2024-03-10",
+    progress: 60,
+    img: "/avatar_m.jpg",
+    status: "Activo",
+  },
+];
+---
+
+<DashboardLayout>
+  <MenteesGrid client:load mentees={mentees} />
+</DashboardLayout>

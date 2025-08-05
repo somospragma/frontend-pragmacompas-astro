@@ -1,0 +1,44 @@
+---
+import DashboardLayout from "@/components/templates/DashboardLayout.astro";
+import MentoresGrid from "@/components/organisms/MentoresGrid/MentoresGrid";
+
+const mentores = [
+  {
+    id: 1,
+    name: "Ana García",
+    role: "Senior Frontend Developer",
+    skills: ["React", "TypeScript", "Next.js", "GraphQL"],
+    experience: "5+ años",
+    rating: 4.9,
+    sessions: 120,
+    img: "/avatar_m.jpg",
+    available: true,
+  },
+  {
+    id: 2,
+    name: "Carlos Rodríguez",
+    role: "Full Stack Developer",
+    skills: ["Node.js", "Python", "AWS", "Docker"],
+    experience: "7+ años",
+    rating: 4.8,
+    sessions: 95,
+    img: "/avatar_m.jpg",
+    available: false,
+  },
+  {
+    id: 3,
+    name: "María López",
+    role: "DevOps Engineer",
+    skills: ["Kubernetes", "CI/CD", "Terraform", "Azure"],
+    experience: "6+ años",
+    rating: 4.9,
+    sessions: 78,
+    img: "/avatar_m.jpg",
+    available: true,
+  },
+];
+---
+
+<DashboardLayout>
+  <MentoresGrid client:load mentores={mentores} />
+</DashboardLayout>

@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
-import { useStore } from "@nanostores/react";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
-import { Loader2, User, Mail } from "lucide-react";
-import { userStore, updateUserProfile } from "@/store/userStore";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { getBasicUserStatistics, type UserStatistics } from "@/infrastructure/services/getBasicUserStatistics";
 import { getChapters } from "@/infrastructure/services/getChapters";
 import { updateUser } from "@/infrastructure/services/updateUser";
-import { getBasicUserStatistics, type UserStatistics } from "@/infrastructure/services/getBasicUserStatistics";
+import { updateUserProfile, userStore } from "@/store/userStore";
+import { useStore } from "@nanostores/react";
+import { Loader2, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function ProfileForm() {
   const user = useStore(userStore);
@@ -28,7 +28,7 @@ export default function ProfileForm() {
   useEffect(() => {
     getChapters().then((res) => setChapters(res as { id: string; name: string }[]));
     console.log("Fetching statistics for user:", user.id);
-    getBasicUserStatistics(user.id)
+    getBasicUserStatistics(user?.id ?? "")
       .then((stats) => {
         console.log("Statistics received:", stats);
         setStatistics(stats);
