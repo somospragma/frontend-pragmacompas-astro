@@ -59,7 +59,7 @@ httpClient.interceptors.response.use(
       setError(message);
 
       if (error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-        window.location.href = ROUTE_PATHS.LOGIN;
+        window.location.href = ROUTE_PATHS.LOGIN.getHref();
       }
     } else {
       setError("Error de conexión con el servidor.");

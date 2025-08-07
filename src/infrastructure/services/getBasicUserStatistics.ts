@@ -5,6 +5,8 @@ export interface UserStatistics {
 }
 
 export async function getBasicUserStatistics(userId: string): Promise<UserStatistics> {
+  console.log("💩 ~ getBasicUserStatistics ~ userId:", userId);
+
   //TODO:  Simulate API call with mock data
   return new Promise((resolve) => {
     setTimeout(() => {

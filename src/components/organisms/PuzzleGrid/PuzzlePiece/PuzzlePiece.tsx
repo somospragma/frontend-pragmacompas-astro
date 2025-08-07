@@ -67,7 +67,13 @@ export const PuzzlePiece = ({ account, isActive, onHover, onLeave, shape }: Prop
           <motion.div
             className="absolute inset-0 z-0 opacity-30"
             style={{
-              backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, ${account.bannerColorHex}20 10px, ${account.bannerColorHex}20 20px)`,
+              backgroundImage: `repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                ${account.bannerColorHex}20 10px,
+                ${account.bannerColorHex}20 20px
+              )`,
             }}
             variants={{
               initial: { opacity: 0 },

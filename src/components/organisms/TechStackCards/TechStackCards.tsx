@@ -34,7 +34,11 @@ const TechStackCards: React.FC = () => {
       {technologies.map((tech, index) => (
         <div
           key={index}
-          className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700"
+          className="
+            bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg
+            hover:shadow-lg dark:hover:shadow-xl transition-all duration-300
+            border border-gray-200 dark:border-gray-700
+          "
         >
           <div className="p-6">
             <div className="flex items-center">

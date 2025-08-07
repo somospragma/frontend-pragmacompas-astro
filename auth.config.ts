@@ -9,4 +9,7 @@ export default defineConfig({
       clientSecret: AUTH_GOOGLE_SECRET,
     }),
   ],
+  pages: {
+    signIn: "/login",
+  },
 });

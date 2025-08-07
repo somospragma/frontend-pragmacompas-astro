@@ -7,7 +7,7 @@ export interface GetChaptersResponse {
   timestamp: string;
 }
 
-export async function getChapters() {
-  const { data } = await httpClient.get<GetChaptersResponse>("/api/v1/chapter");
-  return data;
+export async function getChapters(): Promise<Chapter[]> {
+  const { data } = await httpClient.get<GetChaptersResponse>("/api/chapter/");
+  return data.data;
 }

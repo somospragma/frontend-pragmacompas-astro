@@ -9,5 +9,5 @@ export interface GetSkillsResponse {
 
 export async function getSkills() {
   const { data } = await httpClient.get<GetSkillsResponse>("/api/v1/skills");
-  return data;
+  return data.data;
 }

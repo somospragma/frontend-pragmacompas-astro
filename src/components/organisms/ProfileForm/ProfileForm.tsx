@@ -26,7 +26,9 @@ export default function ProfileForm() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getChapters().then((res) => setChapters(res as { id: string; name: string }[]));
+    getChapters().then((res) => {
+      setChapters(res as { id: string; name: string }[]);
+    });
     console.log("Fetching statistics for user:", user.id);
     getBasicUserStatistics(user?.id ?? "")
       .then((stats) => {
