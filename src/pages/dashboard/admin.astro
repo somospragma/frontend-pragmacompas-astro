@@ -1,0 +1,21 @@
+---
+import { getSession } from "auth-astro/server";
+import Layout from "@/layouts/Layout.astro";
+import AdminDashboard from "@/components/page/AdminDashboard/AdminDashboard";
+
+const session = await getSession(Astro.request);
+
+// Redirect to login if not authenticated
+if (!session) {
+  return Astro.redirect("/login");
+}
+---
+
+<Layout title="Dashboard - Administrador">
+  <AdminDashboard
+    userName={session.user?.name ?? undefined}
+    googleUserId={session.user?.email ?? undefined}
+    chapterId="993ce7f5-f6ed-4bba-a999-8abb558886f5"
+    client:load
+  />
+</Layout>

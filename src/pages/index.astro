@@ -6,6 +6,7 @@ import { type Account } from "@/shared/entities/account";
 import type { IJson } from "@/shared/entities/IJson";
 import { type User } from "@/shared/entities/user";
 import { mapArrayToRecord } from "@/shared/utils/helpers/mapArrayToRecord";
+import { getSession } from "auth-astro/server";
 import "@/styles/global.css";
 
 const entries = await contentfulClient.getEntries<IJson>({
@@ -15,6 +16,12 @@ const entries = await contentfulClient.getEntries<IJson>({
 const users = entries.items.filter((item) => item.fields.name === "users")[0].fields.json as unknown as User[];
 const accounts = entries.items.filter((item) => item.fields.name === "accounts")[0].fields.json as unknown as Account[];
 const accountsRecord = mapArrayToRecord(accounts, "id");
+
+const session = await getSession(Astro.request);
+if (session?.user?.rol === "Administrador") {
+  return Astro.redirect("/dashboard/admin");
+}
+console.log("session", session);
 ---
 
 <MainLayout>

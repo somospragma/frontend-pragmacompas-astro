@@ -1,6 +1,5 @@
 // @vitest-exclude
 import { useErrorStore } from "@/store/errorStore";
-import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
 import axios from "axios";
 
 const baseURL =
@@ -11,7 +10,9 @@ const baseURL =
 export const httpClient = axios.create({
   baseURL,
   timeout: 5000,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 export enum HTTP_METHODS {
@@ -37,7 +38,22 @@ export enum HTTP_STATUS_CODES {
 
 // ✅ Interceptor for error handling
 httpClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    if (!config.headers?.Authorization && typeof window !== "undefined") {
+      try {
+        const sessionResponse = await fetch("/api/auth/session");
+        if (sessionResponse.ok) {
+          const session = await sessionResponse.json();
+
+          if (session?.user?.googleId) {
+            config.headers = config.headers || {};
+            config.headers.Authorization = session.user.googleId;
+          }
+        }
+      } catch (error) {
+        console.warn("No se pudo obtener la sesión:", error);
+      }
+    }
     return config;
   },
   (error) => {
@@ -59,7 +75,7 @@ httpClient.interceptors.response.use(
       setError(message);
 
       if (error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
-        window.location.href = ROUTE_PATHS.LOGIN.getHref();
+        // window.location.href = ROUTE_PATHS.LOGIN.getHref();
       }
     } else {
       setError("Error de conexión con el servidor.");

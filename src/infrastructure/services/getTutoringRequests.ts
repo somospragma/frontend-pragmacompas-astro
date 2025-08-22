@@ -14,6 +14,7 @@ export interface GetTutoringRequestsResponse {
 }
 
 export async function getTutoringRequests(params: GetTutoringRequestsParams) {
-  const { data } = await httpClient.get<GetTutoringRequestsResponse>("/api/v1/tutoring-requests", { params });
+  console.log("💩 ~ getTutoringRequests ~ params:", params);
+  const { data } = await httpClient.get<GetTutoringRequestsResponse>("/api/v1/tutoring-requests");
   return data;
 }
