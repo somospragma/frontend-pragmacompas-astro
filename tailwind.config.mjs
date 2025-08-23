@@ -15,7 +15,7 @@ export default {
         },
         lighthouse: {
           "0%": { opacity: "0" },
-          "50%": { opacity: "1" },  // Se ilumina
+          "50%": { opacity: "1" }, // Se ilumina
           "100%": { opacity: "0" }, // Desaparece
         },
       },
@@ -30,6 +30,10 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        table: {
+          DEFAULT: "hsl(var(--table))",
+          foreground: "hsl(var(--table-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -60,7 +64,7 @@ export default {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
           with: {
-            100: "#fff"
+            100: "#fff",
           },
           purple: {
             50: "#E7DDF8",
@@ -102,7 +106,7 @@ export default {
             900: "#150030",
           },
         },
-        tertiary:{
+        tertiary: {
           50: "#FDECD0",
           300: "#FACA7E",
           500: "#F8AF3C",
