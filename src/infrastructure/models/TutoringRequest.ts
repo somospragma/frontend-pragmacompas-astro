@@ -33,3 +33,20 @@ export interface TutoringRequest {
   needsDescription: string;
   requestStatus: TutoringRequestStatus;
 }
+
+export interface TutoringSession {
+  id: string;
+  tutor: User;
+  tutee: User;
+  skills: Skill[];
+  startDate: string;
+  expectedEndDate: string;
+  status: TutoringRequestStatus;
+  objectives: string;
+}
+
+export interface MyRequestsResponse {
+  requests: TutoringRequest[];
+  tutoringsAsTutor: TutoringSession[];
+  tutoringsAsTutee: TutoringSession[];
+}

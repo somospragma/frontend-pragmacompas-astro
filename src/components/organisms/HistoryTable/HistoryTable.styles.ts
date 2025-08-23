@@ -71,15 +71,18 @@ export const historyTableStyles = {
   },
   badge: {
     base: "font-medium px-3 py-1 rounded-full text-xs",
-    active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-foreground",
+    pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-foreground",
+    rejected: "bg-error-50 text-error-700 dark:bg-error-900 dark:text-foreground",
   },
 };
 
 export const getStatusBadgeClasses = (status: string): string => {
+  // TODO: Mejorar esto
   const statusClasses: Record<string, string> = {
-    ["Active"]: historyTableStyles.badge.active,
-    ["Pendiente reunión"]: historyTableStyles.badge.pending,
+    ["Enviada"]: historyTableStyles.badge.active,
+    ["Aprobada"]: historyTableStyles.badge.pending,
+    ["Rechazada"]: historyTableStyles.badge.rejected,
   };
   return statusClasses[status] || "";
 };
