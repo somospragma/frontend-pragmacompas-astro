@@ -52,6 +52,11 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
         console.warn("Button cell expected string value, got:", typeof value);
         return <span>Invalid value</span>;
       }
+
+      if (value === "") {
+        return null;
+      }
+
       return (
         <Button variant={getVariantButtonClasses(value)} size="sm" aria-label={`${value} ${row.participant}`}>
           {value}

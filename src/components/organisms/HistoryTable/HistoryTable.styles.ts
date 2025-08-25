@@ -1,3 +1,5 @@
+import { Status } from "@/shared/utils/enums/status";
+
 export interface MentorshipData {
   participant: string;
   role: string;
@@ -78,11 +80,10 @@ export const historyTableStyles = {
 };
 
 export const getStatusBadgeClasses = (status: string): string => {
-  // TODO: Mejorar esto
   const statusClasses: Record<string, string> = {
-    ["Enviada"]: historyTableStyles.badge.active,
-    ["Aprobada"]: historyTableStyles.badge.pending,
-    ["Rechazada"]: historyTableStyles.badge.rejected,
+    [Status.Enviada]: historyTableStyles.badge.active,
+    [Status.Aprobada]: historyTableStyles.badge.pending,
+    [Status.Rechazada]: historyTableStyles.badge.rejected,
   };
   return statusClasses[status] || "";
 };

@@ -1,23 +1,29 @@
 ---
 import MainLayout from "@/components/templates/MainLayout.astro";
-import HistoryTable from "@/components/organisms/HistoryTable/HistoryTable";
+import HistoryTablesContainer from "@/components/organisms/HistoryTablesContainer/HistoryTablesContainer";
 import { getSession } from "auth-astro/server";
 
 const session = await getSession(Astro.request);
+
+if (!session?.user) {
+  return Astro.redirect("/login");
+}
+
+const pageData = {
+  user: session.user,
+  title: "Mis mentorías",
+};
 ---
 
-<MainLayout>
-  <main class="w-full max-w-7xl pt-8 pb-8 px-4 sm:px-6 lg:px-8">
-    <section class="flex flex-col gap-6 w-full max-w-7xl">
-      <h1 class="text-3xl font-bold text-foreground">Mis mentorías</h1>
-      <div class="space-y-8">
-        <HistoryTable
-          client:load
-          user={session?.user}
-          title="Mentorías Activas"
-          emptyMessage="No tienes solicitudes ni tutorías activas"
-        />
-      </div>
+<MainLayout title={pageData.title}>
+  <main class="w-full max-w-7xl pt-8 pb-8 px-4 sm:px-6 lg:px-8 mx-auto">
+    <section class="flex flex-col gap-8 w-full">
+      <header>
+        <h1 class="text-3xl font-bold text-foreground">{pageData.title}</h1>
+        <p class="text-muted-foreground mt-2">Gestiona tus solicitudes de mentoría activas y revisa tu historial</p>
+      </header>
+
+      <HistoryTablesContainer client:load user={pageData.user} />
     </section>
   </main>
 </MainLayout>

@@ -3,18 +3,19 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { TableCellRenderer } from "../../atoms/Table/TableCellRenderer";
 import {
   historyTableStyles,
-  historyTableConfig,
   type MentorshipData,
+  type TableColumn,
 } from "../../organisms/HistoryTable/HistoryTable.styles";
 
 interface TableDataRowProps {
   row: MentorshipData;
   index: number;
+  columns?: TableColumn[];
 }
 
-export const TableDataRow: React.FC<TableDataRowProps> = ({ row, index }) => (
+export const TableDataRow: React.FC<TableDataRowProps> = ({ row, index, columns = [] }) => (
   <TableRow key={`${row.participant}-${index}`} className={historyTableStyles.body.row}>
-    {historyTableConfig.map((column) => {
+    {columns.map((column) => {
       const value = row[column.key];
 
       const getCellClassName = (): string => {

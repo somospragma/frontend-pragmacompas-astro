@@ -4,7 +4,14 @@ export interface Chapter {
 }
 
 export type UserRole = "Tutor" | "Tutorado" | "Administrador";
-export type TutoringRequestStatus = "Enviada" | "Aprobada" | "Asignada" | "Rechazada";
+export type TutoringRequestStatus =
+  | "Pendiente"
+  | "Enviada"
+  | "Aprobada"
+  | "Asignada"
+  | "Conversando"
+  | "Rechazada"
+  | "Finalizada";
 
 export interface User {
   id: string;

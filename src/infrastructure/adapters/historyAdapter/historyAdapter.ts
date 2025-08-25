@@ -1,3 +1,4 @@
+import { Status } from "@/shared/utils/enums/status";
 import type { MentorshipData } from "../../../components/organisms/HistoryTable/HistoryTable.styles";
 import type { MyRequestsResponse, TutoringRequest } from "../../models/TutoringRequest";
 
@@ -13,10 +14,22 @@ export function historyAdapter(apiData: MyRequestsResponse): MentorshipData[] {
         scheduledDate: "", // Para request no viene campo de fecha
         chapter: request.tutee.chapter.name,
         skills: request.skills.map((skill) => skill.name),
-        action: "Finalizar", // Generar acciones dependiendo del estado
+        action: getActionByStatus(request.requestStatus),
       });
     });
   }
 
   return tableData;
 }
+
+const getActionByStatus = (status: string): string => {
+  switch (status) {
+    case Status.Conversando:
+    case Status.Asignada:
+      return "Finalizar";
+    case Status.Aprobada:
+      return "Cancelar";
+    default:
+      return "";
+  }
+};
