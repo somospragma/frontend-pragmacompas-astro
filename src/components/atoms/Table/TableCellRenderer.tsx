@@ -1,14 +1,9 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  getStatusBadgeClasses,
-  getVariantButtonClasses,
-  historyTableStyles,
-  type MentorshipData,
-  type TableColumn,
-  type CellValue,
-} from "../../organisms/HistoryTable/HistoryTable.styles";
+import type { CellValue, MentorshipData, TableColumn } from "@/shared/config/historyTableConfig";
+import { historyTableStyles } from "@/components/organisms/HistoryTable/HistoryTable.styles";
+import { getStatusBadgeClasses, getVariantButtonClasses } from "@/shared/utils/helpers/tableCellStyles";
 
 interface TableCellRendererProps {
   value: CellValue;

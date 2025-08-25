@@ -1,11 +1,8 @@
 import React from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { TableCellRenderer } from "../../atoms/Table/TableCellRenderer";
-import {
-  historyTableStyles,
-  type MentorshipData,
-  type TableColumn,
-} from "../../organisms/HistoryTable/HistoryTable.styles";
+import { historyTableStyles } from "../../organisms/HistoryTable/HistoryTable.styles";
+import type { MentorshipData, TableColumn } from "@/shared/config/historyTableConfig";
 
 interface TableDataRowProps {
   row: MentorshipData;

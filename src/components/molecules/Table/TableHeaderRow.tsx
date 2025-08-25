@@ -1,6 +1,7 @@
 import React from "react";
 import { TableHead, TableRow } from "@/components/ui/table";
-import { historyTableStyles, type TableColumn } from "../../organisms/HistoryTable/HistoryTable.styles";
+import { historyTableStyles } from "../../organisms/HistoryTable/HistoryTable.styles";
+import type { TableColumn } from "@/shared/config/historyTableConfig";
 
 interface TableHeaderRowProps {
   columns?: TableColumn[];

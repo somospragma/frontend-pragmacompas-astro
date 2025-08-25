@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import DataTable from "@/components/organisms/DataTable/DataTable";
 import { getMyRequests } from "@/infrastructure/services/getMyRequests";
 import { historyAdapter } from "@/infrastructure/adapters/historyAdapter/historyAdapter";
-import { historyTableConfig, type MentorshipData, type TableColumn } from "./HistoryTable.styles";
 import type { User } from "@auth/core/types";
 import { useErrorStore } from "@/store/errorStore";
 import { Status } from "@/shared/utils/enums/status";
+import { historyTableConfig, type MentorshipData, type TableColumn } from "@/shared/config/historyTableConfig";
 
 interface Props {
   title: string;

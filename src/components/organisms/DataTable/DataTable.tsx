@@ -5,7 +5,7 @@ import { TableDataRow } from "@/components/molecules/Table/TableDataRow";
 import { TableEmptyState } from "@/components/atoms/Table/TableEmptyState";
 import { TableLoadingState } from "@/components/atoms/Table/TableLoadingState";
 import { historyTableStyles } from "../HistoryTable/HistoryTable.styles";
-import type { MentorshipData, TableColumn } from "../HistoryTable/HistoryTable.styles";
+import type { MentorshipData, TableColumn } from "@/shared/config/historyTableConfig";
 
 interface DataTableProps {
   title?: string;

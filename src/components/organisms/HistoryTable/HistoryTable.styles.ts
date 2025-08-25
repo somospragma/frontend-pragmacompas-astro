@@ -1,64 +1,3 @@
-import { Status } from "@/shared/utils/enums/status";
-
-export interface MentorshipData {
-  participant: string;
-  role: string;
-  status: string;
-  scheduledDate: string;
-  chapter: string;
-  skills: string[];
-  action: string;
-}
-
-export type CellValue = string | string[];
-
-export interface TableColumn {
-  key: keyof MentorshipData;
-  label: string;
-  className?: string;
-  cellType?: "text" | "badge" | "skills" | "button";
-}
-
-// Table configuration
-export const historyTableConfig: TableColumn[] = [
-  {
-    key: "participant",
-    label: "Participante",
-    className: "font-medium",
-    cellType: "text",
-  },
-  {
-    key: "role",
-    label: "Rol",
-    cellType: "text",
-  },
-  {
-    key: "status",
-    label: "Estado",
-    cellType: "badge",
-  },
-  {
-    key: "scheduledDate",
-    label: "Fecha Programada",
-    cellType: "text",
-  },
-  {
-    key: "chapter",
-    label: "Chapter",
-    cellType: "text",
-  },
-  {
-    key: "skills",
-    label: "Habilidades",
-    cellType: "skills",
-  },
-  {
-    key: "action",
-    label: "Acción",
-    cellType: "button",
-  },
-];
-
 export const historyTableStyles = {
   container: "bg-table rounded-xl border border-border overflow-hidden",
   header: {
@@ -77,22 +16,4 @@ export const historyTableStyles = {
     pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-foreground",
     rejected: "bg-error-50 text-error-700 dark:bg-error-900 dark:text-foreground",
   },
-};
-
-export const getStatusBadgeClasses = (status: string): string => {
-  const statusClasses: Record<string, string> = {
-    [Status.Enviada]: historyTableStyles.badge.active,
-    [Status.Aprobada]: historyTableStyles.badge.pending,
-    [Status.Rechazada]: historyTableStyles.badge.rejected,
-  };
-  return statusClasses[status] || "";
-};
-
-export const getVariantButtonClasses = (
-  action: string
-): "default" | "link" | "destructive" | "secondary" | "outline" | "ghost" => {
-  const actionClasses: Record<string, "default" | "link" | "destructive" | "secondary" | "outline" | "ghost"> = {
-    ["Cancelar"]: "destructive",
-  };
-  return actionClasses[action] || "default";
 };
