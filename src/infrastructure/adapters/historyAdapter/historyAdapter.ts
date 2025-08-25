@@ -4,7 +4,6 @@ import type { MyRequestsResponse, TutoringRequest } from "../../models/TutoringR
 export function historyAdapter(apiData: MyRequestsResponse): MentorshipData[] {
   const tableData: MentorshipData[] = [];
 
-  // Transform tutoring requests
   if (apiData.requests) {
     apiData.requests.forEach((request: TutoringRequest) => {
       tableData.push({

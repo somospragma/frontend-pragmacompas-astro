@@ -1,23 +1,9 @@
 ---
 import MainLayout from "@/components/templates/MainLayout.astro";
-import { getMyRequests } from "@/infrastructure/services/getMyRequests";
-import { historyAdapter } from "@/infrastructure/adapters/historyAdapter/historyAdapter";
 import HistoryTable from "@/components/organisms/HistoryTable/HistoryTable";
+import { getSession } from "auth-astro/server";
 
-const handleGetMyRequests = async () => {
-  try {
-    const { data } = await getMyRequests();
-    return historyAdapter(data);
-  } catch (error) {
-    console.error("Error fetching my requests:", error);
-    return [];
-  }
-};
-
-const data = await handleGetMyRequests();
-
-// Si llamo la data desde SSR no necesito el loading
-console.log("DATA SERVICE ---->", data);
+const session = await getSession(Astro.request);
 ---
 
 <MainLayout>
@@ -26,13 +12,12 @@ console.log("DATA SERVICE ---->", data);
       <h1 class="text-3xl font-bold text-foreground">Mis mentorías</h1>
       <div class="space-y-8">
         <HistoryTable
-          data={data}
+          client:load
+          user={session?.user}
           title="Mentorías Activas"
-          isLoading={false}
           emptyMessage="No tienes solicitudes ni tutorías activas"
         />
       </div>
     </section>
   </main>
 </MainLayout>
----

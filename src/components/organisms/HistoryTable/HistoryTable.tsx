@@ -1,141 +1,47 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  historyTableStyles,
-  historyTableConfig,
-  getStatusBadgeClasses,
-  getVariantButtonClasses,
-  type MentorshipData,
-  type TableColumn,
-  type CellValue,
-} from "./HistoryTable.styles";
+import React, { useState, useEffect } from "react";
+import { Table, TableBody, TableHeader } from "@/components/ui/table";
+import { TableHeaderRow } from "@/components/molecules/Table/TableHeaderRow";
+import { TableDataRow } from "@/components/molecules/Table/TableDataRow";
+import { TableEmptyState } from "@/components/atoms/Table/TableEmptyState";
+import { TableLoadingState } from "@/components/atoms/Table/TableLoadingState";
+import { getMyRequests } from "@/infrastructure/services/getMyRequests";
+import { historyAdapter } from "@/infrastructure/adapters/historyAdapter/historyAdapter";
+import { historyTableStyles, type MentorshipData } from "./HistoryTable.styles";
+import type { User } from "@auth/core/types";
+import { useErrorStore } from "@/store/errorStore";
 
 interface Props {
-  data: MentorshipData[];
-  title?: string;
-  isLoading?: boolean;
-  emptyMessage?: string;
+  title: string;
+  emptyMessage: string;
+  user?: User;
 }
 
-interface CellRendererProps {
-  value: CellValue;
-  column: TableColumn;
-  row: MentorshipData;
-}
+const HistoryTable: React.FC<Props> = ({ title, emptyMessage, user: userSession }) => {
+  const [data, setData] = useState<MentorshipData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { error, setError } = useErrorStore();
 
-const CellRenderer: React.FC<CellRendererProps> = ({ value, column, row }) => {
-  const baseClassName = column.className || "";
+  const fetchMyRequests = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getMyRequests();
+      const adaptedData = historyAdapter(response.data);
+      setData(adaptedData);
+    } catch (err) {
+      console.error(err);
+      setError("Error al cargar las mentorías");
+      setData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  switch (column.cellType) {
-    case "badge":
-      if (typeof value !== "string") {
-        console.warn("Badge cell expected string value, got:", typeof value);
-        return <span>Invalid value</span>;
-      }
-      return (
-        <Badge variant="outline" className={`${historyTableStyles.badge.base} ${getStatusBadgeClasses(value)}`}>
-          {value}
-        </Badge>
-      );
+  useEffect(() => {
+    fetchMyRequests();
+  }, [userSession]);
 
-    case "skills":
-      if (!Array.isArray(value)) {
-        console.warn("Skills cell expected array value, got:", typeof value);
-        return <span>Invalid value</span>;
-      }
-      return (
-        <div className="flex flex-col gap-1">
-          {value.map((skill, skillIndex) => (
-            <span key={skillIndex} className="text-foreground text-sm">
-              {skill}
-              {skillIndex < value.length - 1 && ","}
-            </span>
-          ))}
-        </div>
-      );
-
-    case "button":
-      if (typeof value !== "string") {
-        console.warn("Button cell expected string value, got:", typeof value);
-        return <span>Invalid value</span>;
-      }
-      return (
-        <Button variant={getVariantButtonClasses(value)} size="sm" aria-label={`${value} ${row.participant}`}>
-          {value}
-        </Button>
-      );
-
-    case "text":
-    default:
-      if (typeof value !== "string") {
-        console.warn("Text cell expected string value, got:", typeof value);
-        return <span>Invalid value</span>;
-      }
-      return <span className={baseClassName}>{value}</span>;
-  }
-};
-
-const TableHeaderRow: React.FC = () => (
-  <TableRow className={historyTableStyles.header.row}>
-    {historyTableConfig.map((column) => (
-      <TableHead key={column.key} className={historyTableStyles.header.cell} scope="col">
-        {column.label}
-      </TableHead>
-    ))}
-  </TableRow>
-);
-
-const TableDataRow: React.FC<{ row: MentorshipData; index: number }> = ({ row, index }) => (
-  <TableRow key={`${row.participant}-${index}`} className={historyTableStyles.body.row}>
-    {historyTableConfig.map((column) => {
-      const value = row[column.key];
-
-      const getCellClassName = (): string => {
-        if (column.cellType === "skills" || column.cellType === "button") {
-          return historyTableStyles.body.skillsCell;
-        }
-
-        if (column.cellType === "text" && column.className?.includes("font-medium")) {
-          return historyTableStyles.body.cellMedium;
-        }
-
-        return historyTableStyles.body.cell;
-      };
-
-      return (
-        <TableCell key={column.key} className={getCellClassName()}>
-          <CellRenderer value={value} column={column} row={row} />
-        </TableCell>
-      );
-    })}
-  </TableRow>
-);
-
-const EmptyState: React.FC<{ message: string }> = ({ message }) => (
-  <TableRow>
-    <TableCell colSpan={historyTableConfig.length} className="text-center py-8 text-muted-foreground">
-      {message}
-    </TableCell>
-  </TableRow>
-);
-
-const LoadingState: React.FC = () => (
-  <TableRow>
-    <TableCell colSpan={historyTableConfig.length} className="text-center py-8 text-muted-foreground">
-      Cargando...
-    </TableCell>
-  </TableRow>
-);
-
-const HistoryTable: React.FC<Props> = ({
-  data,
-  title,
-  isLoading = false,
-  emptyMessage = "No hay mentorías disponibles",
-}) => {
-  const shouldShowEmpty = !isLoading && data.length === 0;
+  const shouldShowError = !isLoading && error;
+  const shouldShowEmpty = !isLoading && data.length === 0 && !error;
   const shouldShowData = !isLoading && data.length > 0;
 
   return (
@@ -149,8 +55,9 @@ const HistoryTable: React.FC<Props> = ({
               <TableHeaderRow />
             </TableHeader>
             <TableBody>
-              {isLoading && <LoadingState />}
-              {shouldShowEmpty && <EmptyState message={emptyMessage} />}
+              {isLoading && <TableLoadingState />}
+              {shouldShowEmpty && <TableEmptyState message={emptyMessage} />}
+              {shouldShowError && <TableEmptyState message={"Error al cargar los datos"} />}
               {shouldShowData &&
                 data.map((row, index) => <TableDataRow key={`${row.participant}-${index}`} row={row} index={index} />)}
             </TableBody>
