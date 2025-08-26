@@ -35,9 +35,9 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
 
   const menuItems = [
     { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
-    { icon: Users, label: "Mentores", href: "/dashboard/mentores", badge: "12" },
-    { icon: UsersRound, label: "Mentees", href: "/dashboard/mentees", badge: "3" },
-    { icon: MessageSquare, label: "Request", href: "/dashboard/requests", badge: "5" },
+    { icon: Users, label: "Mentores", href: "/dashboard/mentores", badge: null },
+    { icon: UsersRound, label: "Mentees", href: "/dashboard/mentees", badge: null },
+    { icon: MessageSquare, label: "Request", href: "/dashboard/requests", badge: null },
   ];
 
   const isActive = (href: string) => {
@@ -176,7 +176,7 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
             href="/dashboard/profile"
             className={`
               flex items-center w-full px-3 py-2 rounded-lg transition-colors duration-200
-              ${isCollapsed ? "justify-center" : "justify-start"}f
+              ${isCollapsed ? "justify-center" : "justify-start"}
               ${
                 isActive("/dashboard/profile")
                   ? "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"

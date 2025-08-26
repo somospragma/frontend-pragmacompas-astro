@@ -7,13 +7,15 @@ export type UserRole = "Tutor" | "Tutorado" | "Administrador";
 export type TutoringRequestStatus = "Enviada" | "Aprobada" | "Asignada" | "Rechazada";
 
 export interface User {
-  id: string;
+  id?: string;
   firstName: string;
   lastName: string;
   email: string;
-  chapter: Chapter;
-  rol: UserRole;
-  activeTutoringLimit: number;
+  googleUserId: string;
+  chapterId?: string;
+  rol?: UserRole;
+  activeTutoringLimit?: number;
+  seniority?: string;
 }
 
 export interface Skill {

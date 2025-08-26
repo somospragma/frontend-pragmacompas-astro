@@ -1,28 +1,27 @@
+import type { SessionUser } from "auth.config";
 import { atom } from "nanostores";
 
-export interface UserState {
-  id: string | null;
-  name: string | null;
-  email: string | null;
-  avatar: string | null;
-  chapterId: string | null;
-  seniority: string | null;
-  isLoggedIn: boolean;
-}
+type User = SessionUser["user"] & { isLoggedIn: boolean; id?: string };
 
-const initialState: UserState = {
-  id: null,
-  name: null,
-  email: null,
-  avatar: null,
-  chapterId: null,
-  seniority: null,
+const initialState: User = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  image: "",
+  chapterId: "",
+  seniority: "",
+  rol: "",
+  googleId: "",
+  userId: "",
+  googleClientId: "",
+  accessToken: "",
   isLoggedIn: false,
+  id: "",
 };
 
-export const userStore = atom<UserState>(initialState);
+export const userStore = atom<User>(initialState);
 
-export const setUser = (userData: Partial<UserState>) => {
+export const setUser = (userData: Partial<User>) => {
   userStore.set({
     ...userStore.get(),
     ...userData,
@@ -34,7 +33,7 @@ export const clearUser = () => {
   userStore.set(initialState);
 };
 
-export const updateUserProfile = (profileData: Partial<UserState>) => {
+export const updateUserProfile = (profileData: Partial<User>) => {
   userStore.set({
     ...userStore.get(),
     ...profileData,

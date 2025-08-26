@@ -1,8 +1,12 @@
 ---
 import ProfileForm from "@/components/organisms/ProfileForm/ProfileForm";
 import DashboardLayout from "@/components/templates/DashboardLayout.astro";
+import { getSession } from "auth-astro/server";
+import type { SessionUser } from "auth.config";
+
+const session = (await getSession(Astro.request)) as SessionUser;
 ---
 
 <DashboardLayout>
-  <ProfileForm client:load />
+  <ProfileForm client:load session={session} />
 </DashboardLayout>
