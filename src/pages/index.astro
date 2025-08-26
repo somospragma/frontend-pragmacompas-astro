@@ -36,10 +36,9 @@ if (session?.user?.rol === "") {
 if (session?.user?.rol === "Tutor") {
   return Astro.redirect("/requests");
 }
-// if (session?.user?.rol === "Administrador") {
-//   return Astro.redirect("/dashboard");
-// }
-console.log("session", session);
+if (session?.user?.rol === "Administrador") {
+  return Astro.redirect("/dashboard");
+}
 ---
 
 <MainLayout>

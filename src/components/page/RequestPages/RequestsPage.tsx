@@ -2,8 +2,30 @@ import React, { useState, useEffect } from "react";
 import { getTutoringRequests, type GetTutoringRequestsParams } from "@/infrastructure/services/getTutoringRequests";
 import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
 import type { SessionUser } from "auth.config";
+import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
 
 // Types
+interface MentorshipRequest {
+  id: string;
+  tutee: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    chapter: {
+      id: string;
+      name: string;
+    };
+    rol: string;
+  };
+  skills: {
+    id: string;
+    name: string;
+  }[];
+  needsDescription: string;
+  requestStatus: string;
+}
+
 interface RequestWithMappedStatus {
   id: string;
   status: "pending" | "approved" | "assigned" | "rejected";
@@ -36,25 +58,11 @@ const reverseStatusMapping = {
   pending: "Enviada" as const,
   approved: "Aprobada" as const,
   assigned: "Asignada" as const,
-  rejected: "Rechazada" as const,
-};
-
-const statusColors = {
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  approved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  assigned: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-};
-
-const statusLabels = {
-  pending: "Pendiente",
-  approved: "Aprobada",
-  assigned: "Asignada",
-  rejected: "Rechazada",
+  rejected: "Finalizada" as const,
 };
 
 export default function RequestsPage({ session }: { session: SessionUser }) {
-  const [allRequests, setAllRequests] = useState<RequestWithMappedStatus[]>([]);
+  const [mentorshipRequests, setMentorshipRequests] = useState<MentorshipRequest[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [counts, setCounts] = useState<TabCounts>({
@@ -83,6 +91,29 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
       }
 
       const response = await getTutoringRequests(params);
+
+      // Map TutoringRequest data to MentorshipRequest format
+      const mappedMentorshipRequests: MentorshipRequest[] = response.data.map((request: TutoringRequest) => ({
+        id: request.id,
+        tutee: {
+          id: request.tutee.id || "",
+          firstName: request.tutee.firstName,
+          lastName: request.tutee.lastName,
+          email: request.tutee.email,
+          chapter: {
+            id: request.tutee.chapterId || "",
+            name: "Chapter", // You may need to fetch this from another source
+          },
+          rol: request.tutee.rol || "Tutorado",
+        },
+        skills: request.skills,
+        needsDescription: request.needsDescription,
+        requestStatus: request.requestStatus,
+      }));
+
+      setMentorshipRequests(mappedMentorshipRequests);
+
+      // Keep mapped data for stats
       const mappedRequests = response.data.map((request: TutoringRequest) => ({
         ...request,
         status:
@@ -94,11 +125,10 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
         date: new Date().toLocaleDateString(), // You may want to add actual date from API
       })) as RequestWithMappedStatus[];
 
-      setAllRequests(mappedRequests);
       return mappedRequests;
     } catch (error) {
       console.error("Error loading requests:", error);
-      setAllRequests([]);
+      setMentorshipRequests([]);
       return [];
     } finally {
       setIsLoading(false);
@@ -132,85 +162,6 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
     };
     init();
   }, []);
-
-  // Loading state component
-  const LoadingState = () => (
-    <tr>
-      <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-lg font-medium text-gray-900 dark:text-white">Cargando solicitudes...</p>
-        </div>
-      </td>
-    </tr>
-  );
-
-  // Empty state component
-  const EmptyState = () => (
-    <tr>
-      <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-        <div className="flex flex-col items-center">
-          <svg
-            className="w-12 h-12 text-gray-300 dark:text-gray-600 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            ></path>
-          </svg>
-          <p className="text-lg font-medium text-gray-900 dark:text-white">No hay solicitudes</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Las solicitudes de mentoría aparecerán aquí</p>
-        </div>
-      </td>
-    </tr>
-  );
-
-  // Request row component
-  const RequestRow = ({ request }: { request: RequestWithMappedStatus }) => (
-    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-medium text-gray-900 dark:text-white">{request.mentee}</div>
-      </td>
-      <td className="px-6 py-4">
-        <div className="flex flex-wrap gap-1">
-          {request.skills?.map((skill: string, index: number) => (
-            <span
-              key={index}
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-      </td>
-      <td className="px-6 py-4">
-        <div className="text-sm text-gray-900 dark:text-white">{request.description}</div>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{request.date}</td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[request.status]}`}
-        >
-          {statusLabels[request.status]}
-        </span>
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{request.mentor || "-"}</td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
-          Ver
-        </button>
-        <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 mr-3">
-          Asignar
-        </button>
-        <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Rechazar</button>
-      </td>
-    </tr>
-  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -296,10 +247,9 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
             <nav className="-mb-px flex space-x-8">
               {[
                 { key: "all", label: "Todas", count: counts.all },
-                { key: "pending", label: "Pendientes", count: counts.pending },
                 { key: "approved", label: "Aprobadas", count: counts.approved },
                 { key: "assigned", label: "Asignadas", count: counts.assigned },
-                { key: "rejected", label: "Finalizadas/Rechazadas", count: counts.rejected },
+                { key: "rejected", label: "Finalizadas", count: counts.rejected },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -320,65 +270,16 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="mb-6 flex flex-wrap gap-4">
-          <button
-            onClick={() => handleTabClick(activeFilter)}
-            className="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
-          >
-            🔄 Actualizar
-          </button>
-          <button className="bg-green-600 dark:bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors">
-            📊 Exportar Reporte
-          </button>
-          <button className="bg-purple-600 dark:bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors">
-            📧 Notificar Mentores
-          </button>
-        </div>
-
-        {/* Requests Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Solicitudes de Mentoría</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Mentee
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Habilidades
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Descripción
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Fecha
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Mentor
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {isLoading ? (
-                  <LoadingState />
-                ) : allRequests.length === 0 ? (
-                  <EmptyState />
-                ) : (
-                  allRequests.map((request, index) => <RequestRow key={request.id || index} request={request} />)
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Mentorship Table */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          {isLoading ? (
+            <div className="flex flex-col items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+              <p className="text-lg font-medium text-gray-900 dark:text-white">Cargando solicitudes...</p>
+            </div>
+          ) : (
+            <MentorshipTable mentorshipRequests={mentorshipRequests} title="Solicitudes de Mentoría" />
+          )}
         </div>
       </div>
     </div>

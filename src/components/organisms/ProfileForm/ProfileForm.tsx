@@ -31,10 +31,9 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
     getChapters().then((res) => {
       setChapters(res as { id: string; name: string }[]);
     });
-    console.log("Fetching statistics for user:", user.id);
+
     getBasicUserStatistics(user?.id ?? "")
       .then((stats) => {
-        console.log("Statistics received:", stats);
         setStatistics(stats);
       })
       .catch((error) => {

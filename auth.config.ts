@@ -31,7 +31,6 @@ export default defineConfig({
   },
   callbacks: {
     async jwt({ token, account, profile }) {
-      console.log("token", profile);
       // Capturar información adicional de Google durante el login
       if (account && profile) {
         token.googleId = profile.sub ?? undefined; // Google User ID

@@ -4,7 +4,7 @@ import type { TutoringRequest } from "../models/TutoringRequest";
 export interface GetTutoringRequestsParams {
   tuteeId?: string;
   skillId?: string;
-  status?: "Enviada" | "Aprobada" | "Asignada" | "Rechazada";
+  status?: "Enviada" | "Aprobada" | "Asignada" | "Finalizada";
   chapterId?: string;
 }
 
@@ -15,8 +15,6 @@ export interface GetTutoringRequestsResponse {
 }
 
 export async function getTutoringRequests(params: GetTutoringRequestsParams) {
-  console.log("💩 ~ getTutoringRequests ~ params:", params);
-
   // Build query parameters dynamically
   const queryParams = new URLSearchParams();
 
