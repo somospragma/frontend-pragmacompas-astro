@@ -7,10 +7,11 @@ interface TableDataRowProps {
   row: MentorshipData;
   index: number;
   columns?: TableColumn[];
+  onActionClick?: (action: string, mentorship: MentorshipData) => void;
 }
 
-export const TableDataRow: React.FC<TableDataRowProps> = ({ row, index, columns = [] }) => (
-  <TableRow key={`${row.participant}-${index}`} className="border-border hover:bg-accent transition-colors">
+export const TableDataRow: React.FC<TableDataRowProps> = ({ row, index, columns = [], onActionClick }) => (
+  <TableRow key={`${row.id}-${index}`} className="border-border hover:bg-accent transition-colors">
     {columns.map((column) => {
       const value = row[column.key];
 
@@ -28,7 +29,7 @@ export const TableDataRow: React.FC<TableDataRowProps> = ({ row, index, columns 
 
       return (
         <TableCell key={column.key} className={getCellClassName()}>
-          <TableCellRenderer value={value} column={column} row={row} />
+          <TableCellRenderer value={value} column={column} row={row} onActionClick={onActionClick} />
         </TableCell>
       );
     })}

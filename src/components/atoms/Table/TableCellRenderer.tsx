@@ -8,9 +8,10 @@ interface TableCellRendererProps {
   value: CellValue;
   column: TableColumn;
   row: MentorshipData;
+  onActionClick?: (action: string, mentorship: MentorshipData) => void;
 }
 
-export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, column }) => {
+export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, column, row, onActionClick }) => {
   const baseClassName = column.className || "";
 
   switch (column.cellType) {
@@ -55,7 +56,12 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
       }
 
       return (
-        <Button variant={getVariantButtonClasses(value)} size="sm" aria-label={`${value}`}>
+        <Button
+          variant={getVariantButtonClasses(value)}
+          size="sm"
+          aria-label={`${value}`}
+          onClick={() => onActionClick?.(value, row)}
+        >
           {value}
         </Button>
       );

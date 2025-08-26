@@ -1,39 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { getMyRequests } from "@/infrastructure/services/getMyRequests";
-import { historyAdapter } from "@/infrastructure/adapters/historyAdapter/historyAdapter";
-import { useErrorStore } from "@/store/errorStore";
+import React from "react";
 import type { User } from "@auth/core/types";
 import { HISTORY_TABLE_CONFIG, type MentorshipData } from "@/shared/config/historyTableConfig";
 import DataTable from "../DataTable/DataTable";
 import { HISTORY_PAGE_CONFIG } from "@/shared/config/historyPageConfig";
+import FeedbackModal from "../FeedbackModal/FeedbackModal";
+import { useHistoryTables } from "@/shared/hooks/useHistoryTables";
+import { useModalState } from "@/shared/hooks/useModalState";
 
-interface HistoryTablesContainerProps {
+interface HistoryTablesProps {
   user?: User;
 }
 
-const HistoryTablesContainer: React.FC<HistoryTablesContainerProps> = ({ user }) => {
-  const [data, setData] = useState<MentorshipData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { setError } = useErrorStore();
+const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
+  const { data, isLoading } = useHistoryTables(user);
+  const { isOpen, selectedItem, openModal, closeModal } = useModalState<MentorshipData>();
 
-  const fetchMyRequests = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getMyRequests();
-      const adaptedData = historyAdapter(response.data);
-      setData(adaptedData);
-    } catch (err) {
-      console.error(err);
-      setError("Error al cargar las mentorías");
-      setData([]);
-    } finally {
-      setIsLoading(false);
+  const handleActionClick = (action: string, mentorship: MentorshipData) => {
+    if (action === "Cancelar") {
+      openModal(mentorship);
     }
   };
-
-  useEffect(() => {
-    fetchMyRequests();
-  }, [user]);
 
   return (
     <div className="flex flex-col gap-12">
@@ -52,11 +38,25 @@ const HistoryTablesContainer: React.FC<HistoryTablesContainerProps> = ({ user })
             data={filteredData}
             emptyMessage={config.emptyMessage}
             loading={isLoading}
+            onActionClick={handleActionClick}
           />
         );
       })}
+
+      {selectedItem && (
+        <FeedbackModal
+          isOpen={isOpen}
+          onClose={closeModal}
+          mentorship={{
+            participant: selectedItem.tutee,
+            role: selectedItem.role,
+            chapter: selectedItem.chapter,
+            skills: selectedItem.skills,
+          }}
+        />
+      )}
     </div>
   );
 };
 
-export default HistoryTablesContainer;
+export default HistoryTables;

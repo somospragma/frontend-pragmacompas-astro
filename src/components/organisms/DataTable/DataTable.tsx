@@ -13,6 +13,7 @@ interface DataTableProps {
   emptyMessage?: string;
   loading?: boolean;
   className?: string;
+  onActionClick?: (action: string, mentorship: MentorshipData) => void;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -22,6 +23,7 @@ const DataTable: React.FC<DataTableProps> = ({
   emptyMessage = "No hay datos disponibles",
   loading = false,
   className = "",
+  onActionClick,
 }) => {
   const shouldShowEmpty = !loading && data.length === 0;
   const shouldShowData = !loading && data.length > 0;
@@ -41,7 +43,13 @@ const DataTable: React.FC<DataTableProps> = ({
               {shouldShowEmpty && <TableEmptyState message={emptyMessage} />}
               {shouldShowData &&
                 data.map((row, index) => (
-                  <TableDataRow key={`${row.participant}-${index}`} row={row} index={index} columns={columns} />
+                  <TableDataRow
+                    key={`${row.id}-${index}`}
+                    row={row}
+                    index={index}
+                    columns={columns}
+                    onActionClick={onActionClick}
+                  />
                 ))}
             </TableBody>
           </Table>
