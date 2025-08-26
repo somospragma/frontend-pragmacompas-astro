@@ -6,6 +6,7 @@ import FeedbackModal from "../FeedbackModal/FeedbackModal";
 import { useHistoryTables } from "@/shared/hooks/useHistoryTables";
 import { useModalState } from "@/shared/hooks/useModalState";
 import type { UserRole } from "@/infrastructure/models/TutoringRequest";
+import { createFeedback, type CreateFeedbackBody } from "@/infrastructure/services/createFeedback";
 
 interface HistoryTablesProps {
   role?: UserRole;
@@ -33,6 +34,28 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
     }
   };
 
+  const handleSubmitFeedback = async (score: number, comments: string) => {
+    // if (!selectedItem || !user.id) {
+    //   console.error("Missing selectedItem or user ID");
+    //   return;
+    // }
+
+    try {
+      const feedbackData: CreateFeedbackBody = {
+        tutoringId: "1a39382d-21b6-432f-93cc-a630e416311b",
+        score: score.toString(),
+        comments,
+        evaluatorId: "tutor-1",
+      };
+
+      await createFeedback(feedbackData);
+      console.log("Feedback submitted successfully");
+      closeModal();
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-12">
       {Object.entries(HISTORY_PAGE_CONFIG).map(([key, config]) => {
@@ -55,7 +78,14 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
         );
       })}
 
-      {feedbackModalData && <FeedbackModal isOpen={isOpen} onClose={closeModal} mentorship={feedbackModalData} />}
+      {feedbackModalData && (
+        <FeedbackModal
+          isOpen={isOpen}
+          onClose={closeModal}
+          mentorship={feedbackModalData}
+          onSubmitFeedback={handleSubmitFeedback}
+        />
+      )}
     </div>
   );
 };

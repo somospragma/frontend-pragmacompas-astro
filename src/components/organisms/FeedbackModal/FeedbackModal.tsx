@@ -20,17 +20,32 @@ interface FeedbackModalProps {
     role: string;
     skills: string[];
   };
+  onSubmitFeedback: (score: number, comments: string) => Promise<void>;
 }
 
-const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, mentorship }: FeedbackModalProps) => {
+const FeedbackModal: React.FC<FeedbackModalProps> = ({
+  isOpen,
+  onClose,
+  mentorship,
+  onSubmitFeedback,
+}: FeedbackModalProps) => {
   const [score, setScore] = useState(0);
   const [comment, setComment] = useState("");
   const [hoveredStar, setHoveredStar] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    // Handle evaluation submission
-    console.log("[v0] Evaluation submitted:", { score, comment });
-    onClose();
+  const handleSubmit = async () => {
+    if (score === 0) return;
+    setIsSubmitting(true);
+    try {
+      await onSubmitFeedback(score, comment);
+      setScore(0);
+      setComment("");
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -107,10 +122,10 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, mentorsh
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={score === 0}
+            disabled={score === 0 || isSubmitting}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Enviar Evaluación
+            {isSubmitting ? "Enviando..." : "Enviar Evaluación"}
           </Button>
         </DialogFooter>
       </DialogContent>
