@@ -2,7 +2,6 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CellValue, MentorshipData, TableColumn } from "@/shared/config/historyTableConfig";
-import { historyTableStyles } from "@/components/organisms/HistoryTable/HistoryTable.styles";
 import { getStatusBadgeClasses, getVariantButtonClasses } from "@/shared/utils/helpers/tableCellStyles";
 
 interface TableCellRendererProps {
@@ -21,7 +20,10 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
         return <span>Invalid value</span>;
       }
       return (
-        <Badge variant="outline" className={`${historyTableStyles.badge.base} ${getStatusBadgeClasses(value)}`}>
+        <Badge
+          variant="outline"
+          className={`font-medium px-3 py-1 rounded-full text-xs ${getStatusBadgeClasses(value)}`}
+        >
           {value}
         </Badge>
       );

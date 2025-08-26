@@ -1,6 +1,5 @@
 import React from "react";
 import { TableHead, TableRow } from "@/components/ui/table";
-import { historyTableStyles } from "../../organisms/HistoryTable/HistoryTable.styles";
 import type { TableColumn } from "@/shared/config/historyTableConfig";
 
 interface TableHeaderRowProps {
@@ -8,9 +7,13 @@ interface TableHeaderRowProps {
 }
 
 export const TableHeaderRow: React.FC<TableHeaderRowProps> = ({ columns }) => (
-  <TableRow className={historyTableStyles.header.row}>
+  <TableRow className="border-border bg-primary/10">
     {columns?.map((column) => (
-      <TableHead key={column.key} className={`${historyTableStyles.header.cell} ${column.className || ""}`} scope="col">
+      <TableHead
+        key={column.key}
+        className={`text-foreground font-semibold py-4 px-6 ${column.className || ""}`}
+        scope="col"
+      >
         {column.label}
       </TableHead>
     ))}

@@ -4,7 +4,6 @@ import { TableHeaderRow } from "@/components/molecules/Table/TableHeaderRow";
 import { TableDataRow } from "@/components/molecules/Table/TableDataRow";
 import { TableEmptyState } from "@/components/atoms/Table/TableEmptyState";
 import { TableLoadingState } from "@/components/atoms/Table/TableLoadingState";
-import { historyTableStyles } from "../HistoryTable/HistoryTable.styles";
 import type { MentorshipData, TableColumn } from "@/shared/config/historyTableConfig";
 
 interface DataTableProps {
@@ -31,7 +30,7 @@ const DataTable: React.FC<DataTableProps> = ({
     <div className={`space-y-4 ${className}`}>
       {title && <h2 className="text-xl font-semibold text-foreground">{title}</h2>}
 
-      <div className={historyTableStyles.container}>
+      <div className="bg-table rounded-xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
