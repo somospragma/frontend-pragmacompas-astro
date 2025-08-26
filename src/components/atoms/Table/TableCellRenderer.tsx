@@ -10,7 +10,7 @@ interface TableCellRendererProps {
   row: MentorshipData;
 }
 
-export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, column, row }) => {
+export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, column }) => {
   const baseClassName = column.className || "";
 
   switch (column.cellType) {
@@ -55,7 +55,7 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
       }
 
       return (
-        <Button variant={getVariantButtonClasses(value)} size="sm" aria-label={`${value} ${row.participant}`}>
+        <Button variant={getVariantButtonClasses(value)} size="sm" aria-label={`${value}`}>
           {value}
         </Button>
       );

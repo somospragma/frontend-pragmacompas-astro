@@ -15,7 +15,7 @@ export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
       tutor: "Por asignar",
       chapter: request.tutee.chapter.name,
       skills: request.skills.map((skill) => skill.name),
-      status: "Pendiente",
+      status: request.requestStatus,
       startDate: "",
       action: "Cancelar",
     });
@@ -69,12 +69,10 @@ const getActionByStatus = (status: string, userRole: UserRole): string => {
 
   // Los tutorados tienen acciones limitadas
   if (userRole === "Tutorado") {
-    switch (status) {
-      case Status.Pendiente:
-        return "Cancelar";
-      default:
-        return "";
+    if (status === Status.Pendiente) {
+      return "Cancelar";
     }
+    return "";
   }
 
   return "";

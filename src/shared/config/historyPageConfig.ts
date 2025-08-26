@@ -12,7 +12,7 @@ export const HISTORY_PAGE_CONFIG = {
     title: "Mentorías activas",
     emptyMessage: "No tienes mentorías activas en este momento",
     showActions: true,
-    status: [Status.Activa],
+    status: [Status.Activa, Status.Pendiente],
   },
   completed: {
     title: "Mentorías completadas",
