@@ -1,6 +1,6 @@
 import { Status } from "@/shared/utils/enums/status";
-import type { MentorshipData } from "../../../components/organisms/HistoryTable/HistoryTable.styles";
 import type { MyRequestsResponse, TutoringRequest } from "../../models/TutoringRequest";
+import type { MentorshipData } from "@/shared/config/historyTableConfig";
 
 export function historyAdapter(apiData: MyRequestsResponse): MentorshipData[] {
   const tableData: MentorshipData[] = [];
@@ -26,6 +26,7 @@ const getActionByStatus = (status: string): string => {
   switch (status) {
     case Status.Conversando:
     case Status.Asignada:
+    case Status.Enviada:
       return "Finalizar";
     case Status.Aprobada:
       return "Cancelar";

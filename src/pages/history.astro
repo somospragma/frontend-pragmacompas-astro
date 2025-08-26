@@ -1,6 +1,6 @@
 ---
 import MainLayout from "@/components/templates/MainLayout.astro";
-import HistoryTablesContainer from "@/components/organisms/HistoryTablesContainer/HistoryTablesContainer";
+import HistoryTables from "@/components/organisms/HistoryTables/HistoryTables";
 import { getSession } from "auth-astro/server";
 
 const session = await getSession(Astro.request);
@@ -10,7 +10,7 @@ if (!session?.user) {
 }
 
 const pageData = {
-  user: session.user,
+  user: { ...session.user, role: "Tutor" },
   title: "Mis mentorías",
 };
 ---
@@ -23,7 +23,7 @@ const pageData = {
         <p class="text-muted-foreground mt-2">Gestiona tus solicitudes de mentoría activas y revisa tu historial</p>
       </header>
 
-      <HistoryTablesContainer client:load user={pageData.user} />
+      <HistoryTables client:load user={pageData.user} />
     </section>
   </main>
 </MainLayout>

@@ -10,6 +10,6 @@ export interface GetMyRequests {
 
 export async function getMyRequests(): Promise<GetMyRequests> {
   const { data } = await httpClient.get<GetMyRequests>("/api/v1/tutoring-requests/my-requests");
-  console.log("API Response:", data); // Log the actual API response
+  return data;
   return Promise.resolve(mockGetMyRequestsResponse);
 }

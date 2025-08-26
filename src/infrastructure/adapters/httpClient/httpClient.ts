@@ -11,7 +11,7 @@ const baseURL =
 export const httpClient = axios.create({
   baseURL,
   timeout: 5000,
-  headers: { "Content-Type": "application/json" },
+  headers: { "Content-Type": "application/json", Authorization: "google-tutor-1" },
 });
 
 export enum HTTP_METHODS {
