@@ -12,12 +12,12 @@ export const HISTORY_TABLE_CONFIGS: Record<"active" | "completed", HistoryTableC
     title: "Mentorías activas",
     emptyMessage: "No tienes solicitudes ni tutorías activas",
     showActions: true,
-    status: [Status.Enviada, Status.Aprobada, Status.Asignada, Status.Conversando],
+    status: [Status.Activa],
   },
   completed: {
     title: "Mentorías completadas",
     emptyMessage: "No tienes tutorías completadas",
     showActions: false,
-    status: [Status.Finalizada, Status.Rechazada],
+    status: [Status.Completada],
   },
 } as const;

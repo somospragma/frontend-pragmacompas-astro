@@ -9,6 +9,7 @@ if (!session?.user) {
   return Astro.redirect("/login");
 }
 
+// Como obtengo el rol del usuario
 const pageData = {
   user: { ...session.user, role: "Tutor" },
   title: "Mis mentorías",

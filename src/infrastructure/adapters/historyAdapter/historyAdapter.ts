@@ -1,20 +1,21 @@
 import { Status } from "@/shared/utils/enums/status";
-import type { MyRequestsResponse, TutoringRequest } from "../../models/TutoringRequest";
+import type { MyRequestsResponse, TutoringSession, UserRole } from "../../models/TutoringRequest";
 import type { MentorshipData } from "@/shared/config/historyTableConfig";
+import { dateAdapter } from "../dateAdapter/dateAdapter";
 
-export function historyAdapter(apiData: MyRequestsResponse): MentorshipData[] {
+export function historyAdapter(apiData: MyRequestsResponse, role: UserRole): MentorshipData[] {
   const tableData: MentorshipData[] = [];
 
-  if (apiData.requests) {
-    apiData.requests.forEach((request: TutoringRequest) => {
+  if (apiData?.tutoringsAsTutor && role === "Tutor") {
+    apiData.tutoringsAsTutor.forEach((data: TutoringSession) => {
       tableData.push({
-        participant: `${request.tutee.firstName} ${request.tutee.lastName}`,
-        role: request.tutee.rol,
-        status: request.requestStatus,
-        scheduledDate: "", // Para request no viene campo de fecha
-        chapter: request.tutee.chapter.name,
-        skills: request.skills.map((skill) => skill.name),
-        action: getActionByStatus(request.requestStatus),
+        participant: `${data.tutee.firstName} ${data.tutee.lastName}`,
+        role: data.tutee.rol,
+        status: data.status,
+        scheduledDate: dateAdapter(data.startDate).format("DD [de] MMMM, YYYY"),
+        chapter: data.tutee.chapter.name,
+        skills: data.skills.map((skill) => skill.name),
+        action: getActionByStatus(data.status),
       });
     });
   }
@@ -27,8 +28,10 @@ const getActionByStatus = (status: string): string => {
     case Status.Conversando:
     case Status.Asignada:
     case Status.Enviada:
+    case Status.Activa:
       return "Finalizar";
     case Status.Aprobada:
+    case Status.Completada:
       return "Cancelar";
     default:
       return "";
