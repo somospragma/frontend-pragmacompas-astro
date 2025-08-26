@@ -1,8 +1,10 @@
 export interface RequestsByStatus {
-  Enviada: number;
   Aprobada: number;
   Asignada: number;
-  Rechazada: number;
+  Finalizada: number;
+  Pendiente: number;
+  Cancelada: number;
+  Conversando: number;
 }
 
 export interface TutoringsByStatus {
@@ -12,7 +14,7 @@ export interface TutoringsByStatus {
 }
 
 export interface ActiveTutorsByChapter {
-  [chapterName: string]: number;
+  activeTutors: number;
 }
 
 export interface DashboardStatistics {

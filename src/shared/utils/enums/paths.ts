@@ -9,9 +9,6 @@ type RouteParamsMap = {
   LOGIN: void;
   DASHBOARD: void;
   DASHBOARD_PROFILE: void;
-  DASHBOARD_TUTOR: void;
-  DASHBOARD_ADMIN: void;
-  DASHBOARD_TUTORADO: void;
   WORLD_PRAGMA: void;
   WORLD_PRAGMA_ACCOUNT: { id: string };
   PROFILE: void;
@@ -22,9 +19,6 @@ export const ROUTE_PATHS: { [K in keyof RouteParamsMap]: Route<RouteParamsMap[K]
   LOGIN: { path: "/login", getHref: () => "/login" },
   DASHBOARD: { path: "/dashboard", getHref: () => "/dashboard" },
   DASHBOARD_PROFILE: { path: "/dashboard/profile", getHref: () => "/dashboard/profile" },
-  DASHBOARD_TUTOR: { path: "/dashboard/tutor", getHref: () => "/dashboard/tutor" },
-  DASHBOARD_ADMIN: { path: "/dashboard/admin", getHref: () => "/dashboard/admin" },
-  DASHBOARD_TUTORADO: { path: "/dashboard/tutorado", getHref: () => "/dashboard/tutorado" },
   WORLD_PRAGMA: { path: "/mundo-pragma", getHref: () => "/mundo-pragma" },
   WORLD_PRAGMA_ACCOUNT: { path: "/mundo-pragma/cuenta/:id", getHref: ({ id }) => `/mundo-pragma/cuenta/${id}` },
   TRIVIA_SCRIPT: { path: "/mundo-pragma/triviascript", getHref: () => `/mundo-pragma/triviascript` },
@@ -38,14 +32,11 @@ export const PROTECTED_ROUTES: string[] = [
   ROUTE_PATHS.PROFILE.getHref(),
   ROUTE_PATHS.DASHBOARD.getHref(),
   ROUTE_PATHS.DASHBOARD_PROFILE.getHref(),
-  ROUTE_PATHS.DASHBOARD_TUTOR.getHref(),
-  ROUTE_PATHS.DASHBOARD_ADMIN.getHref(),
-  ROUTE_PATHS.DASHBOARD_TUTORADO.getHref(),
 ];
 
 // Role-based route mapping
 export const ROLE_ROUTES = {
-  Tutor: ROUTE_PATHS.DASHBOARD_TUTOR.getHref(),
-  Administrador: ROUTE_PATHS.DASHBOARD_ADMIN.getHref(),
-  Tutorado: ROUTE_PATHS.DASHBOARD_TUTORADO.getHref(),
+  Tutor: ROUTE_PATHS.HOME.getHref(),
+  Tutorado: ROUTE_PATHS.HOME.getHref(),
+  Administrador: ROUTE_PATHS.DASHBOARD.getHref(),
 } as const;

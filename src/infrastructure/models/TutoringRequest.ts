@@ -18,6 +18,7 @@ export interface User {
   rol?: UserRole;
   activeTutoringLimit?: number;
   slackId?: string;
+  seniority?: string;
 }
 
 export interface Skill {
