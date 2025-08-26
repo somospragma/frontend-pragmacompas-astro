@@ -1,16 +1,13 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/molecules/Dialog/Dialog";
 import { useState } from "react";
+import { MentorshipState } from "@/shared/entities/mentorshipState";
+import MentorshipActionModal from "./MentorshipActionModal/MentorshipActionModal";
+import {
+  ADMIN_MENTORSHIP_STATE_FILTERS,
+  TUTOR_MENTORSHIP_STATE_FILTERS,
+} from "@/shared/utils/enums/mentorshipsStateFilter";
 
-interface MentorshipRequest {
+export interface MentorshipRequest {
   id: string;
   tutee: {
     id: string;
@@ -22,22 +19,48 @@ interface MentorshipRequest {
       name: string;
     };
     rol: string;
+    slackId: string;
   };
   skills: {
     id: string;
     name: string;
   }[];
   needsDescription: string;
-  requestStatus: string;
+  requestStatus: MentorshipState;
 }
 
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
+  isDashboard?: boolean;
+  refetch?: () => void;
 }
 
-export default function MentorshipTable({ mentorshipRequests, title = "Solicitudes de Mentoría" }: Props) {
-  const [selectedRequest, setSelectedRequest] = useState<MentorshipRequest | null>(null);
+export const renderState = (state?: MentorshipState) => {
+  return (
+    <span
+      className={`px-3 py-1 rounded-full text-xs ${
+        state === MentorshipState.PENDING || state === MentorshipState.CONVERSING
+          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+          : state === MentorshipState.COMPLETED || state === MentorshipState.APPROVED
+            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+            : state === MentorshipState.CANCELLED || state === MentorshipState.CANCELLING
+              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+      }`}
+    >
+      {state}
+    </span>
+  );
+};
+
+export default function MentorshipTable({
+  mentorshipRequests,
+  title = "Solicitudes de Mentoría",
+  isDashboard,
+  refetch,
+}: Props) {
+  const [selectedRequest, setSelectedRequest] = useState<MentorshipRequest>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Todos los estados");
@@ -54,9 +77,13 @@ export default function MentorshipTable({ mentorshipRequests, title = "Solicitud
       request.tutee.chapter.name.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = selectedStatus === "Todos los estados" || request.requestStatus === selectedStatus;
+    const matchesByRol = isDashboard
+      ? ADMIN_MENTORSHIP_STATE_FILTERS.some((state) => state === request.requestStatus)
+      : TUTOR_MENTORSHIP_STATE_FILTERS.some((state) => state === request.requestStatus);
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesByRol;
   });
+
   return (
     <>
       <div className="space-y-6">
@@ -76,11 +103,17 @@ export default function MentorshipTable({ mentorshipRequests, title = "Solicitud
               onChange={(e) => setSelectedStatus(e.target.value)}
             >
               <option>Todos los estados</option>
-              <option>Enviada</option>
-              <option>Aceptada</option>
-              <option>Rechazada</option>
-              <option>En progreso</option>
-              <option>Completada</option>
+              {isDashboard
+                ? ADMIN_MENTORSHIP_STATE_FILTERS.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))
+                : TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
             </select>
           </div>
         </div>
@@ -112,21 +145,7 @@ export default function MentorshipTable({ mentorshipRequests, title = "Solicitud
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs ${
-                        request.requestStatus === "Enviada"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                          : request.requestStatus === "Aceptada"
-                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                            : request.requestStatus === "Rechazada"
-                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                      }`}
-                    >
-                      {request.requestStatus}
-                    </span>
-                  </div>
+                  <div className="flex items-center gap-4">{renderState(request.requestStatus)}</div>
                 </div>
               </CardContent>
             </Card>
@@ -139,80 +158,17 @@ export default function MentorshipTable({ mentorshipRequests, title = "Solicitud
           </div>
         )}
       </div>
-
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Solicitud de Mentoría</DialogTitle>
-            <DialogDescription>Detalles de la solicitud de mentoría</DialogDescription>
-          </DialogHeader>
-
-          {selectedRequest && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-primary font-semibold text-lg">
-                    {selectedRequest.tutee.firstName.charAt(0)}
-                    {selectedRequest.tutee.lastName.charAt(0)}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    {selectedRequest.tutee.firstName} {selectedRequest.tutee.lastName}
-                  </h3>
-                  <p className="text-muted-foreground">{selectedRequest.tutee.chapter.name}</p>
-                  <p className="text-sm text-muted-foreground">{selectedRequest.tutee.email}</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div>
-                  <span className="text-sm font-medium">Skills solicitadas:</span>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {selectedRequest.skills.map((skill) => (
-                      <span
-                        key={skill.id}
-                        className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs"
-                      >
-                        {skill.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-sm font-medium">Descripción de necesidades:</span>
-                  <p className="text-sm text-muted-foreground mt-1">{selectedRequest.needsDescription}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Estado:</span>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs ${
-                    selectedRequest.requestStatus === "Enviada"
-                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                      : selectedRequest.requestStatus === "Aceptada"
-                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                        : selectedRequest.requestStatus === "Rechazada"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                  }`}
-                >
-                  {selectedRequest.requestStatus}
-                </span>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter>
-            <Button variant="destructive" onClick={() => setIsModalOpen(false)}>
-              Cancelar
-            </Button>
-            <Button onClick={() => setIsModalOpen(false)}>Aceptar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {selectedRequest && (
+        <MentorshipActionModal
+          key={`modal-${selectedRequest?.id}`}
+          isOpen={isModalOpen}
+          selectedRequest={selectedRequest}
+          onOpenChange={() => {
+            setIsModalOpen(false);
+            refetch?.();
+          }}
+        />
+      )}
     </>
   );
 }
