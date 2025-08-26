@@ -2,11 +2,11 @@
 import MainLayout from "@/components/templates/MainLayout.astro";
 import HistoryTables from "@/components/organisms/HistoryTables/HistoryTables";
 import { getSession } from "auth-astro/server";
+import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 
 const session = await getSession(Astro.request);
-
 const pageData = {
-  user: { ...session?.user },
+  role: session?.user.role as UserRole,
   title: "Mis mentorías",
   description: "Gestiona tus mentorías activas y revisa tu historial",
 };
@@ -20,7 +20,7 @@ const pageData = {
         <p class="text-muted-foreground mt-2">{pageData.description}</p>
       </header>
 
-      <HistoryTables client:load user={pageData.user} />
+      <HistoryTables client:load role={pageData.role} />
     </section>
   </main>
 </MainLayout>

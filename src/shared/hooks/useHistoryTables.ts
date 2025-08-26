@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import type { MentorshipData } from "../config/historyTableConfig";
-import type { User } from "@auth/core/types";
 import { useErrorStore } from "@/store/errorStore";
 import { getMyRequests } from "@/infrastructure/services/getMyRequests";
 import { historyAdapter } from "@/infrastructure/adapters/historyAdapter/historyAdapter";
+import { useStore } from "@nanostores/react";
+import { userStore } from "@/store/userStore";
 
-export const useHistoryTables = (user?: User) => {
+export const useHistoryTables = () => {
   const [data, setData] = useState<MentorshipData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { setError } = useErrorStore();
+  const user = useStore(userStore);
 
   const fetchMyRequests = async () => {
     try {

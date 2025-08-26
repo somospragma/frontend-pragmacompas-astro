@@ -15,11 +15,11 @@ export type TutoringRequestStatus =
 
 export interface User {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  chapter: Chapter;
-  rol: UserRole;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  chapter?: Chapter;
+  rol?: UserRole;
   activeTutoringLimit: number;
 }
 

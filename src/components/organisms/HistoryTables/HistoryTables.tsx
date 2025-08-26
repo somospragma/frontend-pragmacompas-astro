@@ -1,19 +1,31 @@
-import React from "react";
-import type { User } from "@auth/core/types";
+import React, { useMemo } from "react";
 import { HISTORY_TABLE_CONFIG, type MentorshipData } from "@/shared/config/historyTableConfig";
 import DataTable from "../DataTable/DataTable";
 import { HISTORY_PAGE_CONFIG } from "@/shared/config/historyPageConfig";
 import FeedbackModal from "../FeedbackModal/FeedbackModal";
 import { useHistoryTables } from "@/shared/hooks/useHistoryTables";
 import { useModalState } from "@/shared/hooks/useModalState";
+import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 
 interface HistoryTablesProps {
-  user?: User;
+  role?: UserRole;
 }
 
-const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
-  const { data, isLoading } = useHistoryTables(user);
+const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
+  const { data, isLoading } = useHistoryTables();
   const { isOpen, selectedItem, openModal, closeModal } = useModalState<MentorshipData>();
+
+  const feedbackModalData = useMemo(() => {
+    if (!selectedItem || !role) return null;
+
+    const isTutor = role === "Tutor";
+
+    return {
+      participant: isTutor ? selectedItem.tutee : selectedItem.tutor,
+      role: isTutor ? "Tutorado" : "Tutor",
+      skills: selectedItem.skills,
+    };
+  }, [selectedItem, role]);
 
   const handleActionClick = (action: string, mentorship: MentorshipData) => {
     if (action === "Cancelar") {
@@ -43,17 +55,7 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
         );
       })}
 
-      {selectedItem && (
-        <FeedbackModal
-          isOpen={isOpen}
-          onClose={closeModal}
-          mentorship={{
-            participant: selectedItem.tutee,
-            role: selectedItem.role,
-            skills: selectedItem.skills,
-          }}
-        />
-      )}
+      {feedbackModalData && <FeedbackModal isOpen={isOpen} onClose={closeModal} mentorship={feedbackModalData} />}
     </div>
   );
 };
