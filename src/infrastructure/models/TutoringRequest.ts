@@ -14,13 +14,15 @@ export type TutoringRequestStatus =
   | "Finalizada";
 
 export interface User {
-  id: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  chapter?: Chapter;
+  id?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  googleUserId: string;
+  chapterId?: string;
   rol?: UserRole;
-  activeTutoringLimit: number;
+  activeTutoringLimit?: number;
+  seniority?: string;
 }
 
 export interface Skill {

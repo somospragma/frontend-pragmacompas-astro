@@ -33,4 +33,13 @@ export const PROTECTED_ROUTES: string[] = [
   ROUTE_PATHS.WORLD_PRAGMA.getHref(),
   ROUTE_PATHS.PROFILE.getHref(),
   ROUTE_PATHS.HISTORY.getHref(),
+  ROUTE_PATHS.DASHBOARD.getHref(),
+  ROUTE_PATHS.DASHBOARD_PROFILE.getHref(),
 ];
+
+// Role-based route mapping
+export const ROLE_ROUTES = {
+  Tutor: ROUTE_PATHS.HOME.getHref(),
+  Tutorado: ROUTE_PATHS.HOME.getHref(),
+  Administrador: ROUTE_PATHS.DASHBOARD.getHref(),
+} as const;

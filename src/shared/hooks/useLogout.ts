@@ -16,7 +16,6 @@ export const useLogout = () => {
       });
 
       if (response.ok) {
-        console.log("Logout successful");
         // Small delay to ensure cookies are cleared before redirect
         setTimeout(() => {
           window.location.href = "/";
