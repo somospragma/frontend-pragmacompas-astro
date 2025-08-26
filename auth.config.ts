@@ -36,7 +36,6 @@ export default defineConfig({
     session({ session, token }) {
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
-      console.log("🔥 Session callback - role:", session.user);
       return session;
     },
   },

@@ -21,7 +21,7 @@ export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
     });
   });
 
-  data.tutoringsAsTutor.forEach((tutoring: TutoringSession) => {
+  data.tutoringsAsTutor?.forEach((tutoring: TutoringSession) => {
     result.push({
       id: tutoring.id,
       type: "Mentoría",
@@ -55,11 +55,8 @@ export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
 }
 
 const getActionByStatus = (status: string, userRole: UserRole): string => {
-  // Solo los mentores pueden finalizar mentorías activas
   if (userRole === "Tutor") {
     switch (status) {
-      case Status.Conversando:
-      case Status.Asignada:
       case Status.Activa:
         return "Finalizar";
       default:
@@ -67,12 +64,14 @@ const getActionByStatus = (status: string, userRole: UserRole): string => {
     }
   }
 
-  // Los tutorados tienen acciones limitadas
   if (userRole === "Tutorado") {
-    if (status === Status.Pendiente) {
-      return "Cancelar";
+    switch (status) {
+      case Status.Pendiente:
+      case Status.Activa:
+        return "Cancelar";
+      default:
+        return "";
     }
-    return "";
   }
 
   return "";
