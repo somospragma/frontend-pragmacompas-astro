@@ -1,8 +1,9 @@
 ---
-import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
+import MentorshipTable, { type MentorshipRequest } from "@/components/organisms/MentorShipTable/MentorShipTable";
 import MainLayout from "@/components/templates/MainLayout.astro";
+import { MentorshipState } from "@/shared/entities/mentorshipState";
 
-const mentorshipRequests = [
+const mentorshipRequests: MentorshipRequest[] = [
   {
     id: "90d713a1-dbe7-4fdd-b395-f775fb0ed305",
     tutee: {
@@ -10,6 +11,7 @@ const mentorshipRequests = [
       firstName: "David",
       lastName: "Lee",
       email: "david.lee@pragma.com",
+      slackId: "U08T2MW1XT4",
       chapter: {
         id: "frontend",
         name: "Frontend",
@@ -22,7 +24,7 @@ const mentorshipRequests = [
       { id: "skills-3", name: "Next.js" },
     ],
     needsDescription: "Necesito ayuda con optimización de rendimiento en React",
-    requestStatus: "Enviada",
+    requestStatus: MentorshipState.PENDING,
   },
   {
     id: "90d713a1-dbe7-4fdd-b395-f775fb0ed306",
@@ -31,6 +33,7 @@ const mentorshipRequests = [
       firstName: "Anderson",
       lastName: "Castano",
       email: "anderson.castano@pragma.com",
+      slackId: "U08SU4GTYNS",
       chapter: {
         id: "frontend",
         name: "Frontend",
@@ -42,7 +45,7 @@ const mentorshipRequests = [
       { id: "skills-5", name: "Nuxt.js" },
     ],
     needsDescription: "Quiero aprender Vue.js desde cero",
-    requestStatus: "Enviada",
+    requestStatus: MentorshipState.APPROVED,
   },
   {
     id: "90d713a1-dbe7-4fdd-b395-f775fb0ed307",
@@ -50,6 +53,7 @@ const mentorshipRequests = [
       id: "tutee-3",
       firstName: "María",
       lastName: "González",
+      slackId: "U07G4H5K2L3",
       email: "maria.gonzalez@pragma.com",
       chapter: {
         id: "backend",
@@ -62,7 +66,7 @@ const mentorshipRequests = [
       { id: "skills-7", name: "Express" },
     ],
     needsDescription: "Necesito mejorar en arquitectura de APIs REST",
-    requestStatus: "Aceptada",
+    requestStatus: MentorshipState.CANCELLED,
   },
 ];
 ---
