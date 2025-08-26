@@ -7,16 +7,16 @@ export interface HistoryTableConfig {
   status: Status[];
 }
 
-export const HISTORY_TABLE_CONFIGS: Record<"active" | "completed", HistoryTableConfig> = {
+export const HISTORY_PAGE_CONFIG = {
   active: {
     title: "Mentorías activas",
-    emptyMessage: "No tienes solicitudes ni tutorías activas",
+    emptyMessage: "No tienes mentorías activas en este momento",
     showActions: true,
     status: [Status.Activa],
   },
   completed: {
     title: "Mentorías completadas",
-    emptyMessage: "No tienes tutorías completadas",
+    emptyMessage: "No tienes mentorías completadas aún",
     showActions: false,
     status: [Status.Completada],
   },

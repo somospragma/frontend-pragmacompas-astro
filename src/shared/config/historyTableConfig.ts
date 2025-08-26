@@ -1,8 +1,11 @@
 export interface MentorshipData {
-  participant: string;
+  id: string;
+  type: string;
   role: string;
+  tutee: string;
+  tutor: string;
   status: string;
-  scheduledDate: string;
+  startDate: string;
   chapter: string;
   skills: string[];
   action: string;
@@ -17,26 +20,27 @@ export interface TableColumn {
   cellType?: "text" | "badge" | "skills" | "button";
 }
 
-export const historyTableConfig: TableColumn[] = [
+export const HISTORY_TABLE_CONFIG: TableColumn[] = [
   {
-    key: "participant",
-    label: "Participante",
+    key: "tutor",
+    label: "Tutor",
+    className: "font-medium",
+    cellType: "text",
+  },
+  {
+    key: "tutee",
+    label: "Tutorado",
     className: "font-medium",
     cellType: "text",
   },
   {
     key: "role",
-    label: "Rol",
+    label: "Mi Rol",
     cellType: "text",
   },
   {
-    key: "status",
-    label: "Estado",
-    cellType: "badge",
-  },
-  {
-    key: "scheduledDate",
-    label: "Fecha Programada",
+    key: "startDate",
+    label: "Fecha Inicio",
     cellType: "text",
   },
   {
@@ -48,6 +52,11 @@ export const historyTableConfig: TableColumn[] = [
     key: "skills",
     label: "Habilidades",
     cellType: "skills",
+  },
+  {
+    key: "status",
+    label: "Estado",
+    cellType: "badge",
   },
   {
     key: "action",

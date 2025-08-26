@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { HISTORY_TABLE_CONFIGS } from "@/shared/config/historyPageConfig";
 import { getMyRequests } from "@/infrastructure/services/getMyRequests";
 import { historyAdapter } from "@/infrastructure/adapters/historyAdapter/historyAdapter";
 import { useErrorStore } from "@/store/errorStore";
 import type { User } from "@auth/core/types";
-import { historyTableConfig, type MentorshipData } from "@/shared/config/historyTableConfig";
+import { HISTORY_TABLE_CONFIG, type MentorshipData } from "@/shared/config/historyTableConfig";
 import DataTable from "../DataTable/DataTable";
+import { HISTORY_PAGE_CONFIG } from "@/shared/config/historyPageConfig";
 
 interface HistoryTablesContainerProps {
   user?: User;
@@ -20,7 +20,7 @@ const HistoryTablesContainer: React.FC<HistoryTablesContainerProps> = ({ user })
     try {
       setIsLoading(true);
       const response = await getMyRequests();
-      const adaptedData = historyAdapter(response.data, "Tutor");
+      const adaptedData = historyAdapter(response.data);
       setData(adaptedData);
     } catch (err) {
       console.error(err);
@@ -37,10 +37,10 @@ const HistoryTablesContainer: React.FC<HistoryTablesContainerProps> = ({ user })
 
   return (
     <div className="flex flex-col gap-12">
-      {Object.entries(HISTORY_TABLE_CONFIGS).map(([key, config]) => {
+      {Object.entries(HISTORY_PAGE_CONFIG).map(([key, config]) => {
         const columns = config.showActions
-          ? historyTableConfig
-          : historyTableConfig.filter((col) => col.key !== "action");
+          ? HISTORY_TABLE_CONFIG
+          : HISTORY_TABLE_CONFIG.filter((col) => col.key !== "action");
 
         const filteredData = data.filter((item) => config.status.some((status) => status === item.status));
 

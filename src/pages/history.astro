@@ -5,14 +5,10 @@ import { getSession } from "auth-astro/server";
 
 const session = await getSession(Astro.request);
 
-if (!session?.user) {
-  return Astro.redirect("/login");
-}
-
-// Como obtengo el rol del usuario
 const pageData = {
-  user: { ...session.user, role: "Tutor" },
+  user: { ...session?.user },
   title: "Mis mentorías",
+  description: "Gestiona tus mentorías activas y revisa tu historial",
 };
 ---
 
@@ -21,7 +17,7 @@ const pageData = {
     <section class="flex flex-col gap-8 w-full">
       <header>
         <h1 class="text-3xl font-bold text-foreground">{pageData.title}</h1>
-        <p class="text-muted-foreground mt-2">Gestiona tus solicitudes de mentoría activas y revisa tu historial</p>
+        <p class="text-muted-foreground mt-2">{pageData.description}</p>
       </header>
 
       <HistoryTables client:load user={pageData.user} />
