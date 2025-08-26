@@ -1,8 +1,12 @@
 ---
-import MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
+import RequestsPage from "@/components/page/RequestPages/RequestsPage";
 import DashboardLayout from "@/components/templates/DashboardLayout.astro";
+import { getSession } from "auth-astro/server";
+import type { SessionUser } from "auth.config";
+
+const session = (await getSession(Astro.request)) as SessionUser;
 ---
 
 <DashboardLayout>
-  <MentorshipRequest client:load />
+  <RequestsPage client:load session={session} />
 </DashboardLayout>

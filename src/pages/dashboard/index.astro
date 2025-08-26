@@ -2,15 +2,17 @@
 import AdminDashboard from "@/components/page/AdminDashboard/AdminDashboard";
 import DashboardLayout from "@/components/templates/DashboardLayout.astro";
 import { getSession } from "auth-astro/server";
+import type { SessionUser } from "auth.config";
+import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 
-const session = await getSession(Astro.request);
+const session = (await getSession(Astro.request)) as SessionUser;
 ---
 
 <DashboardLayout>
   <AdminDashboard
-    userName={session?.user?.name ?? undefined}
-    googleUserId={session?.user?.email ?? undefined}
-    chapterId="993ce7f5-f6ed-4bba-a999-8abb558886f5"
+    userName={session?.user?.firstName + " " + session?.user?.lastName}
+    userRole={(session?.user?.rol as UserRole) ?? undefined}
+    chapterId={session?.user?.chapterId}
     client:load
   />
 </DashboardLayout>

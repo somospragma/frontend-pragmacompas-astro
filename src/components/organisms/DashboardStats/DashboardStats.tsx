@@ -62,7 +62,7 @@ export default function DashboardStats({ chapterId }: Props) {
   }
 
   const totalRequests = Object.values(statistics.requestsByStatus).reduce((sum, count) => sum + count, 0);
-  const totalActiveTutors = Object.values(statistics.activeTutorsByChapter).reduce((sum, count) => sum + count, 0);
+  const totalActiveTutors = statistics.activeTutorsByChapter.activeTutors;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -85,7 +85,7 @@ export default function DashboardStats({ chapterId }: Props) {
           </div>
         </div>
         <div className="mt-2 text-xs text-green-600">
-          {Object.values(statistics.activeTutorsByChapter).filter((count) => count > 0).length} activos
+          {statistics.activeTutorsByChapter.activeTutors > 0 ? "Activos" : "Sin actividad"}
         </div>
       </div>
 
@@ -112,7 +112,7 @@ export default function DashboardStats({ chapterId }: Props) {
           </div>
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
-          {Math.round((statistics.requestsByStatus.Aprobada / totalRequests) * 100) || 0}% progreso promedio
+          {Math.round((statistics.requestsByStatus.Finalizada / totalRequests) * 100) || 0}% finalizadas
         </div>
       </div>
 
@@ -120,7 +120,7 @@ export default function DashboardStats({ chapterId }: Props) {
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-2xl font-bold text-foreground">{statistics.requestsByStatus.Enviada}</p>
+            <p className="text-2xl font-bold text-foreground">{statistics.requestsByStatus.Pendiente}</p>
             <p className="text-muted-foreground text-sm">Solicitudes Pendientes</p>
           </div>
           <div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center">

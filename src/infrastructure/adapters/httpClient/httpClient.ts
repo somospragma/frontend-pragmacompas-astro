@@ -7,6 +7,11 @@ const baseURL =
     ? (await import("astro:env/server")).getSecret("API_URL")
     : import.meta.env.PUBLIC_API_URL;
 
+const apiKey =
+  typeof window === "undefined"
+    ? (await import("astro:env/server")).getSecret("API_KEY")
+    : import.meta.env.PUBLIC_API_KEY;
+
 export const httpClient = axios.create({
   baseURL,
   timeout: 5000,
@@ -45,9 +50,12 @@ httpClient.interceptors.request.use(
         if (sessionResponse.ok) {
           const session = await sessionResponse.json();
 
-          if (session?.user?.googleId) {
+          if (session?.user?.googleId && session?.user?.userId !== "") {
             config.headers = config.headers || {};
             config.headers.Authorization = session.user.googleId;
+          } else {
+            config.headers = config.headers || {};
+            config.headers.Authorization = apiKey;
           }
         }
       } catch (error) {

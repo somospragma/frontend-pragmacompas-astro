@@ -15,6 +15,7 @@ export interface User {
   chapterId?: string;
   rol?: UserRole;
   activeTutoringLimit?: number;
+  seniority?: string;
 }
 
 export interface Skill {

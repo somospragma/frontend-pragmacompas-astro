@@ -5,6 +5,7 @@ export interface GetTutoringRequestsParams {
   tuteeId?: string;
   skillId?: string;
   status?: "Enviada" | "Aprobada" | "Asignada" | "Rechazada";
+  chapterId?: string;
 }
 
 export interface GetTutoringRequestsResponse {
@@ -15,6 +16,30 @@ export interface GetTutoringRequestsResponse {
 
 export async function getTutoringRequests(params: GetTutoringRequestsParams) {
   console.log("💩 ~ getTutoringRequests ~ params:", params);
-  const { data } = await httpClient.get<GetTutoringRequestsResponse>("/api/v1/tutoring-requests");
+
+  // Build query parameters dynamically
+  const queryParams = new URLSearchParams();
+
+  if (params.tuteeId) {
+    queryParams.append("tuteeId", params.tuteeId);
+  }
+
+  if (params.skillId) {
+    queryParams.append("skillId", params.skillId);
+  }
+
+  if (params.status) {
+    queryParams.append("status", params.status);
+  }
+
+  if (params.chapterId) {
+    queryParams.append("chapterId", params.chapterId);
+  }
+
+  // Build the final URL
+  const baseUrl = "/api/v1/tutoring-requests";
+  const url = queryParams.toString() ? `${baseUrl}?${queryParams.toString()}` : baseUrl;
+
+  const { data } = await httpClient.get<GetTutoringRequestsResponse>(url);
   return data;
 }

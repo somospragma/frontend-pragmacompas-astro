@@ -12,6 +12,7 @@ export interface UserValidationResponse {
       name: string;
     };
     rol: string;
+    seniority: string;
     activeTutoringLimit: number;
   };
   timestamp: string;

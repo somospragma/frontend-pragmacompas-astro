@@ -6,13 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { getBasicUserStatistics, type UserStatistics } from "@/infrastructure/services/getBasicUserStatistics";
 import { getChapters } from "@/infrastructure/services/getChapters";
+import { postCreateUser } from "@/infrastructure/services/postCreateUser";
 import { updateUser } from "@/infrastructure/services/updateUser";
 import { updateUserProfile, userStore } from "@/store/userStore";
 import { useStore } from "@nanostores/react";
 import { Loader2, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { SessionUser } from "auth.config";
 
-export default function ProfileForm() {
+export default function ProfileForm({ session }: { session: SessionUser }) {
   const user = useStore(userStore);
   const [chapters, setChapters] = useState<{ id: string; name: string }[]>([]);
   const [statistics, setStatistics] = useState<UserStatistics | null>(null);
@@ -55,14 +57,33 @@ export default function ProfileForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const createUser = async () => {
+    if (!session?.user) return;
+
+    postCreateUser({
+      firstName: session.user.firstName ?? "",
+      lastName: session.user.lastName ?? "",
+      email: session.user.email || "",
+      googleUserId: session.user.googleId || "",
+      chapterId: formData.chapterId || "",
+      seniority: formData.seniority || "",
+      rol: "Tutorado",
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate() || !user.id) return;
+    if (!validate()) return;
 
     setLoading(true);
+
+    if (session.user.userId === "") {
+      await createUser();
+      return;
+    }
     try {
       await updateUser({
-        id: user.id,
+        id: user.id ?? "",
         chapterId: formData.chapterId,
         seniority: formData.seniority,
       });
@@ -98,16 +119,16 @@ export default function ProfileForm() {
         {/* Profile Info - Horizontal Layout */}
         <div className="flex items-center gap-6 mb-8 pb-6 border-b">
           <Avatar
-            src={user.avatar || undefined}
-            fallback={getInitials(user.name)}
+            src={session?.user.image || undefined}
+            fallback={getInitials(session?.user?.firstName || null)}
             size="xl"
             className="ring-2 ring-border"
           />
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{user.name || "Usuario"}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{session?.user?.firstName || "Usuario"}</h1>
             <div className="flex items-center gap-2 mt-2 text-muted-foreground">
               <Mail className="h-4 w-4" />
-              <span className="text-sm">{user.email || "email@ejemplo.com"}</span>
+              <span className="text-sm">{session?.user?.email || "email@ejemplo.com"}</span>
             </div>
           </div>
         </div>
