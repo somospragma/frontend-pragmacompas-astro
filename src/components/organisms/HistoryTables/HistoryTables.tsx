@@ -50,7 +50,6 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
           mentorship={{
             participant: selectedItem.tutee,
             role: selectedItem.role,
-            chapter: selectedItem.chapter,
             skills: selectedItem.skills,
           }}
         />
