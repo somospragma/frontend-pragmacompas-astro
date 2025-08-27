@@ -1,13 +1,8 @@
 ---
-import ProfileForm from "@/components/organisms/ProfileForm/ProfileForm";
+import { ProfileForm } from "@/components/organisms/ProfileForm/ProfileForm";
 import MainLayout from "@/components/templates/MainLayout.astro";
-import { getSession } from "auth-astro/server";
-import type { SessionUser } from "auth.config";
-
-const session = (await getSession(Astro.request)) as SessionUser;
 ---
 
-<MainLayout showNotCreatedUser={true}>
-  <h1>Profile Page</h1>
-  <ProfileForm client:load session={session} />
+<MainLayout>
+  <ProfileForm client:load />
 </MainLayout>
