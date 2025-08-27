@@ -9,6 +9,8 @@ import { useModalState } from "@/shared/hooks/useModalState";
 import { createFeedback, type CreateFeedbackBody } from "@/infrastructure/services/createFeedback";
 import { cancelTutoring } from "@/infrastructure/services/cancelTutoring";
 import type { User } from "@/infrastructure/models/TutoringRequest";
+import { UserRole } from "@/shared/utils/enums/role";
+import { MentorshipAction } from "@/shared/utils/enums/mentorshipAction";
 
 interface HistoryTablesProps {
   user: User;
@@ -33,12 +35,11 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
 
   const feedbackModalData = useMemo(() => {
     if (!selectedFeedbackItem || !user.rol) return null;
-
-    const isTutor = user.rol === "Tutor";
+    const isTutor = selectedFeedbackItem.role === UserRole.TUTOR;
 
     return {
       participant: isTutor ? selectedFeedbackItem.tutee : selectedFeedbackItem.tutor,
-      role: isTutor ? "Tutorado" : "Tutor",
+      role: isTutor ? UserRole.TUTEE : UserRole.TUTOR,
       skills: selectedFeedbackItem.skills,
     };
   }, [selectedFeedbackItem, user]);
@@ -56,9 +57,9 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
   }, [selectedCancellationItem, user]);
 
   const handleActionClick = (action: string, mentorship: MentorshipData) => {
-    if (action === "Cancelar") {
+    if (action === MentorshipAction.CANCEL) {
       openCancellationModal(mentorship);
-    } else if (action === "Finalizar") {
+    } else if (action === MentorshipAction.COMPLETE) {
       openFeedbackModal(mentorship);
     }
   };

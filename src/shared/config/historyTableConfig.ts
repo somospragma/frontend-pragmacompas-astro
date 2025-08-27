@@ -1,7 +1,9 @@
+import type { UserRole } from "@/infrastructure/models/TutoringRequest";
+
 export interface MentorshipData {
   id: string;
   type: string;
-  role: string;
+  role: UserRole;
   tutee: string;
   tutor: string;
   evaluatorId: string;
