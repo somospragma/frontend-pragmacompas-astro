@@ -1,11 +1,20 @@
+import { validateUser } from "@/infrastructure/services/validateUser";
 import { setUser, type User } from "@/store/userStore";
 import { useEffect } from "react";
 
-export function UserInitializer({ user }: { user: Partial<User> | null }) {
+export async function UserInitializer({ user }: { user: Partial<User> | null }) {
   useEffect(() => {
-    if (user) {
-      setUser(user);
+    async function initializeUser() {
+      const userValidation = await validateUser(user?.id ?? "");
+      if (user && userValidation && typeof userValidation === "object" && "data" in userValidation) {
+        setUser({
+          ...user,
+          seniority: userValidation.data.seniority,
+          chapterId: userValidation.data.chapter.id,
+        });
+      }
     }
+    initializeUser();
   }, []);
 
   return null;
