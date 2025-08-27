@@ -13,6 +13,7 @@ import { useStore } from "@nanostores/react";
 import { Loader2, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { SessionUser } from "auth.config";
+import { toast } from "sonner";
 
 export default function ProfileForm({ session }: { session: SessionUser }) {
   const user = useStore(userStore);
@@ -26,6 +27,18 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+  const [initialValidationShown, setInitialValidationShown] = useState(false);
+
+  // Validación inicial - mostrar errores si los campos están vacíos al cargar
+  useEffect(() => {
+    if (!initialValidationShown && user.id) {
+      const initialErrors: { [key: string]: string } = {};
+      if (!user.chapterId) initialErrors.chapterId = "El chapter es requerido";
+      if (!user.seniority) initialErrors.seniority = "La seniority es requerida";
+      setErrors(initialErrors);
+      setInitialValidationShown(true);
+    }
+  }, [user.id, user.chapterId, user.seniority, initialValidationShown]);
 
   useEffect(() => {
     getChapters().then((res) => {
@@ -50,7 +63,7 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
 
   const validate = () => {
     const newErrors: typeof errors = {};
-    if (!formData.chapterId) newErrors.chapterId = "El capítulo es requerido";
+    if (!formData.chapterId) newErrors.chapterId = "El chapter es requerido";
     if (!formData.seniority) newErrors.seniority = "La seniority es requerida";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -92,17 +105,26 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
         seniority: formData.seniority,
       });
 
-      alert("¡Perfil actualizado exitosamente!");
+      // Limpiar errores después de actualización exitosa
+      setErrors({});
+
+      toast.success("¡Perfil actualizado exitosamente!", {
+        description: "Tus datos han sido guardados correctamente.",
+        duration: 4000,
+      });
     } catch (err) {
-      console.error(err);
-      alert("Algo salió mal, por favor intenta de nuevo más tarde.");
+      console.error("Error updating user profile:", err);
+      toast.error("Error al actualizar perfil", {
+        description: "Algo salió mal, por favor intenta de nuevo más tarde.",
+        duration: 4000,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const getInitials = (name: string | null) => {
-    if (!name) return "U";
+    if (!name) return "??";
     return name
       .split(" ")
       .map((part) => part.charAt(0))
@@ -137,14 +159,21 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
           <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="chapter" className="text-sm font-medium text-foreground">
-                Capítulo
+                Chapter <span className="text-destructive">*</span>
               </Label>
               <div className="max-w-md">
                 <Select
                   options={chapters.map((c) => ({ value: c.id, label: c.name }))}
                   value={formData.chapterId}
-                  onValueChange={(value) => setFormData({ ...formData, chapterId: value })}
-                  placeholder="Selecciona un capítulo"
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, chapterId: value });
+                    // Limpiar error cuando el usuario selecciona un valor
+                    if (errors.chapterId) {
+                      setErrors({ ...errors, chapterId: "" });
+                    }
+                  }}
+                  placeholder="Selecciona un chapter"
+                  className={errors.chapterId ? "border-destructive focus:ring-destructive" : ""}
                 />
               </div>
               {errors.chapterId && <p className="text-sm text-destructive">{errors.chapterId}</p>}
@@ -152,7 +181,7 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
 
             <div className="space-y-2">
               <Label htmlFor="seniority" className="text-sm font-medium text-foreground">
-                Seniority
+                Seniority <span className="text-destructive">*</span>
               </Label>
               <div className="max-w-md">
                 <Input
@@ -160,8 +189,14 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
                   type="text"
                   placeholder="Ej: Junior, Mid, Senior"
                   value={formData.seniority}
-                  onChange={(e) => setFormData({ ...formData, seniority: e.target.value })}
-                  className="bg-background"
+                  onChange={(e) => {
+                    setFormData({ ...formData, seniority: e.target.value });
+                    // Limpiar error cuando el usuario escribe
+                    if (errors.seniority) {
+                      setErrors({ ...errors, seniority: "" });
+                    }
+                  }}
+                  className={`bg-background ${errors.seniority ? "border-destructive focus:ring-destructive" : ""}`}
                 />
               </div>
               {errors.seniority && <p className="text-sm text-destructive">{errors.seniority}</p>}
@@ -188,44 +223,37 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
       </div>
 
       {/* Statistics Section */}
-      {statistics ? (
-        <div className="w-full">
-          <h2 className="text-xl font-bold mb-6 text-foreground">Estadísticas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6 text-center">
-                <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                  Mentorías
-                </CardTitle>
-                <p className="text-3xl font-bold text-foreground">{statistics.mentorshipsGiven || 0}</p>
-              </CardContent>
-            </Card>
+      <div className="w-full">
+        <h2 className="text-xl font-bold mb-6 text-foreground">Estadísticas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6 text-center">
+              <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                Mentorías
+              </CardTitle>
+              <p className="text-3xl font-bold text-foreground">{statistics?.mentorshipsGiven ?? "??"}</p>
+            </CardContent>
+          </Card>
 
-            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6 text-center">
-                <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                  Horas
-                </CardTitle>
-                <p className="text-3xl font-bold text-foreground">{statistics.totalHours || 0}</p>
-              </CardContent>
-            </Card>
+          <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6 text-center">
+              <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                Horas
+              </CardTitle>
+              <p className="text-3xl font-bold text-foreground">{statistics?.totalHours ?? "??"}</p>
+            </CardContent>
+          </Card>
 
-            <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-6 text-center">
-                <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                  Reseñas
-                </CardTitle>
-                <p className="text-3xl font-bold text-foreground">{statistics.mentorshipsReceived || 0}</p>
-              </CardContent>
-            </Card>
-          </div>
+          <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-6 text-center">
+              <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                Reseñas
+              </CardTitle>
+              <p className="text-3xl font-bold text-foreground">{statistics?.mentorshipsReceived ?? "??"}</p>
+            </CardContent>
+          </Card>
         </div>
-      ) : (
-        <div className="w-full">
-          <h2 className="text-xl font-bold mb-6 text-foreground">Estadísticas</h2>
-          <p className="text-muted-foreground">Cargando estadísticas...</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
