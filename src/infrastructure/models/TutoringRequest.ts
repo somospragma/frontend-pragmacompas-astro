@@ -10,15 +10,20 @@ export type TutoringRequestStatus = MentorshipState;
 
 export interface User {
   id?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  googleUserId: string;
+  userId?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  googleUserId?: string;
+  googleId?: string;
+  googleClientId?: string;
+  accessToken?: string;
   chapterId?: string;
   rol?: UserRole;
   activeTutoringLimit?: number;
   slackId?: string;
   seniority?: string;
+  image?: string;
 }
 
 export interface Skill {
@@ -37,4 +42,21 @@ export interface TutoringRequest {
   skills: Skill[];
   needsDescription: string;
   requestStatus: TutoringRequestStatus;
+}
+
+export interface TutoringSession {
+  id: string;
+  tutor: User;
+  tutee: User;
+  skills: Skill[];
+  startDate: string;
+  expectedEndDate: string;
+  status: TutoringRequestStatus;
+  objectives: string;
+}
+
+export interface MyRequestsResponse {
+  requests: TutoringRequest[];
+  tutoringsAsTutor: TutoringSession[];
+  tutoringsAsTutee: TutoringSession[];
 }

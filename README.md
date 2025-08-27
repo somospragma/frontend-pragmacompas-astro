@@ -56,16 +56,19 @@ Para ejecutar este proyecto localmente, siga las instrucciones a continuación.
 ### Instalación
 
 1. Clonar el repositorio:
+
    ```sh
    git clone https://github.com/Jhon-H/Arquetipo-Astro
    ```
 
 2. Instalar las dependencias:
+
    ```sh
    cd Arquetipo-Astro && npm install
    ```
 
 3. Crear archivo `.env` y agregar las variables de entorno:
+
    ```sh
    cp .env.example .env
    ```
@@ -83,10 +86,10 @@ La estructura de carpetas del proyecto es la siguiente:
 src/
 ├── assets/           # Recursos estáticos como imágenes
 ├── components/       # Componentes (usando Atomic Design)
-│ ├── atoms/          
-│ ├── molecules/      
-│ ├── organisms/      
-│ ├── templates/      
+│ ├── atoms/
+│ ├── molecules/
+│ ├── organisms/
+│ ├── templates/
 │ └── ui/             # Componentes de UI de shadcn
 ├── infrastructure/   # Capa de infraestructura
 │ ├── adapters/       # Adaptadores para librerías de terceros
@@ -95,13 +98,13 @@ src/
 │ └── services/       # Endpoints del backend
 ├── pages/            # Páginas y endpoints API
 │ └── api/            # Endpoints API
-├── shared/           
+├── shared/
 │ ├── entities/       # Modelos de frontend
 │ ├── types/          # Tipos comunes
 │ └── utils/          # Utilidades
 ├── store/            # Stores (ej: Nanostore)
 ├── styles/           # Estilos globales y de Tailwind
-└── tests/            
+└── tests/
 │ ├── mocks/          # Mocks para pruebas
 │ ├── e2e/            # Pruebas end-to-end
 │ └── unit/           # Pruebas unitarias

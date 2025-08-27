@@ -37,20 +37,21 @@ const {
     }
   </style>
 
-  <div class="flex items-center flex-col background min-h-screen w-full">
+  <div class="flex flex-col background min-h-screen w-full">
     {!hideHeader && <Header />}
 
     {
       showNotCreatedUser && (
-        <div class="w-full max-w-7xl px-4 pt-4">
+        <div class="w-full max-w-7xl px-4 pt-4 mx-auto">
           <ProfileAlert client:load />
         </div>
       )
     }
 
-    <main class="w-full max-w-7xl">
+    <main class="flex-grow w-full max-w-7xl mx-auto">
       <slot />
-      {!hideFooter && <Footer />}
     </main>
+
+    {!hideFooter && <Footer />}
   </div>
 </BaseLayout>

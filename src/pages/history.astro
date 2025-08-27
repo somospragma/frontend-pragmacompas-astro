@@ -1,0 +1,25 @@
+---
+import MainLayout from "@/components/templates/MainLayout.astro";
+import HistoryTables from "@/components/organisms/HistoryTables/HistoryTables";
+import { getSession } from "auth-astro/server";
+import type { User } from "@/infrastructure/models/TutoringRequest";
+
+const session = await getSession(Astro.request);
+
+const pageData = {
+  user: session?.user as User,
+  title: "Mis mentorías",
+};
+---
+
+<MainLayout title={pageData.title}>
+  <main class="w-full max-w-7xl pt-8 pb-8 px-4 sm:px-6 lg:px-8 mx-auto">
+    <section class="flex flex-col gap-8 w-full">
+      <header>
+        <h1 class="text-3xl font-bold text-foreground">{pageData.title}</h1>
+      </header>
+
+      <HistoryTables client:load user={pageData.user} />
+    </section>
+  </main>
+</MainLayout>
