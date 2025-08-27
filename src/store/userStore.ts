@@ -1,7 +1,7 @@
 import type { SessionUser } from "auth.config";
 import { atom } from "nanostores";
 
-type User = SessionUser["user"] & { isLoggedIn: boolean; id?: string };
+export type User = SessionUser["user"] & { isLoggedIn: boolean; id?: string };
 
 const initialState: User = {
   firstName: "",

@@ -1,16 +1,15 @@
 import { httpClient } from "../adapters/httpClient/httpClient";
-import type { Tutoring } from "../models/Tutoring";
+import type { TutoringRequest } from "../models/TutoringRequest";
 
 export interface CreateTutoringRequestBody {
   tuteeId: string;
-  skills: string[];
-  chapterId: string;
-  note: string;
+  skillIds?: string[];
+  needsDescription: string;
 }
 
 export interface CreateTutoringRequestResponse {
   message: string;
-  data: Tutoring;
+  data: TutoringRequest;
   timestamp: string;
 }
 

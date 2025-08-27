@@ -28,7 +28,7 @@ export const UserMenu = ({ user }: UserMenuProps) => {
   };
 
   const handleViewProfile = () => {
-    window.location.href = "/dashboard/profile";
+    window.location.href = "/profile";
   };
 
   const getInitials = (name: string | null | undefined) => {
