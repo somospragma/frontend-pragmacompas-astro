@@ -8,7 +8,6 @@ export interface GetTutoringRequestsParams {
   status?: MentorshipState;
   chapterId?: string;
 }
-
 export interface GetTutoringRequestsResponse {
   message: string;
   data: TutoringRequest[];

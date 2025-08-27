@@ -33,8 +33,8 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
           id: request.tutee.id || "", // Ensure id is always a string
           rol: request.tutee.rol || "Tutorado", // Provide default role
           chapter: {
-            id: request.tutee.chapterId || "",
-            name: "Chapter Name", // You might want to fetch this from another API
+            id: request.tutee?.chapter ? request.tutee.chapter.id : "",
+            name: request.tutee?.chapter ? request.tutee.chapter.name : "",
           },
           slackId: request.tutee.slackId || "", // Ensure slackId is always a string
         },

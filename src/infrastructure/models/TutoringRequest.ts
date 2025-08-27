@@ -14,7 +14,8 @@ export interface User {
   lastName: string;
   email: string;
   googleUserId: string;
-  chapterId?: string;
+  chapterId: string;
+  chapter?: Chapter;
   rol?: UserRole;
   activeTutoringLimit?: number;
   slackId?: string;
