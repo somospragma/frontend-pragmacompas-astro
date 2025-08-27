@@ -4,11 +4,12 @@ export interface MentorshipData {
   role: string;
   tutee: string;
   tutor: string;
+  evaluatorId: string;
   status: string;
   startDate: string;
   chapter: string;
   skills: string[];
-  action: string;
+  action: string[];
 }
 
 export type CellValue = string | string[];

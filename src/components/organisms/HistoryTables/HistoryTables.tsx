@@ -65,11 +65,15 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
 
   const handleSubmitFeedback = async (score: number, comments: string) => {
     try {
+      if (!selectedFeedbackItem?.id) {
+        return;
+      }
+
       const feedbackData: CreateFeedbackBody = {
-        tutoringId: "1a39382d-21b6-432f-93cc-a630e416311b",
+        tutoringId: selectedFeedbackItem?.id,
         score: score.toString(),
         comments,
-        evaluatorId: "tutor-1",
+        evaluatorId: selectedFeedbackItem.evaluatorId,
       };
 
       await createFeedback(feedbackData);

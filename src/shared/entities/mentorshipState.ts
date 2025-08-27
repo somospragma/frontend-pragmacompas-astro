@@ -15,7 +15,7 @@ type ActionTypes = "NEXT" | "PREVIOUS" | "CANCEL";
 type Action = { type: ActionTypes | "SET_STATE"; payload?: MentorshipState };
 
 // Explicit transitions
-const transitions: Record<MentorshipState, Partial<Record<ActionTypes, MentorshipState>>> = {
+export const transitions: Record<MentorshipState, Partial<Record<ActionTypes, MentorshipState>>> = {
   [MentorshipState.PENDING]: {
     NEXT: MentorshipState.APPROVED,
     CANCEL: MentorshipState.CANCELLING,

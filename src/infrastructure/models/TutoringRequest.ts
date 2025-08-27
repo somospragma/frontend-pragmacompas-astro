@@ -19,6 +19,7 @@ export interface User {
   googleClientId?: string;
   accessToken?: string;
   chapterId?: string;
+  chapter?: Chapter;
   rol?: UserRole;
   activeTutoringLimit?: number;
   slackId?: string;
