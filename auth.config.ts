@@ -41,16 +41,12 @@ export default defineConfig({
         if (userValidation && typeof userValidation === "object" && "data" in userValidation) {
           token.rol = userValidation.data.rol;
           token.userId = userValidation.data.id;
-          token.chapterId = userValidation.data.chapter.id;
-          token.seniority = userValidation.data.seniority;
           token.firstName = profile.given_name;
           token.lastName = profile.family_name;
           token.email = token.email;
         } else {
           token.rol = "";
           token.userId = "";
-          token.chapterId = "";
-          token.seniority = "";
           token.firstName = profile.given_name;
           token.lastName = profile.family_name;
           token.email = token.email;
@@ -66,7 +62,6 @@ export default defineConfig({
         (session as SessionUser).user.googleId = token.googleId as string | undefined;
         (session as SessionUser).user.googleClientId = token.googleClientId as string | undefined;
         (session as SessionUser).user.accessToken = token.accessToken as string | undefined;
-        (session as SessionUser).user.chapterId = token.chapterId as string | undefined;
         (session as SessionUser).user.firstName = token.firstName as string | undefined;
         (session as SessionUser).user.lastName = token.lastName as string | undefined;
       }
