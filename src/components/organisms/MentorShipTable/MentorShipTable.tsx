@@ -7,7 +7,6 @@ import {
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
-
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
@@ -76,24 +75,20 @@ export default function MentorshipTable({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <select
-              className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-            >
-              <option>Todos los estados</option>
-              {isDashboard
-                ? ADMIN_MENTORSHIP_STATE_FILTERS.map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))
-                : TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))}
-            </select>
+            {!isDashboard && (
+              <select
+                className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+                <option>Todos los estados</option>
+                {TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
 
@@ -117,9 +112,9 @@ export default function MentorshipTable({
                       <h3 className="text-foreground font-semibold">
                         {request.tutee?.firstName} {request.tutee?.lastName}
                       </h3>
-                      <p className="text-muted-foreground text-sm">{request.tutee?.chapter?.name}</p>
+                      <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
                       <p className="text-muted-foreground text-xs">
-                        {request.skills.map((skill) => skill.name).join(", ")}
+                        {request.needsDescription} - Skills:{request.skills.map((skill) => skill.name).join(", ")}
                       </p>
                     </div>
                   </div>
