@@ -5,10 +5,10 @@ import { getSession } from "auth-astro/server";
 import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 
 const session = await getSession(Astro.request);
+
 const pageData = {
   role: session?.user.role as UserRole,
   title: "Mis mentorías",
-  description: "Gestiona tus mentorías activas y revisa tu historial",
 };
 ---
 
@@ -17,7 +17,6 @@ const pageData = {
     <section class="flex flex-col gap-8 w-full">
       <header>
         <h1 class="text-3xl font-bold text-foreground">{pageData.title}</h1>
-        <p class="text-muted-foreground mt-2">{pageData.description}</p>
       </header>
 
       <HistoryTables client:load role={pageData.role} />
