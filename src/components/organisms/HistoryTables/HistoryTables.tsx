@@ -6,14 +6,15 @@ import FeedbackModal from "../FeedbackModal/FeedbackModal";
 import CancellationModal from "../CancellationModal/CancellationModal";
 import { useHistoryTables } from "@/shared/hooks/useHistoryTables";
 import { useModalState } from "@/shared/hooks/useModalState";
-import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 import { createFeedback, type CreateFeedbackBody } from "@/infrastructure/services/createFeedback";
+import { cancelTutoring } from "@/infrastructure/services/cancelTutoring";
+import type { User } from "@/infrastructure/models/TutoringRequest";
 
 interface HistoryTablesProps {
-  role?: UserRole;
+  user: User;
 }
 
-const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
+const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
   const { data, isLoading } = useHistoryTables();
 
   const {
@@ -31,32 +32,30 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
   } = useModalState<MentorshipData>();
 
   const feedbackModalData = useMemo(() => {
-    if (!selectedFeedbackItem || !role) return null;
+    if (!selectedFeedbackItem || !user.rol) return null;
 
-    const isTutor = role === "Tutor";
+    const isTutor = user.rol === "Tutor";
 
     return {
       participant: isTutor ? selectedFeedbackItem.tutee : selectedFeedbackItem.tutor,
       role: isTutor ? "Tutorado" : "Tutor",
       skills: selectedFeedbackItem.skills,
     };
-  }, [selectedFeedbackItem, role]);
+  }, [selectedFeedbackItem, user]);
 
   const cancellationModalData = useMemo(() => {
-    console.log("Selected Cancellation Item:", selectedCancellationItem);
-    if (!selectedCancellationItem || !role) return null;
+    if (!selectedCancellationItem || !user.rol) return null;
 
-    const isTutor = role === "Tutor";
+    const isTutor = user.rol === "Tutor";
 
     return {
       participant: isTutor ? selectedCancellationItem.tutee : selectedCancellationItem.tutor,
       role: isTutor ? "Tutorado" : "Tutor",
       skills: selectedCancellationItem.skills,
     };
-  }, [selectedCancellationItem, role]);
+  }, [selectedCancellationItem, user]);
 
   const handleActionClick = (action: string, mentorship: MentorshipData) => {
-    console.log("Action clicked:", action, mentorship);
     if (action === "Cancelar") {
       openCancellationModal(mentorship);
     } else if (action === "Finalizar") {
@@ -74,22 +73,23 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
       };
 
       await createFeedback(feedbackData);
-      console.log("Feedback submitted successfully");
       closeFeedbackModal();
     } catch (error) {
       console.error("Error submitting feedback:", error);
     }
   };
 
-  const handleCancellation = async (reason: string) => {
+  const handleCancellation = async (comments: string) => {
     try {
-      // Aquí harías la llamada a tu API para cancelar la mentoría
-      // await cancelTutoring({
-      //   tutoringId: selectedCancellationItem.id,
-      //   reason: reason
-      // });
+      if (!selectedCancellationItem?.id) {
+        return;
+      }
 
-      console.log("Mentoría cancelada con razón:", reason);
+      await cancelTutoring(selectedCancellationItem.id, {
+        userId: user.userId ?? "",
+        comments,
+      });
+
       closeCancellationModal();
     } catch (error) {
       console.error("Error cancelling mentorship:", error);
@@ -131,7 +131,6 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
         <CancellationModal
           isOpen={isCancellationModalOpen}
           onClose={closeCancellationModal}
-          mentorship={cancellationModalData}
           onSubmitCancellation={handleCancellation}
         />
       )}
