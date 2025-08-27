@@ -1,7 +1,7 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { SENIORITY_OPTIONS } from "@/shared/utils/enums/seniority";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { getBasicUserStatistics, type UserStatistics } from "@/infrastructure/services/getBasicUserStatistics";
@@ -12,24 +12,22 @@ import { updateUserProfile, userStore } from "@/store/userStore";
 import { useStore } from "@nanostores/react";
 import { Loader2, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { SessionUser } from "auth.config";
 import { toast } from "sonner";
 
-export default function ProfileForm({ session }: { session: SessionUser }) {
+export const ProfileForm = () => {
   const user = useStore(userStore);
   const [chapters, setChapters] = useState<{ id: string; name: string }[]>([]);
   const [statistics, setStatistics] = useState<UserStatistics | null>(null);
 
   const [formData, setFormData] = useState({
     chapterId: user.chapterId || "",
-    seniority: user.seniority || "",
+    seniority: user.seniority ? String(user.seniority) : "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [initialValidationShown, setInitialValidationShown] = useState(false);
 
-  // Validación inicial - mostrar errores si los campos están vacíos al cargar
   useEffect(() => {
     if (!initialValidationShown && user.id) {
       const initialErrors: { [key: string]: string } = {};
@@ -57,7 +55,7 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
   useEffect(() => {
     setFormData({
       chapterId: user.chapterId || "",
-      seniority: user.seniority || "",
+      seniority: user.seniority ? String(user.seniority) : "",
     });
   }, [user.chapterId, user.seniority]);
 
@@ -70,15 +68,15 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
   };
 
   const createUser = async () => {
-    if (!session?.user) return;
+    if (!user) return;
 
     postCreateUser({
-      firstName: session.user.firstName ?? "",
-      lastName: session.user.lastName ?? "",
-      email: session.user.email || "",
-      googleUserId: session.user.googleId || "",
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
+      email: user.email || "",
+      googleUserId: user.googleId || "",
       chapterId: formData.chapterId || "",
-      seniority: formData.seniority || "",
+      seniority: formData.seniority,
       rol: "Tutorado",
     });
   };
@@ -89,13 +87,13 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
 
     setLoading(true);
 
-    if (session.user.userId === "") {
+    if (user?.userId === "") {
       await createUser();
       return;
     }
     try {
       await updateUser({
-        id: user.id ?? "",
+        id: user.userId ?? "",
         chapterId: formData.chapterId,
         seniority: formData.seniority,
       });
@@ -134,22 +132,22 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-8">
       {/* Profile Section */}
       <div className="w-full">
         {/* Profile Info - Horizontal Layout */}
         <div className="flex items-center gap-6 mb-8 pb-6 border-b">
           <Avatar
-            src={session?.user.image || undefined}
-            fallback={getInitials(session?.user?.firstName || null)}
+            src={user?.image || undefined}
+            fallback={getInitials(user?.firstName || null)}
             size="xl"
             className="ring-2 ring-border"
           />
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{session?.user?.firstName || "Usuario"}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{user?.firstName || "Usuario"}</h1>
             <div className="flex items-center gap-2 mt-2 text-muted-foreground">
               <Mail className="h-4 w-4" />
-              <span className="text-sm">{session?.user?.email || "email@ejemplo.com"}</span>
+              <span className="text-sm">{user?.email || "email@ejemplo.com"}</span>
             </div>
           </div>
         </div>
@@ -184,19 +182,17 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
                 Seniority <span className="text-destructive">*</span>
               </Label>
               <div className="max-w-md">
-                <Input
-                  id="seniority"
-                  type="text"
-                  placeholder="Ej: Junior, Mid, Senior"
+                <Select
+                  options={SENIORITY_OPTIONS}
                   value={formData.seniority}
-                  onChange={(e) => {
-                    setFormData({ ...formData, seniority: e.target.value });
-                    // Limpiar error cuando el usuario escribe
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, seniority: value });
                     if (errors.seniority) {
                       setErrors({ ...errors, seniority: "" });
                     }
                   }}
-                  className={`bg-background ${errors.seniority ? "border-destructive focus:ring-destructive" : ""}`}
+                  placeholder="Selecciona un nivel"
+                  className={errors.seniority ? "border-destructive focus:ring-destructive" : ""}
                 />
               </div>
               {errors.seniority && <p className="text-sm text-destructive">{errors.seniority}</p>}
@@ -256,4 +252,4 @@ export default function ProfileForm({ session }: { session: SessionUser }) {
       </div>
     </div>
   );
-}
+};
