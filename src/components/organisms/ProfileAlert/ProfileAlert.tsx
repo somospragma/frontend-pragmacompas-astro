@@ -11,10 +11,15 @@ export default function ProfileAlert() {
   if (!shouldShowAlert) return null;
 
   return (
-    <div className="w-full max-w-7xl px-4 pt-4 h-14">
-      <Alert variant="warning" className="border-yellow-500/50 bg-yellow-50 dark:bg-yellow-900/20">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription className="font-medium">
+    <div className="w-full px-4 pt-4 h-14">
+      <Alert
+        variant="warning"
+        className="border-yellow-400/50 bg-yellow-50 dark:bg-yellow-600/20 flex items-center gap-3"
+      >
+        <span className="flex items-start justify-start h-full">
+          <AlertTriangle className="h-6 w-6" />
+        </span>
+        <AlertDescription className="font-medium w-full text-center">
           Actualiza tus datos para poder acceder a las funcionalidades
         </AlertDescription>
       </Alert>
