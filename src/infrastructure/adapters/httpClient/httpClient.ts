@@ -2,15 +2,8 @@
 import { useErrorStore } from "@/store/errorStore";
 import axios from "axios";
 
-const baseURL =
-  typeof window === "undefined"
-    ? (await import("astro:env/server")).getSecret("API_URL")
-    : import.meta.env.PUBLIC_API_URL;
-
-const apiKey =
-  typeof window === "undefined"
-    ? (await import("astro:env/server")).getSecret("API_KEY")
-    : import.meta.env.PUBLIC_API_KEY;
+const baseURL = import.meta.env.PUBLIC_API_URL;
+const apiKey = import.meta.env.PUBLIC_API_KEY;
 
 export const httpClient = axios.create({
   baseURL,
