@@ -7,11 +7,11 @@ declare module "@auth/core/types" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
-      role?: string;
+      rol?: string;
     };
   }
 
   interface JWT {
-    role?: string;
+    rol?: string;
   }
 }

@@ -3,6 +3,7 @@ import { HISTORY_TABLE_CONFIG, type MentorshipData } from "@/shared/config/histo
 import DataTable from "../DataTable/DataTable";
 import { HISTORY_PAGE_CONFIG } from "@/shared/config/historyPageConfig";
 import FeedbackModal from "../FeedbackModal/FeedbackModal";
+import CancellationModal from "../CancellationModal/CancellationModal";
 import { useHistoryTables } from "@/shared/hooks/useHistoryTables";
 import { useModalState } from "@/shared/hooks/useModalState";
 import type { UserRole } from "@/infrastructure/models/TutoringRequest";
@@ -14,32 +15,56 @@ interface HistoryTablesProps {
 
 const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
   const { data, isLoading } = useHistoryTables();
-  const { isOpen, selectedItem, openModal, closeModal } = useModalState<MentorshipData>();
+
+  const {
+    isOpen: isFeedbackModalOpen,
+    selectedItem: selectedFeedbackItem,
+    openModal: openFeedbackModal,
+    closeModal: closeFeedbackModal,
+  } = useModalState<MentorshipData>();
+
+  const {
+    isOpen: isCancellationModalOpen,
+    selectedItem: selectedCancellationItem,
+    openModal: openCancellationModal,
+    closeModal: closeCancellationModal,
+  } = useModalState<MentorshipData>();
 
   const feedbackModalData = useMemo(() => {
-    if (!selectedItem || !role) return null;
+    if (!selectedFeedbackItem || !role) return null;
 
     const isTutor = role === "Tutor";
 
     return {
-      participant: isTutor ? selectedItem.tutee : selectedItem.tutor,
+      participant: isTutor ? selectedFeedbackItem.tutee : selectedFeedbackItem.tutor,
       role: isTutor ? "Tutorado" : "Tutor",
-      skills: selectedItem.skills,
+      skills: selectedFeedbackItem.skills,
     };
-  }, [selectedItem, role]);
+  }, [selectedFeedbackItem, role]);
+
+  const cancellationModalData = useMemo(() => {
+    console.log("Selected Cancellation Item:", selectedCancellationItem);
+    if (!selectedCancellationItem || !role) return null;
+
+    const isTutor = role === "Tutor";
+
+    return {
+      participant: isTutor ? selectedCancellationItem.tutee : selectedCancellationItem.tutor,
+      role: isTutor ? "Tutorado" : "Tutor",
+      skills: selectedCancellationItem.skills,
+    };
+  }, [selectedCancellationItem, role]);
 
   const handleActionClick = (action: string, mentorship: MentorshipData) => {
+    console.log("Action clicked:", action, mentorship);
     if (action === "Cancelar") {
-      openModal(mentorship);
+      openCancellationModal(mentorship);
+    } else if (action === "Finalizar") {
+      openFeedbackModal(mentorship);
     }
   };
 
   const handleSubmitFeedback = async (score: number, comments: string) => {
-    // if (!selectedItem || !user.id) {
-    //   console.error("Missing selectedItem or user ID");
-    //   return;
-    // }
-
     try {
       const feedbackData: CreateFeedbackBody = {
         tutoringId: "1a39382d-21b6-432f-93cc-a630e416311b",
@@ -50,9 +75,24 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
 
       await createFeedback(feedbackData);
       console.log("Feedback submitted successfully");
-      closeModal();
+      closeFeedbackModal();
     } catch (error) {
       console.error("Error submitting feedback:", error);
+    }
+  };
+
+  const handleCancellation = async (reason: string) => {
+    try {
+      // Aquí harías la llamada a tu API para cancelar la mentoría
+      // await cancelTutoring({
+      //   tutoringId: selectedCancellationItem.id,
+      //   reason: reason
+      // });
+
+      console.log("Mentoría cancelada con razón:", reason);
+      closeCancellationModal();
+    } catch (error) {
+      console.error("Error cancelling mentorship:", error);
     }
   };
 
@@ -80,10 +120,19 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ role }) => {
 
       {feedbackModalData && (
         <FeedbackModal
-          isOpen={isOpen}
-          onClose={closeModal}
+          isOpen={isFeedbackModalOpen}
+          onClose={closeFeedbackModal}
           mentorship={feedbackModalData}
           onSubmitFeedback={handleSubmitFeedback}
+        />
+      )}
+
+      {cancellationModalData && (
+        <CancellationModal
+          isOpen={isCancellationModalOpen}
+          onClose={closeCancellationModal}
+          mentorship={cancellationModalData}
+          onSubmitCancellation={handleCancellation}
         />
       )}
     </div>
