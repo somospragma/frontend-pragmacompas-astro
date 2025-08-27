@@ -1,17 +1,12 @@
+import type { MentorshipState } from "@/shared/entities/mentorshipState";
+
 export interface Chapter {
   id: string;
   name: string;
 }
 
 export type UserRole = "Tutor" | "Tutorado" | "Administrador";
-export type TutoringRequestStatus =
-  | "Pendiente"
-  | "Enviada"
-  | "Aprobada"
-  | "Asignada"
-  | "Conversando"
-  | "Rechazada"
-  | "Finalizada";
+export type TutoringRequestStatus = MentorshipState;
 
 export interface User {
   id?: string;
@@ -22,6 +17,7 @@ export interface User {
   chapterId?: string;
   rol?: UserRole;
   activeTutoringLimit?: number;
+  slackId?: string;
   seniority?: string;
 }
 

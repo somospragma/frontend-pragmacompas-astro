@@ -1,76 +1,12 @@
 ---
-import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
 import MainLayout from "@/components/templates/MainLayout.astro";
-
-const mentorshipRequests = [
-  {
-    id: "90d713a1-dbe7-4fdd-b395-f775fb0ed305",
-    tutee: {
-      id: "tutee-1",
-      firstName: "David",
-      lastName: "Lee",
-      email: "david.lee@pragma.com",
-      chapter: {
-        id: "frontend",
-        name: "Frontend",
-      },
-      rol: "Tutorado",
-    },
-    skills: [
-      { id: "skills-1", name: "React" },
-      { id: "skills-2", name: "TypeScript" },
-      { id: "skills-3", name: "Next.js" },
-    ],
-    needsDescription: "Necesito ayuda con optimización de rendimiento en React",
-    requestStatus: "Enviada",
-  },
-  {
-    id: "90d713a1-dbe7-4fdd-b395-f775fb0ed306",
-    tutee: {
-      id: "tutee-2",
-      firstName: "Anderson",
-      lastName: "Castano",
-      email: "anderson.castano@pragma.com",
-      chapter: {
-        id: "frontend",
-        name: "Frontend",
-      },
-      rol: "Tutorado",
-    },
-    skills: [
-      { id: "skills-4", name: "Vue.js" },
-      { id: "skills-5", name: "Nuxt.js" },
-    ],
-    needsDescription: "Quiero aprender Vue.js desde cero",
-    requestStatus: "Enviada",
-  },
-  {
-    id: "90d713a1-dbe7-4fdd-b395-f775fb0ed307",
-    tutee: {
-      id: "tutee-3",
-      firstName: "María",
-      lastName: "González",
-      email: "maria.gonzalez@pragma.com",
-      chapter: {
-        id: "backend",
-        name: "Backend",
-      },
-      rol: "Tutorado",
-    },
-    skills: [
-      { id: "skills-6", name: "Node.js" },
-      { id: "skills-7", name: "Express" },
-    ],
-    needsDescription: "Necesito mejorar en arquitectura de APIs REST",
-    requestStatus: "Aceptada",
-  },
-];
+import MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 ---
 
 <MainLayout>
   <main class="w-full max-w-7xl pt-8 pb-8 px-4 sm:px-6 lg:px-8">
     <section class="flex flex-col gap-4 w-full max-w-7xl">
-      <MentorshipTable title="Solicitudes de Mentoría" client:load mentorshipRequests={mentorshipRequests} />
+      <MentorshipRequest client:load />
     </section>
   </main>
 </MainLayout>

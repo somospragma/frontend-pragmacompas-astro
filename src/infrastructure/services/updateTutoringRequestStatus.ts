@@ -1,8 +1,9 @@
+import type { MentorshipState } from "@/shared/entities/mentorshipState";
 import { httpClient } from "../adapters/httpClient/httpClient";
 import type { TutoringRequest } from "../models/TutoringRequest";
 
 export interface UpdateTutoringRequestStatusBody {
-  status: "Enviada" | "Aprobada" | "Asignada" | "Rechazada";
+  status: MentorshipState;
 }
 
 export interface UpdateTutoringRequestStatusResponse {
