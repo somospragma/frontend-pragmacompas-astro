@@ -6,28 +6,7 @@ import {
   ADMIN_MENTORSHIP_STATE_FILTERS,
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
-
-export interface MentorshipRequest {
-  id: string;
-  tutee: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    chapter: {
-      id: string;
-      name: string;
-    };
-    rol: string;
-    slackId: string;
-  };
-  skills: {
-    id: string;
-    name: string;
-  }[];
-  needsDescription: string;
-  requestStatus: MentorshipState;
-}
+import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 
 interface Props {
   mentorshipRequests: MentorshipRequest[];
@@ -130,15 +109,15 @@ export default function MentorshipTable({
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-primary font-semibold">
-                        {request.tutee.firstName.charAt(0)}
-                        {request.tutee.lastName.charAt(0)}
+                        {request.tutee?.firstName ? request.tutee.firstName.charAt(0) : "?"}
+                        {request.tutee?.lastName ? request.tutee.lastName.charAt(0) : "?"}
                       </span>
                     </div>
                     <div>
                       <h3 className="text-foreground font-semibold">
-                        {request.tutee.firstName} {request.tutee.lastName}
+                        {request.tutee?.firstName} {request.tutee?.lastName}
                       </h3>
-                      <p className="text-muted-foreground text-sm">{request.tutee.chapter.name}</p>
+                      <p className="text-muted-foreground text-sm">{request.tutee?.chapter?.name}</p>
                       <p className="text-muted-foreground text-xs">
                         {request.skills.map((skill) => skill.name).join(", ")}
                       </p>
