@@ -6,11 +6,7 @@ import { type Account } from "@/shared/entities/account";
 import type { IJson } from "@/shared/entities/IJson";
 import { type User } from "@/shared/entities/user";
 import { mapArrayToRecord } from "@/shared/utils/helpers/mapArrayToRecord";
-import { getSession } from "auth-astro/server";
 import "@/styles/global.css";
-import { setUser } from "@/store/userStore";
-import type { SessionUser } from "auth.config";
-
 const entries = await contentfulClient.getEntries<IJson>({
   content_type: "json",
 });
@@ -18,27 +14,6 @@ const entries = await contentfulClient.getEntries<IJson>({
 const users = entries.items.filter((item) => item.fields.name === "users")[0].fields.json as unknown as User[];
 const accounts = entries.items.filter((item) => item.fields.name === "accounts")[0].fields.json as unknown as Account[];
 const accountsRecord = mapArrayToRecord(accounts, "id");
-
-const session = (await getSession(Astro.request)) as SessionUser;
-if (session?.user?.rol === "") {
-  setUser({
-    id: session.user.userId,
-    firstName: session.user.firstName,
-    lastName: session.user.lastName,
-    email: session.user.googleId,
-    image: session.user.image,
-    chapterId: session.user.chapterId,
-    seniority: session.user.seniority,
-    isLoggedIn: true,
-  });
-  return Astro.redirect("/profile");
-}
-if (session?.user?.rol === "Tutor") {
-  return Astro.redirect("/requests");
-}
-if (session?.user?.rol === "Administrador") {
-  return Astro.redirect("/dashboard");
-}
 ---
 
 <MainLayout>

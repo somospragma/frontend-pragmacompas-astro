@@ -2,7 +2,11 @@
 import Footer from "@/components/organisms/Footer.astro";
 import Header from "@/components/organisms/Header.astro";
 import ProfileAlert from "@/components/organisms/ProfileAlert/ProfileAlert.tsx";
+import { Toaster } from "@/components/ui/toaster";
 import BaseLayout from "./BaseLayout.astro";
+import type { SessionUser } from "auth.config";
+import { getSession } from "auth-astro/server";
+import { UserInitializer } from "@/components/organisms/UserInitializer/UserInitializer";
 
 interface Props {
   title?: string;
@@ -19,8 +23,9 @@ const {
   image = "https://astro.build/og/astro.jpg",
   hideHeader = false,
   hideFooter = false,
-  showNotCreatedUser,
 } = Astro.props;
+
+const session = (await getSession(Astro.request)) as SessionUser;
 ---
 
 <BaseLayout title={title} description={description} image={image}>
@@ -38,20 +43,18 @@ const {
   </style>
 
   <div class="flex flex-col background min-h-screen w-full">
-    {!hideHeader && <Header />}
+    <ProfileAlert client:load />
 
-    {
-      showNotCreatedUser && (
-        <div class="w-full max-w-7xl px-4 pt-4 mx-auto">
-          <ProfileAlert client:load />
-        </div>
-      )
-    }
+    <UserInitializer user={session?.user} client:load />
+
+    {!hideHeader && <Header />}
 
     <main class="flex-grow w-full max-w-7xl mx-auto">
       <slot />
     </main>
 
     {!hideFooter && <Footer />}
+
+    <Toaster client:load />
   </div>
 </BaseLayout>

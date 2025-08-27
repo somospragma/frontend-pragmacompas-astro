@@ -2,16 +2,16 @@
 
 ## Architecture Overview
 
-This is an **Astro SSR application** with React components, following **Clean Architecture** principles and designed for mentorship platform functionality. The app uses server-side rendering with Vercel deployment.
+This is an **Astro SSR mentorship platform** with React components, following **Clean Architecture** principles. The app uses server-side rendering with Vercel deployment and integrates with a Spring Boot backend API.
 
 ### Key Technologies
 
 - **Astro 5** with SSR (`output: "server"`) and Vercel adapter
 - **React 19** for interactive components with `client:load` directives
-- **Authentication** via `auth-astro` with Google OAuth
+- **Authentication** via `auth-astro` with Google OAuth (configured in `auth.config.ts`)
 - **State Management**: Nanostores for user state, Zustand for error handling
 - **Styling**: Tailwind CSS with shadcn/ui components and dark mode support
-- **HTTP Client**: Axios with centralized error handling and environment-aware base URL
+- **HTTP Client**: Axios with environment-aware base URL and automatic error handling
 
 ## Essential Patterns
 
@@ -45,7 +45,7 @@ services/        # API endpoint functions (getTutoringRequests.ts)
 
 ### HTTP Client Configuration
 
-The `httpClient` handles server/client environment differences:
+The `httpClient` in `src/infrastructure/adapters/httpClient/httpClient.ts` handles server/client environment differences:
 
 ```typescript
 // Uses astro:env/server on server, PUBLIC_API_URL on client
@@ -55,16 +55,25 @@ const baseURL =
     : import.meta.env.PUBLIC_API_URL;
 ```
 
+**Critical**: Includes automatic error handling with Zustand store integration and auth redirects on 401 responses.
+
 ### Service Layer Pattern
 
-Each API endpoint has its own file with typed interfaces:
+Each API endpoint has its own file in `src/infrastructure/services/` with typed interfaces:
 
 ```typescript
-// Example: getTutoringRequests.ts
-export interface GetTutoringRequestsParams { ... }
-export interface GetTutoringRequestsResponse { ... }
-export async function getTutoringRequests(params) { ... }
+// Example: getChapters.ts
+export interface GetChaptersResponse { message: string; data: Chapter[]; timestamp: string; }
+export async function getChapters(): Promise<Chapter[]> { ... }
 ```
+
+**Services integrate with httpClient** and follow backend API response structure from OpenAPI spec.
+
+### Authentication & Middleware
+
+- **Google OAuth** in `auth.config.ts` with `/login` custom sign-in page
+- **Route protection** via `src/middleware.ts` using `PROTECTED_ROUTES` array
+- **Session handling** with `getSession(context.request)` in Astro components
 
 ### Dark Mode Implementation
 
