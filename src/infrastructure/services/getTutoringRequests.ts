@@ -9,9 +9,18 @@ export interface GetTutoringRequestsParams {
   chapterId?: string;
 }
 
+export type GetTutoringRequestsResponseData = Omit<TutoringRequest, "tutee"> & {
+  tutee: Omit<TutoringRequest["tutee"], "chapterId"> & {
+    chapter: {
+      id: string;
+      name: string;
+    };
+  };
+};
+
 export interface GetTutoringRequestsResponse {
   message: string;
-  data: TutoringRequest[];
+  data: GetTutoringRequestsResponseData[];
   timestamp: string;
 }
 

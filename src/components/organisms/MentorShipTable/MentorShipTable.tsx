@@ -6,29 +6,7 @@ import {
   ADMIN_MENTORSHIP_STATE_FILTERS,
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
-
-export interface MentorshipRequest {
-  id: string;
-  tutee: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    chapter: {
-      id: string;
-      name: string;
-    };
-    rol: string;
-    slackId: string;
-  };
-  skills: {
-    id: string;
-    name: string;
-  }[];
-  needsDescription: string;
-  requestStatus: MentorshipState;
-}
-
+import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
@@ -97,24 +75,20 @@ export default function MentorshipTable({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <select
-              className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-            >
-              <option>Todos los estados</option>
-              {isDashboard
-                ? ADMIN_MENTORSHIP_STATE_FILTERS.map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))
-                : TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))}
-            </select>
+            {!isDashboard && (
+              <select
+                className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+                <option>Todos los estados</option>
+                {TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         </div>
 
@@ -130,17 +104,17 @@ export default function MentorshipTable({
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-primary font-semibold">
-                        {request.tutee.firstName.charAt(0)}
-                        {request.tutee.lastName.charAt(0)}
+                        {request.tutee?.firstName ? request.tutee.firstName.charAt(0) : "?"}
+                        {request.tutee?.lastName ? request.tutee.lastName.charAt(0) : "?"}
                       </span>
                     </div>
                     <div>
                       <h3 className="text-foreground font-semibold">
-                        {request.tutee.firstName} {request.tutee.lastName}
+                        {request.tutee?.firstName} {request.tutee?.lastName}
                       </h3>
-                      <p className="text-muted-foreground text-sm">{request.tutee.chapter.name}</p>
+                      <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
                       <p className="text-muted-foreground text-xs">
-                        {request.skills.map((skill) => skill.name).join(", ")}
+                        {request.needsDescription} - Skills:{request.skills.map((skill) => skill.name).join(", ")}
                       </p>
                     </div>
                   </div>

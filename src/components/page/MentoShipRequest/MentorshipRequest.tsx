@@ -1,8 +1,10 @@
 import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
-import { getTutoringRequests } from "@/infrastructure/services/getTutoringRequests";
+import { getTutoringRequests, type GetTutoringRequestsParams } from "@/infrastructure/services/getTutoringRequests";
 import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
 import { useEffect, useState } from "react";
 import { MentorshipState } from "@/shared/entities/mentorshipState";
+import { userStore } from "@/store/userStore";
+import { TUTOR_MENTORSHIP_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
 
 // Transform TutoringRequest to match MentorshipTable's expected interface
 type MentorshipRequest = Omit<TutoringRequest, "tutee"> & {
@@ -23,8 +25,13 @@ type Props = {
 
 const MentorshipRequest = ({ isDashboard }: Props) => {
   const [mentorshipRequests, setMentorshipRequests] = useState<MentorshipRequest[]>([]);
+
   const handleGetTutoringRequests = () => {
-    getTutoringRequests({}).then((data) => {
+    const params: GetTutoringRequestsParams = {
+      chapterId: userStore.get().chapterId,
+      status: isDashboard ? MentorshipState.PENDING : undefined,
+    };
+    getTutoringRequests(params).then((data) => {
       // Transform TutoringRequest[] to match MentorshipRequest interface
       const transformedData: MentorshipRequest[] = data.data.map((request) => ({
         ...request,
@@ -33,8 +40,8 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
           id: request.tutee.id || "", // Ensure id is always a string
           rol: request.tutee.rol || "Tutorado", // Provide default role
           chapter: {
-            id: request.tutee.chapterId || "",
-            name: "Chapter Name", // You might want to fetch this from another API
+            id: request.tutee?.chapter ? request.tutee.chapter.id : "",
+            name: request.tutee?.chapter ? request.tutee.chapter.name : "",
           },
           slackId: request.tutee.slackId || "", // Ensure slackId is always a string
         },
@@ -54,7 +61,13 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
           <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold text-foreground">{mentorshipRequests.length}</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {
+                    mentorshipRequests.filter((request) =>
+                      TUTOR_MENTORSHIP_STATE_FILTERS.includes(request.requestStatus)
+                    ).length
+                  }
+                </p>
                 <p className="text-muted-foreground text-sm">Total Solicitudes</p>
               </div>
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
