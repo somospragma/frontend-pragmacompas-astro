@@ -3,14 +3,18 @@ import { getSession } from "auth-astro/server";
 import DashboardHeader from "../organisms/DashboardHeader/DashboardHeader";
 import DashboardSidebar from "../organisms/DashboardSidebar/DashboardSidebar";
 import BaseLayout from "./BaseLayout.astro";
+import { UserInitializer } from "../organisms/UserInitializer/UserInitializer";
+import type { SessionUser } from "auth.config";
 
-const session = await getSession(Astro.request);
+const session = (await getSession(Astro.request)) as SessionUser;
 ---
 
 <BaseLayout>
   <div class="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
     <DashboardSidebar client:load currentPath={Astro.url.pathname} />
     <div class="flex-1 flex flex-col overflow-hidden">
+      <UserInitializer user={session?.user} client:load />
+
       <DashboardHeader user={session?.user} client:load />
       <main
         class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-gray-900 transition-colors duration-300"
