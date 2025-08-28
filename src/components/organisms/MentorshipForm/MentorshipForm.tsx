@@ -101,7 +101,7 @@ export default function MentorshipForm() {
       setChapter("");
       setNeedsDescription("");
 
-      const homeUrl = ROUTE_PATHS.HOME.getHref();
+      const homeUrl = ROUTE_PATHS.HISTORY.getHref();
       window.location.href = homeUrl;
     } catch {
       toast.error("Error al enviar solicitud", {
@@ -154,13 +154,13 @@ export default function MentorshipForm() {
         <form className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="chapter" className="text-sm font-medium">
-              Capítulo
+              Chapter
             </Label>
             <Select
               options={chapters.map((c) => ({ value: c.id, label: c.name }))}
               value={chapter}
               onValueChange={setChapter}
-              placeholder="Selecciona un capítulo"
+              placeholder="Selecciona un chapter"
             />
             {errors.chapter && <p className="text-sm text-destructive">{errors.chapter}</p>}
           </div>
