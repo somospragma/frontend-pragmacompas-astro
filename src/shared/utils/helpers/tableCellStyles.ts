@@ -1,3 +1,4 @@
+import { MentorshipState } from "@/shared/entities/mentorshipState";
 import { Status } from "@/shared/utils/enums/status";
 
 export const getStatusBadgeClasses = (status: string): string => {
@@ -10,7 +11,7 @@ export const getStatusBadgeClasses = (status: string): string => {
     [Status.Asignada]: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
     [Status.Conversando]: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
     [Status.Pendiente]: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-    [Status.Rechazada]: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    [MentorshipState.CANCELLED]: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
   };
   return statusClasses[status] || "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
 };
