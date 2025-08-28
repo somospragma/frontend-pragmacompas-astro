@@ -1,14 +1,17 @@
+import type { UserRole } from "@/infrastructure/models/TutoringRequest";
+
 export interface MentorshipData {
   id: string;
   type: string;
-  role: string;
+  role: UserRole;
   tutee: string;
   tutor: string;
+  evaluatorId: string;
   status: string;
   startDate: string;
   chapter: string;
   skills: string[];
-  action: string;
+  action: string[];
 }
 
 export type CellValue = string | string[];

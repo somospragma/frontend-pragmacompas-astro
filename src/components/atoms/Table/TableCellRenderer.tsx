@@ -17,7 +17,6 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
   switch (column.cellType) {
     case "badge":
       if (typeof value !== "string") {
-        console.warn("Badge cell expected string value, got:", typeof value);
         return <span>Invalid value</span>;
       }
       return (
@@ -31,7 +30,6 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
 
     case "skills":
       if (!Array.isArray(value)) {
-        console.warn("Skills cell expected array value, got:", typeof value);
         return <span>Invalid value</span>;
       }
       return (
@@ -46,8 +44,29 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
       );
 
     case "button":
+      if (Array.isArray(value)) {
+        if (value.length === 0) {
+          return null;
+        }
+
+        return (
+          <div className="flex gap-2 flex-wrap">
+            {value.map((buttonValue, index) => (
+              <Button
+                key={index}
+                variant={getVariantButtonClasses(buttonValue)}
+                size="sm"
+                aria-label={`${buttonValue}`}
+                onClick={() => onActionClick?.(buttonValue, row)}
+              >
+                {buttonValue}
+              </Button>
+            ))}
+          </div>
+        );
+      }
+
       if (typeof value !== "string") {
-        console.warn("Button cell expected string value, got:", typeof value);
         return <span>Invalid value</span>;
       }
 
@@ -69,7 +88,6 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
     case "text":
     default:
       if (typeof value !== "string") {
-        console.warn("Text cell expected string value, got:", typeof value);
         return <span>Invalid value</span>;
       }
       return <span className={baseClassName}>{value}</span>;

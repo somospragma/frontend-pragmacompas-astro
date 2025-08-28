@@ -9,13 +9,18 @@ import { useModalState } from "@/shared/hooks/useModalState";
 import { createFeedback, type CreateFeedbackBody } from "@/infrastructure/services/createFeedback";
 import { cancelTutoring } from "@/infrastructure/services/cancelTutoring";
 import type { User } from "@/infrastructure/models/TutoringRequest";
+import { UserRole } from "@/shared/utils/enums/role";
+import { MentorshipAction } from "@/shared/utils/enums/mentorshipAction";
+import { updateTutoringRequestStatus } from "@/infrastructure/services/updateTutoringRequestStatus";
+import { MentorshipState } from "@/shared/entities/mentorshipState";
+import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
 
 interface HistoryTablesProps {
   user: User;
 }
 
 const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
-  const { data, isLoading } = useHistoryTables();
+  const { data, isLoading, refetch } = useHistoryTables();
 
   const {
     isOpen: isFeedbackModalOpen,
@@ -33,12 +38,11 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
 
   const feedbackModalData = useMemo(() => {
     if (!selectedFeedbackItem || !user.rol) return null;
-
-    const isTutor = user.rol === "Tutor";
+    const isTutor = selectedFeedbackItem.role === UserRole.TUTOR;
 
     return {
       participant: isTutor ? selectedFeedbackItem.tutee : selectedFeedbackItem.tutor,
-      role: isTutor ? "Tutorado" : "Tutor",
+      role: isTutor ? UserRole.TUTEE : UserRole.TUTOR,
       skills: selectedFeedbackItem.skills,
     };
   }, [selectedFeedbackItem, user]);
@@ -56,41 +60,59 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
   }, [selectedCancellationItem, user]);
 
   const handleActionClick = (action: string, mentorship: MentorshipData) => {
-    if (action === "Cancelar") {
+    if (action === MentorshipAction.CANCEL) {
       openCancellationModal(mentorship);
-    } else if (action === "Finalizar") {
+    } else if (action === MentorshipAction.COMPLETE) {
       openFeedbackModal(mentorship);
     }
   };
 
   const handleSubmitFeedback = async (score: number, comments: string) => {
+    if (!selectedFeedbackItem?.id) {
+      return;
+    }
     try {
       const feedbackData: CreateFeedbackBody = {
-        tutoringId: "1a39382d-21b6-432f-93cc-a630e416311b",
+        tutoringId: selectedFeedbackItem?.id,
         score: score.toString(),
         comments,
-        evaluatorId: "tutor-1",
+        evaluatorId: selectedFeedbackItem.evaluatorId,
       };
 
       await createFeedback(feedbackData);
       closeFeedbackModal();
+      await refetch();
     } catch (error) {
       console.error("Error submitting feedback:", error);
     }
   };
 
-  const handleCancellation = async (comments: string) => {
+  const handleCancellation = async (comments: string): Promise<void> => {
+    if (!selectedCancellationItem?.id) {
+      return;
+    }
+
     try {
-      if (!selectedCancellationItem?.id) {
-        return;
+      switch (selectedCancellationItem.type) {
+        case MentorshipType.REQUEST:
+          await updateTutoringRequestStatus(selectedCancellationItem.id, {
+            status: MentorshipState.CANCELLED,
+          });
+          break;
+
+        case MentorshipType.MENTORSHIP:
+          await cancelTutoring(selectedCancellationItem.id, {
+            userId: user.userId,
+            comments,
+          });
+          break;
+
+        default:
+          return;
       }
 
-      await cancelTutoring(selectedCancellationItem.id, {
-        userId: user.userId ?? "",
-        comments,
-      });
-
       closeCancellationModal();
+      await refetch();
     } catch (error) {
       console.error("Error cancelling mentorship:", error);
     }

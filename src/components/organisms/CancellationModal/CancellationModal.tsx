@@ -50,7 +50,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">Cancelar Mentoría</DialogTitle>
-          <DialogDescription>¿Estás seguro de que deseas cancelar esta sesión de mentoría?</DialogDescription>
+          <DialogDescription>Esta acción no se puede deshacer</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -67,13 +67,6 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
               maxLength={500}
             />
             <p className="text-xs text-muted-foreground">{reason.length}/500 caracteres</p>
-          </div>
-
-          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
-            <p className="text-sm text-foreground">
-              <strong>Importante:</strong> Esta acción no se puede deshacer. El participante será notificado de la
-              cancelación.
-            </p>
           </div>
         </div>
 

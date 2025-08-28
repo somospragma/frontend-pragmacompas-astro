@@ -43,7 +43,7 @@ export const ProfileForm = () => {
       setChapters(res as { id: string; name: string }[]);
     });
 
-    getBasicUserStatistics(user?.id ?? "")
+    getBasicUserStatistics()
       .then((stats) => {
         setStatistics(stats);
       })

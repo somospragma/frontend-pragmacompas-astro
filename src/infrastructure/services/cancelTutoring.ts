@@ -2,7 +2,7 @@ import { httpClient } from "../adapters/httpClient/httpClient";
 import type { Tutoring } from "../models/Tutoring";
 
 export interface CancelTutoringBody {
-  userId: string;
+  userId?: string;
   comments?: string;
 }
 

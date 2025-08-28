@@ -1,4 +1,5 @@
 import { Status } from "@/shared/utils/enums/status";
+import { MentorshipState } from "../entities/mentorshipState";
 
 export interface HistoryTableConfig {
   title: string;
@@ -12,7 +13,7 @@ export const HISTORY_PAGE_CONFIG = {
     title: "Mentorías activas",
     emptyMessage: "No tienes mentorías activas en este momento",
     showActions: true,
-    status: [Status.Activa, Status.Pendiente],
+    status: [Status.Activa, MentorshipState.PENDING, MentorshipState.APPROVED],
   },
   completed: {
     title: "Mentorías completadas",

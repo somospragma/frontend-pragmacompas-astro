@@ -1,7 +1,10 @@
-import { Status } from "@/shared/utils/enums/status";
-import type { MyRequestsResponse, TutoringSession, UserRole } from "../../models/TutoringRequest";
+import type { MyRequestsResponse, TutoringSession } from "../../models/TutoringRequest";
 import type { MentorshipData } from "@/shared/config/historyTableConfig";
 import { dateAdapter } from "../dateAdapter/dateAdapter";
+import { MentorshipState } from "@/shared/entities/mentorshipState";
+import { UserRole } from "@/shared/utils/enums/role";
+import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
+import { MentorshipAction } from "@/shared/utils/enums/mentorshipAction";
 
 export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
   const result: MentorshipData[] = [];
@@ -9,70 +12,80 @@ export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
   data.requests?.forEach((request) => {
     result.push({
       id: request.id,
-      type: "Solicitud",
-      role: "Tutorado",
+      type: MentorshipType.REQUEST,
+      role: UserRole.TUTEE,
       tutee: `${request.tutee.firstName} ${request.tutee.lastName}`,
       tutor: "Por asignar",
-      chapter: request.tutee.chapter.name,
+      evaluatorId: "",
+      chapter: request?.tutee?.chapter?.name ?? "",
       skills: request.skills.map((skill) => skill.name),
       status: request.requestStatus,
       startDate: "",
-      action: "Cancelar",
+      action: getAvailableActions(request.requestStatus, UserRole.TUTEE, MentorshipType.REQUEST),
     });
   });
 
   data.tutoringsAsTutor?.forEach((tutoring: TutoringSession) => {
     result.push({
       id: tutoring.id,
-      type: "Mentoría",
-      role: "Tutor",
+      type: MentorshipType.MENTORSHIP,
+      role: UserRole.TUTOR,
       tutee: `${tutoring.tutee.firstName} ${tutoring.tutee.lastName}`,
       tutor: `${tutoring.tutor.firstName} ${tutoring.tutor.lastName}`,
-      chapter: tutoring.tutee.chapter.name,
+      evaluatorId: `${tutoring.tutor.id}`,
+      chapter: tutoring.tutee.chapter?.name ?? "",
       status: tutoring.status,
       startDate: dateAdapter(tutoring.startDate).format("DD [de] MMMM, YYYY"),
       skills: tutoring.skills.map((skill) => skill.name),
-      action: getActionByStatus(tutoring.status, "Tutor"),
+      action: getAvailableActions(tutoring.status, UserRole.TUTOR, MentorshipType.MENTORSHIP),
     });
   });
 
   data.tutoringsAsTutee?.forEach((tutoring) => {
     result.push({
       id: tutoring.id,
-      type: "Mentoría",
-      role: "Tutorado",
+      type: MentorshipType.MENTORSHIP,
+      role: UserRole.TUTEE,
       tutee: `${tutoring.tutee.firstName} ${tutoring.tutee.lastName}`,
       tutor: `${tutoring.tutor.firstName} ${tutoring.tutor.lastName}`,
-      chapter: tutoring.tutor.chapter.name,
+      evaluatorId: `${tutoring.tutor.id}`,
+      chapter: tutoring.tutor.chapter?.name ?? "",
       skills: tutoring.skills.map((skill) => skill.name),
       status: tutoring.status,
       startDate: dateAdapter(tutoring.startDate).format("DD [de] MMMM, YYYY"),
-      action: getActionByStatus(tutoring.status, "Tutorado"),
+      action: getAvailableActions(tutoring.status, UserRole.TUTEE, MentorshipType.MENTORSHIP),
     });
   });
 
   return result;
 }
 
-const getActionByStatus = (status: string, userRole: UserRole): string => {
-  if (userRole === "Tutor") {
-    switch (status) {
-      case Status.Activa:
-        return "Finalizar";
-      default:
-        return "";
-    }
+const getAvailableActions = (status: MentorshipState, userRoleInItem: UserRole, itemType: MentorshipType): string[] => {
+  if (status === MentorshipState.CANCELLING) {
+    return [];
   }
 
-  if (userRole === "Tutorado") {
-    switch (status) {
-      case Status.Pendiente:
-      case Status.Activa:
-        return "Cancelar";
-      default:
-        return "";
-    }
+  const actions: string[] = [];
+
+  switch (itemType) {
+    case MentorshipType.REQUEST:
+      // Solo el tutorado puede cancelar su propia solicitud
+      if (userRoleInItem === UserRole.TUTEE) {
+        actions.push(MentorshipAction.CANCEL);
+      }
+      break;
+
+    case MentorshipType.MENTORSHIP:
+      if (status === ("Activa" as MentorshipState)) {
+        // Ambos roles pueden cancelar y finalizar la mentoría activa
+        actions.push(MentorshipAction.CANCEL);
+        actions.push(MentorshipAction.COMPLETE);
+      }
+      break;
+
+    default:
+      break;
   }
 
-  return "";
+  return actions;
 };
