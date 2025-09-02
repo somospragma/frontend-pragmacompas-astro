@@ -1,3 +1,5 @@
+import { UserRole } from "./role";
+
 export type Route<TParams> = {
   path: string;
   getHref: TParams extends never ? () => string : (params: TParams) => string;
@@ -13,6 +15,7 @@ type RouteParamsMap = {
   WORLD_PRAGMA_ACCOUNT: { id: string };
   PROFILE: void;
   HISTORY: void;
+  REQUESTS: void;
 };
 
 export const ROUTE_PATHS: { [K in keyof RouteParamsMap]: Route<RouteParamsMap[K]> } = {
@@ -25,6 +28,7 @@ export const ROUTE_PATHS: { [K in keyof RouteParamsMap]: Route<RouteParamsMap[K]
   TRIVIA_SCRIPT: { path: "/mundo-pragma/triviascript", getHref: () => `/mundo-pragma/triviascript` },
   PROFILE: { path: "/profile", getHref: () => "/profile" },
   HISTORY: { path: "/history", getHref: () => "/history" },
+  REQUESTS: { path: "/requests", getHref: () => "/requests" },
 } as const;
 
 // Routes required authentication
@@ -35,7 +39,13 @@ export const PROTECTED_ROUTES: string[] = [
   ROUTE_PATHS.HISTORY.getHref(),
   ROUTE_PATHS.DASHBOARD.getHref(),
   ROUTE_PATHS.DASHBOARD_PROFILE.getHref(),
+  ROUTE_PATHS.REQUESTS.getHref(),
 ];
+
+// Routes that require specific roles
+export const ROLE_RESTRICTED_ROUTES: Record<string, string[]> = {
+  [ROUTE_PATHS.REQUESTS.getHref()]: [UserRole.TUTOR],
+} as const;
 
 // Role-based route mapping
 export const ROLE_ROUTES = {
