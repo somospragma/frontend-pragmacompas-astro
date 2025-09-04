@@ -29,7 +29,6 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
   const handleGetTutoringRequests = () => {
     const params: GetTutoringRequestsParams = {
       chapterId: userStore.get().chapterId,
-      status: isDashboard ? MentorshipState.PENDING : undefined,
     };
     getTutoringRequests(params).then((data) => {
       // Transform TutoringRequest[] to match MentorshipRequest interface

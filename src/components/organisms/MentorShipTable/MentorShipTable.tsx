@@ -75,20 +75,25 @@ export default function MentorshipTable({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {!isDashboard && (
-              <select
-                className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-              >
-                <option>Todos los estados</option>
-                {TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            )}
+
+            <select
+              className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option>Todos los estados</option>
+              {!isDashboard
+                ? TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))
+                : ADMIN_MENTORSHIP_STATE_FILTERS.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+            </select>
           </div>
         </div>
 

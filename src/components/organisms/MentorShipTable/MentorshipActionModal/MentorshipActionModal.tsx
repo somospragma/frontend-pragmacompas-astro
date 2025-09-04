@@ -6,7 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/molecules/Dialog/Dialog";
-import { renderState, type MentorshipRequest } from "../MentorShipTable";
+import { renderState } from "../MentorShipTable";
+import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import { MentorshipState, useMentorshipStates } from "@/shared/entities/mentorshipState";
 import { Button } from "@/components/ui/button";
 
@@ -29,8 +30,8 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props)
         acceptAction = "Aceptar";
         break;
       case MentorshipState.CONVERSING:
-        rejectAction = "Rechazar";
-        acceptAction = "Aceptar";
+        rejectAction = "No tomar tutoría";
+        acceptAction = "Tomar tutoría";
         break;
       case MentorshipState.APPROVED:
         rejectAction = "Volver";
@@ -74,8 +75,8 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props)
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-primary font-semibold text-lg">
-                {selectedRequest?.tutee.firstName.charAt(0)}
-                {selectedRequest?.tutee.lastName.charAt(0)}
+                {selectedRequest?.tutee.firstName ? selectedRequest?.tutee.firstName.charAt(0) : "?"}
+                {selectedRequest?.tutee.lastName ? selectedRequest?.tutee.lastName.charAt(0) : "?"}
               </span>
             </div>
             <div>
