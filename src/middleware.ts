@@ -3,7 +3,7 @@ import type { APIContext, MiddlewareHandler, MiddlewareNext } from "astro";
 import { sequence } from "astro:middleware";
 import { getSession } from "auth-astro/server";
 import type { UserRole } from "./infrastructure/models/TutoringRequest";
-import { PROTECTED_ROUTES, ROLE_ROUTES, ROUTE_PATHS } from "./shared/utils/enums/paths";
+import { PROTECTED_ROUTES, ROLE_ROUTES, ROUTE_PATHS, ROLE_RESTRICTED_ROUTES } from "./shared/utils/enums/paths";
 import type { SessionUser } from "auth.config";
 
 export async function logAccess(context: APIContext, next: MiddlewareNext): Promise<Response> {
@@ -59,4 +59,29 @@ export async function roleRedirectMiddleware(context: APIContext, next: Middlewa
   return next();
 }
 
-export const onRequest: MiddlewareHandler = sequence(logAccess, authMiddleware, roleRedirectMiddleware);
+export async function roleAccessMiddleware(context: APIContext, next: MiddlewareNext): Promise<Response> {
+  const session = (await getSession(context.request)) as SessionUser;
+
+  if (session && session.user?.googleId) {
+    const currentPath = context.url.pathname;
+    const userRole = session.user?.rol as UserRole;
+
+    for (const [restrictedPath, allowedRoles] of Object.entries(ROLE_RESTRICTED_ROUTES)) {
+      if (currentPath === restrictedPath || currentPath.startsWith(restrictedPath)) {
+        if (!allowedRoles.includes(userRole as string)) {
+          const redirectRoute = ROLE_ROUTES[userRole] || ROUTE_PATHS.HOME.getHref();
+          return context.redirect(redirectRoute);
+        }
+      }
+    }
+  }
+
+  return next();
+}
+
+export const onRequest: MiddlewareHandler = sequence(
+  logAccess,
+  authMiddleware,
+  roleRedirectMiddleware,
+  roleAccessMiddleware
+);
