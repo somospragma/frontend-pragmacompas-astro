@@ -1,0 +1,39 @@
+---
+import UsersList from "@/components/organisms/UsersList/UsersList.tsx";
+import UsersStats from "@/components/organisms/UsersStats/UsersStats.tsx";
+import DashboardLayout from "@/components/templates/DashboardLayout.astro";
+import { getSession } from "auth-astro/server";
+import type { SessionUser } from "auth.config";
+
+const session = (await getSession(Astro.request)) as SessionUser;
+console.log("session 22", session);
+---
+
+<DashboardLayout>
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Gestión de Tutorados</h1>
+        <p class="text-gray-600 dark:text-gray-300">Administra y supervisa a todos los tutorados del capítulo</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <UsersStats
+        chapterId={session?.user?.chapterId || ""}
+        userType="Tutorado"
+        label="Tutorados Activos"
+        iconColor="green"
+        client:load
+      />
+
+      <!-- Mentees Table -->
+      <UsersList
+        chapterId={session?.user?.chapterId || ""}
+        userType="Tutorado"
+        title="Lista de Tutorados"
+        client:load
+      />
+    </div>
+  </div>
+</DashboardLayout>

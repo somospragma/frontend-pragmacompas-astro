@@ -9,6 +9,7 @@ const session = (await getSession(Astro.request)) as SessionUser;
 const userRole = session?.user?.rol;
 
 const showMentoriasLink = userRole === UserRole.TUTOR || userRole === UserRole.ADMINISTRADOR;
+const showDashboardLink = userRole === UserRole.ADMINISTRADOR;
 ---
 
 <header class="flex items-center justify-between border-b border-border bg-background px-6 py-4 w-full">
@@ -46,6 +47,13 @@ const showMentoriasLink = userRole === UserRole.TUTOR || userRole === UserRole.A
     <a href="/tutoring-request" class="hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-accent"
       >Solicitar mentoría</a
     >
+    {
+      showDashboardLink && (
+        <a href="/dashboard" class="hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-accent">
+          Dashboard
+        </a>
+      )
+    }
   </nav>
 
   <div class="flex items-center gap-3">
