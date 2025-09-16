@@ -108,7 +108,7 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
                   ></path>
                 </svg>
               </div>
-              <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">MentorMatch</span>
+              <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">Tutorías</span>
             </div>
           )}
 

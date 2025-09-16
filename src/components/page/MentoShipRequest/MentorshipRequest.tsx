@@ -122,7 +122,7 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
 
       <MentorshipTable
         isDashboard={isDashboard}
-        title="Solicitudes de Mentoría"
+        title="Solicitudes de tutoría"
         mentorshipRequests={mentorshipRequests}
         refetch={handleGetTutoringRequests}
       />

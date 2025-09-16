@@ -52,7 +52,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Evaluación de Mentoría</DialogTitle>
+          <DialogTitle>Evaluación de Tutoría</DialogTitle>
           <DialogDescription>Evalúa la sesión completada</DialogDescription>
         </DialogHeader>
 
@@ -73,7 +73,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           </div>
 
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-foreground">Skills trabajadas:</h4>
+            <h4 className="text-sm font-medium text-foreground">Habilidades trabajadas:</h4>
             <div className="flex flex-wrap gap-2">
               {mentorship.skills.map((skill, index) => (
                 <Badge key={index} variant="secondary" className="text-xs">
@@ -109,7 +109,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Comparte tu experiencia con esta mentoría..."
+              placeholder="Comparte tu experiencia con esta tutoría..."
               className="resize-none"
               rows={4}
             />

@@ -169,7 +169,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Gestión de Solicitudes</h1>
-          <p className="text-gray-600 dark:text-gray-300">Administra las solicitudes de mentoría del capítulo</p>
+          <p className="text-gray-600 dark:text-gray-300">Administra las solicitudes de mentoría del chapter</p>
         </div>
 
         {/* Stats Cards */}
@@ -278,7 +278,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
               <p className="text-lg font-medium text-gray-900 dark:text-white">Cargando solicitudes...</p>
             </div>
           ) : (
-            <MentorshipTable mentorshipRequests={mentorshipRequests} title="Solicitudes de Mentoría" />
+            <MentorshipTable mentorshipRequests={mentorshipRequests} title="Solicitudes de tutoría" />
           )}
         </div>
       </div>

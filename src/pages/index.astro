@@ -14,17 +14,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
         <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
           Bienvenido a
           <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Pragma Mentorías
+            Pragma Tutorías
           </span>
         </h1>
         <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
-          Conecta con mentores expertos y acelera tu crecimiento profesional. Una plataforma diseñada para compartir
+          Conecta con tutores expertos y acelera tu crecimiento profesional. Una plataforma diseñada para compartir
           conocimiento y potenciar el talento en Pragma.
         </p>
         <div class="mt-10 flex items-center justify-center gap-x-6">
           <a
             href="/tutoring-request"
-            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium transition-colors duration-200"
+            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium
+                   transition-colors duration-200"
           >
             Comenzar ahora
           </a>
@@ -39,7 +40,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
       <div class="mx-auto max-w-2xl text-center">
         <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">¿Cómo funciona?</h2>
         <p class="mt-4 text-lg leading-8 text-gray-600 dark:text-gray-300">
-          Un proceso simple y efectivo para conectar mentores y mentees
+          Un proceso simple y efectivo para conectar tutores y tutees
         </p>
       </div>
 
@@ -90,11 +91,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
               </div>
-              <CardTitle className="text-xl font-semibold">Encuentra mentores</CardTitle>
+              <CardTitle className="text-xl font-semibold">Encuentra tutores</CardTitle>
             </CardHeader>
             <CardContent>
               <CardDescription className="text-gray-600 dark:text-gray-300">
-                Explora perfiles de mentores expertos y solicita sesiones de mentoría según tus necesidades.
+                Explora perfiles de tutores expertos y solicita sesiones de tutoría según tus necesidades.
               </CardDescription>
             </CardContent>
           </Card>
@@ -118,7 +119,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
             </CardHeader>
             <CardContent>
               <CardDescription className="text-gray-600 dark:text-gray-300">
-                Participa en sesiones de mentoría personalizadas y desarrolla nuevas habilidades de manera efectiva.
+                Participa en sesiones de tutoría personalizadas y desarrolla nuevas habilidades de manera efectiva.
               </CardDescription>
             </CardContent>
           </Card>
@@ -130,13 +131,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 <style>
   .bg-grid-pattern {
-    background-image: linear-gradient(to right, theme(colors.gray.100) 1px, transparent 1px),
-      linear-gradient(to bottom, theme(colors.gray.100) 1px, transparent 1px);
+    background-image: linear-gradient(to right, rgb(229 231 235) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(229 231 235) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
-  .dark .bg-grid-pattern {
-    background-image: linear-gradient(to right, theme(colors.gray.800) 1px, transparent 1px),
-      linear-gradient(to bottom, theme(colors.gray.800) 1px, transparent 1px);
+  :global(.dark) .bg-grid-pattern {
+    background-image: linear-gradient(to right, rgb(31 41 55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(31 41 55) 1px, transparent 1px);
   }
 </style>

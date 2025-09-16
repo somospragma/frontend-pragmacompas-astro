@@ -10,14 +10,14 @@ export interface HistoryTableConfig {
 
 export const HISTORY_PAGE_CONFIG = {
   active: {
-    title: "Mentorías activas",
-    emptyMessage: "No tienes mentorías activas en este momento",
+    title: "Tutorías activas",
+    emptyMessage: "No tienes tutorías activas en este momento",
     showActions: true,
     status: [Status.Activa, MentorshipState.PENDING, MentorshipState.APPROVED],
   },
   completed: {
-    title: "Mentorías completadas",
-    emptyMessage: "No tienes mentorías completadas aún",
+    title: "Tutorías completadas",
+    emptyMessage: "No tienes tutorías completadas aún",
     showActions: false,
     status: [Status.Completada],
   },
