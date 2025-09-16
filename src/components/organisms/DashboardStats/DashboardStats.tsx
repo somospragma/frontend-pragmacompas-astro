@@ -71,7 +71,7 @@ export default function DashboardStats({ chapterId }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-2xl font-bold text-foreground">{totalActiveTutors}</p>
-            <p className="text-muted-foreground text-sm">Total Mentores</p>
+            <p className="text-muted-foreground text-sm">Total Tutores</p>
           </div>
           <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
             <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ export default function DashboardStats({ chapterId }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-2xl font-bold text-foreground">{totalRequests}</p>
-            <p className="text-muted-foreground text-sm">Total Mentees</p>
+            <p className="text-muted-foreground text-sm">Total Tutees</p>
           </div>
           <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
             <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -60,7 +60,7 @@ export default function MentorshipForm() {
   const validate = () => {
     const newErrors: typeof errors = {};
     if (selectedSkills.length === 0) newErrors.skills = "Selecciona al menos una habilidad";
-    if (!chapter) newErrors.chapter = "El capítulo es requerido";
+    if (!chapter) newErrors.chapter = "El chapter es requerido";
     if (!needsDescription) newErrors.needsDescription = "La descripción es requerida";
 
     setErrors(newErrors);
@@ -145,9 +145,9 @@ export default function MentorshipForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader className="pb-6 w-full">
-        <CardTitle className="text-2xl font-bold text-center">Solicitar Mentoría</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">Solicitar tutoría</CardTitle>
         <CardDescription className="text-center text-base mt-2">
-          Completa el formulario para solicitar una sesión de mentoría.
+          Completa el formulario para solicitar una sesión de tutoría.
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6 pb-6">

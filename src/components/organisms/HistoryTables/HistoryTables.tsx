@@ -114,7 +114,7 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
       closeCancellationModal();
       await refetch();
     } catch (error) {
-      console.error("Error cancelling mentorship:", error);
+      console.error("Error cancelling:", error);
     }
   };
 

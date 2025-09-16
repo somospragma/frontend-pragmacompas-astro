@@ -34,7 +34,7 @@ export const renderState = (state?: MentorshipState) => {
 
 export default function MentorshipTable({
   mentorshipRequests,
-  title = "Solicitudes de Mentoría",
+  title = "Solicitudes de Tutoría",
   isDashboard,
   refetch,
 }: Props) {
@@ -114,7 +114,7 @@ export default function MentorshipTable({
                       </h3>
                       <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
                       <p className="text-muted-foreground text-xs">
-                        {request.needsDescription} - Skills:{request.skills.map((skill) => skill.name).join(", ")}
+                        {request.needsDescription} - Habilidades:{request.skills.map((skill) => skill.name).join(", ")}
                       </p>
                     </div>
                   </div>

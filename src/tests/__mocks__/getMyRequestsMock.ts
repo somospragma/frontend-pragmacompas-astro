@@ -120,7 +120,7 @@ export const mockGetMyRequestsResponse: GetMyRequests = {
         startDate: "2025-08-25T15:00:00Z",
         expectedEndDate: "2025-08-25T16:30:00Z",
         status: "Aprobada",
-        objectives: "Mentoría práctica sobre manejo de estado con hooks",
+        objectives: "Tutoría práctica sobre manejo de estado con hooks",
       },
     ],
     tutoringsAsTutee: [

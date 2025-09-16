@@ -14,23 +14,24 @@ const showMentoriasLink = userRole === UserRole.TUTOR || userRole === UserRole.A
 <header class="flex items-center justify-between border-b border-border bg-background px-6 py-4 w-full">
   <div class="flex items-center gap-4">
     <div class="flex items-center gap-3">
-      <div class="size-6 text-primary">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="
-              M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134
-              C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462
-              C2.19985 28.361 1.76794 23.9758 2.60947 19.7452
-              C3.451 15.5145 5.52816 11.6284 8.57829 8.5783
-              C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948
-              C23.9758 1.76795 28.361 2.19986 32.3462 3.85057
-              C36.3314 5.50129 39.7376 8.29668 42.134 11.8833
-              C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z
-            "
-            fill="currentColor"></path>
-        </svg>
+      <div class="flex items-center gap-2">
+        <a href="/">
+          <img
+            src="/pragma-compas-black.svg"
+            alt="Logo Pragma"
+            width="200"
+            height="40"
+            class="h-[40px] w-[200px] block dark:hidden"
+          />
+          <img
+            src="/pragma-compas-white.svg"
+            alt="Logo Pragma"
+            width="200"
+            height="40"
+            class="h-[40px] w-[200px] hidden dark:block"
+          />
+        </a>
       </div>
-      <h1 class="text-xl font-bold text-foreground">Sistema Mentorías</h1>
     </div>
   </div>
 
@@ -38,13 +39,13 @@ const showMentoriasLink = userRole === UserRole.TUTOR || userRole === UserRole.A
     {
       showMentoriasLink && (
         <a href="/requests" class="hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-accent">
-          Mentorías
+          Tutorías
         </a>
       )
     }
     <a href="/history" class="hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-accent">Historial</a>
     <a href="/tutoring-request" class="hover:text-primary transition-colors px-3 py-2 rounded-md hover:bg-accent"
-      >Solicitar mentoría</a
+      >Solicitar tutoría</a
     >
   </nav>
 

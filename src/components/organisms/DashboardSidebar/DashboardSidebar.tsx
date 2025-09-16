@@ -35,9 +35,9 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
 
   const menuItems = [
     { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
-    { icon: Users, label: "Mentores", href: "/dashboard/mentores", badge: null },
-    { icon: UsersRound, label: "Mentees", href: "/dashboard/mentees", badge: null },
-    { icon: MessageSquare, label: "Request", href: "/dashboard/requests", badge: null },
+    { icon: Users, label: "Tutores", href: "/dashboard/mentores", badge: null },
+    { icon: UsersRound, label: "Tutees", href: "/dashboard/mentees", badge: null },
+    { icon: MessageSquare, label: "Solicitudes", href: "/dashboard/requests", badge: null },
   ];
 
   const isActive = (href: string) => {
@@ -106,7 +106,7 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
                   ></path>
                 </svg>
               </div>
-              <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">MentorMatch</span>
+              <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">Tutorías</span>
             </div>
           )}
 
