@@ -35,12 +35,12 @@ export default function MentoresGrid({ mentores }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-foreground">Mentores</h1>
+        <h1 className="text-3xl font-bold text-foreground">Tutores</h1>
         <div className="flex gap-4">
           <input
             className="bg-input rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             type="text"
-            placeholder="Buscar mentores..."
+            placeholder="Buscar tutores..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -97,7 +97,7 @@ export default function MentoresGrid({ mentores }: Props) {
               </div>
 
               <button className="w-full bg-primary text-primary-foreground py-2 rounded-md hover:bg-primary/90 transition-colors">
-                Solicitar Mentoría
+                Solicitar Tutoría
               </button>
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function MentoresGrid({ mentores }: Props) {
 
       {filteredMentores.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">No se encontraron mentores que coincidan con los filtros.</p>
+          <p className="text-muted-foreground">No se encontraron tutores que coincidan con los filtros.</p>
         </div>
       )}
     </div>

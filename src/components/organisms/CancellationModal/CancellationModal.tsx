@@ -49,7 +49,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-foreground">Cancelar Mentoría</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 text-foreground">Cancelar tutoría</DialogTitle>
           <DialogDescription>Esta acción no se puede deshacer</DialogDescription>
         </DialogHeader>
 
@@ -72,7 +72,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
-            Mantener Mentoría
+            Mantener tutoría
           </Button>
           <Button
             variant="destructive"

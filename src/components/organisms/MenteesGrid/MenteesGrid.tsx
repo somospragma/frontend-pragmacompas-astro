@@ -37,7 +37,7 @@ export default function MenteesGrid({ mentees }: Props) {
           <input
             className="bg-input rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             type="text"
-            placeholder="Buscar mentees..."
+            placeholder="Buscar tutees..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -120,7 +120,7 @@ export default function MenteesGrid({ mentees }: Props) {
 
       {filteredMentees.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">No se encontraron mentees que coincidan con los filtros.</p>
+          <p className="text-muted-foreground">No se encontraron tutees que coincidan con los filtros.</p>
         </div>
       )}
     </div>

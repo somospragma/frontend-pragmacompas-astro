@@ -66,7 +66,7 @@ const PruebaServices: React.FC = () => {
   };
 
   const handlePostCreateChapter = async () => {
-    const res = await postCreateChapter({ name: "Nuevo Capítulo" });
+    const res = await postCreateChapter({ name: "Nuevo Chapter" });
     setResult(res);
   };
 

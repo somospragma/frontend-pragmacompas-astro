@@ -225,7 +225,7 @@ export const ProfileForm = () => {
           <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-6 text-center">
               <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                Mentorías
+                Tutorías
               </CardTitle>
               <p className="text-3xl font-bold text-foreground">{statistics?.mentorshipsGiven ?? "??"}</p>
             </CardContent>

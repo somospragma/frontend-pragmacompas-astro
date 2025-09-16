@@ -67,8 +67,8 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props)
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Solicitud de Mentoría</DialogTitle>
-          <DialogDescription>Detalles de la solicitud de mentoría</DialogDescription>
+          <DialogTitle>Solicitud de tutoría</DialogTitle>
+          <DialogDescription>Detalles de la solicitud de tutoría</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -90,7 +90,7 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props)
 
           <div className="space-y-2">
             <div>
-              <span className="text-sm font-medium">Skills solicitadas:</span>
+              <span className="text-sm font-medium">Habilidades solicitadas:</span>
               <div className="flex flex-wrap gap-1 mt-1">
                 {selectedRequest?.skills.map((skill) => (
                   <span key={skill.id} className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs">
