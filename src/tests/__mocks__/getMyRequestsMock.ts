@@ -1,4 +1,5 @@
 import type { GetMyRequests } from "@/infrastructure/services/getMyRequests";
+import { MentorshipState } from "@/shared/entities/mentorshipState";
 
 export const mockGetMyRequestsResponse: GetMyRequests = {
   message: "Solicitudes y tutorías obtenidas exitosamente",
@@ -56,7 +57,7 @@ export const mockGetMyRequestsResponse: GetMyRequests = {
           },
         ],
         needsDescription: "Quiero mejorar el rendimiento de mis consultas en PostgreSQL",
-        requestStatus: "Aprobada",
+        requestStatus: MentorshipState.AVAILABLE,
       },
       {
         id: "req-003",
@@ -119,7 +120,7 @@ export const mockGetMyRequestsResponse: GetMyRequests = {
         ],
         startDate: "2025-08-25T15:00:00Z",
         expectedEndDate: "2025-08-25T16:30:00Z",
-        status: "Aprobada",
+        status: MentorshipState.AVAILABLE,
         objectives: "Tutoría práctica sobre manejo de estado con hooks",
       },
     ],

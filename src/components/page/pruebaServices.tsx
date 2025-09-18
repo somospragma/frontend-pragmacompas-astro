@@ -12,6 +12,7 @@ import { postCreateChapter } from "../../infrastructure/services/postCreateChapt
 import { getFindChapter } from "../../infrastructure/services/getFindChapter";
 import { updateSkill } from "../../infrastructure/services/updateSkill";
 import { deleteSkill } from "../../infrastructure/services/deleteSkill";
+import { MentorshipState } from "@/shared/entities/mentorshipState";
 
 const PruebaServices: React.FC = () => {
   const [result, setResult] = useState<unknown>(null);
@@ -22,7 +23,7 @@ const PruebaServices: React.FC = () => {
   };
 
   const handleUpdateTutoringRequestStatus = async () => {
-    const res = await updateTutoringRequestStatus("requestId", { status: "Aprobada" });
+    const res = await updateTutoringRequestStatus("requestId", { status: MentorshipState.AVAILABLE });
     setResult(res);
   };
 

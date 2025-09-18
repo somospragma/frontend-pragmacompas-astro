@@ -20,7 +20,7 @@ export const renderState = (state?: MentorshipState) => {
       className={`px-3 py-1 rounded-full text-xs ${
         state === MentorshipState.PENDING || state === MentorshipState.CONVERSING
           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-          : state === MentorshipState.COMPLETED || state === MentorshipState.APPROVED
+          : state === MentorshipState.COMPLETED || state === MentorshipState.AVAILABLE
             ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
             : state === MentorshipState.CANCELLED || state === MentorshipState.CANCELLING
               ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
