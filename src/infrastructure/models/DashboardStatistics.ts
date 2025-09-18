@@ -1,5 +1,5 @@
 export interface RequestsByStatus {
-  Aprobada: number;
+  Disponible: number;
   Asignada: number;
   Finalizada: number;
   Pendiente: number;

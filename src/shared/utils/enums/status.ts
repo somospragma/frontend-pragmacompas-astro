@@ -1,7 +1,7 @@
 export enum Status {
   Pendiente = "Pendiente",
   Enviada = "Enviada",
-  Aprobada = "Aprobada",
+  Disponible = "Disponible",
   Activa = "Activa",
   Asignada = "Asignada",
   Conversando = "Conversando",

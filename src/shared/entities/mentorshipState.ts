@@ -3,7 +3,7 @@ import { useReducer, useState } from "react";
 
 export enum MentorshipState {
   PENDING = "Pendiente",
-  APPROVED = "Aprobada",
+  AVAILABLE = "Disponible",
   CONVERSING = "Conversando",
   ASSIGNED = "Asignada",
   CANCELLING = "En cancelación",
@@ -17,16 +17,16 @@ type Action = { type: ActionTypes | "SET_STATE"; payload?: MentorshipState };
 // Explicit transitions
 export const transitions: Record<MentorshipState, Partial<Record<ActionTypes, MentorshipState>>> = {
   [MentorshipState.PENDING]: {
-    NEXT: MentorshipState.APPROVED,
+    NEXT: MentorshipState.AVAILABLE,
     CANCEL: MentorshipState.CANCELLING,
   },
-  [MentorshipState.APPROVED]: {
+  [MentorshipState.AVAILABLE]: {
     NEXT: MentorshipState.CONVERSING,
     CANCEL: MentorshipState.CANCELLING,
   },
   [MentorshipState.CONVERSING]: {
     NEXT: MentorshipState.ASSIGNED,
-    PREVIOUS: MentorshipState.APPROVED,
+    PREVIOUS: MentorshipState.AVAILABLE,
     CANCEL: MentorshipState.CANCELLING,
   },
   [MentorshipState.ASSIGNED]: {

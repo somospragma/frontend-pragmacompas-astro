@@ -33,7 +33,7 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props)
         rejectAction = "Rechazar";
         acceptAction = "Aceptar";
         break;
-      case MentorshipState.APPROVED:
+      case MentorshipState.AVAILABLE:
         rejectAction = "Volver";
         acceptAction = "Reunirse";
         break;

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getTutoringRequests, type GetTutoringRequestsParams } from "@/infrastructure/services/getTutoringRequests";
-import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
+import type { TutoringRequest, UserRole } from "@/infrastructure/models/TutoringRequest";
 import type { SessionUser } from "auth.config";
 import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
+import type { MentorshipState } from "@/shared/entities/mentorshipState";
 
 // Types
 interface MentorshipRequest {
@@ -16,19 +17,19 @@ interface MentorshipRequest {
       id: string;
       name: string;
     };
-    rol: string;
+    rol: UserRole;
   };
   skills: {
     id: string;
     name: string;
   }[];
   needsDescription: string;
-  requestStatus: string;
+  requestStatus: MentorshipState;
 }
 
 interface RequestWithMappedStatus {
   id: string;
-  status: "pending" | "approved" | "assigned" | "rejected";
+  status: "pending" | "available" | "assigned" | "rejected";
   mentor?: string | null;
   mentee: string;
   description: string;
@@ -36,12 +37,12 @@ interface RequestWithMappedStatus {
   skills: string[];
 }
 
-type FilterType = "all" | "pending" | "approved" | "assigned" | "rejected";
+type FilterType = "all" | "pending" | "available" | "assigned" | "rejected";
 
 interface TabCounts {
   all: number;
   pending: number;
-  approved: number;
+  available: number;
   assigned: number;
   rejected: number;
 }
@@ -49,14 +50,14 @@ interface TabCounts {
 // Status mappings
 const statusMapping = {
   Enviada: "pending" as const,
-  Aprobada: "approved" as const,
+  Disponible: "available" as const,
   Asignada: "assigned" as const,
   Rechazada: "rejected" as const,
 };
 
 const reverseStatusMapping = {
   pending: "Enviada" as const,
-  approved: "Aprobada" as const,
+  available: "Disponible" as const,
   assigned: "Asignada" as const,
   rejected: "Finalizada" as const,
 };
@@ -68,7 +69,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
   const [counts, setCounts] = useState<TabCounts>({
     all: 0,
     pending: 0,
-    approved: 0,
+    available: 0,
     assigned: 0,
     rejected: 0,
   });
@@ -87,7 +88,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
       }
 
       if (filter !== "all") {
-        params.status = reverseStatusMapping[filter];
+        params.status = reverseStatusMapping[filter] as MentorshipState;
       }
 
       const response = await getTutoringRequests(params);
@@ -97,18 +98,18 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
         id: request.id,
         tutee: {
           id: request.tutee.id || "",
-          firstName: request.tutee.firstName,
-          lastName: request.tutee.lastName,
-          email: request.tutee.email,
+          firstName: request.tutee.firstName || "",
+          lastName: request.tutee.lastName || "",
+          email: request.tutee.email || "",
           chapter: {
             id: request.tutee.chapterId || "",
             name: "Chapter", // You may need to fetch this from another source
           },
-          rol: request.tutee.rol || "Tutorado",
+          rol: (request.tutee.rol as UserRole) || "Tutorado",
         },
         skills: request.skills,
         needsDescription: request.needsDescription,
-        requestStatus: request.requestStatus,
+        requestStatus: request.requestStatus as MentorshipState,
       }));
 
       setMentorshipRequests(mappedMentorshipRequests);
@@ -140,7 +141,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
     const newCounts = {
       all: requests.length,
       pending: requests.filter((r) => r.status === "pending").length,
-      approved: requests.filter((r) => r.status === "approved").length,
+      available: requests.filter((r) => r.status === "available").length,
       assigned: requests.filter((r) => r.status === "assigned").length,
       rejected: requests.filter((r) => r.status === "rejected").length,
     };
@@ -196,8 +197,8 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{counts.approved}</p>
-                <p className="text-gray-600 dark:text-gray-300 text-sm">Aprobadas</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{counts.available}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Disponibles</p>
               </div>
               <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,7 +248,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
             <nav className="-mb-px flex space-x-8">
               {[
                 { key: "all", label: "Todas", count: counts.all },
-                { key: "approved", label: "Aprobadas", count: counts.approved },
+                { key: "available", label: "Disponibles", count: counts.available },
                 { key: "assigned", label: "Asignadas", count: counts.assigned },
                 { key: "rejected", label: "Finalizadas", count: counts.rejected },
               ].map((tab) => (
