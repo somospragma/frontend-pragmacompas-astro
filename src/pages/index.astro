@@ -24,7 +24,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
         <div class="mt-10 flex items-center justify-center gap-x-6">
           <a
             href="/tutoring-request"
-            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium transition-colors duration-200"
+            class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium
+                   transition-colors duration-200"
           >
             Comenzar ahora
           </a>
@@ -130,13 +131,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 <style>
   .bg-grid-pattern {
-    background-image: linear-gradient(to right, theme(colors.gray.100) 1px, transparent 1px),
-      linear-gradient(to bottom, theme(colors.gray.100) 1px, transparent 1px);
+    background-image: linear-gradient(to right, rgb(229 231 235) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(229 231 235) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
-  .dark .bg-grid-pattern {
-    background-image: linear-gradient(to right, theme(colors.gray.800) 1px, transparent 1px),
-      linear-gradient(to bottom, theme(colors.gray.800) 1px, transparent 1px);
+  :global(.dark) .bg-grid-pattern {
+    background-image: linear-gradient(to right, rgb(31 41 55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(31 41 55) 1px, transparent 1px);
   }
 </style>

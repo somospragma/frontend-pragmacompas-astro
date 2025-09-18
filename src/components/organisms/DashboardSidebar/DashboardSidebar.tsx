@@ -35,16 +35,18 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
 
   const menuItems = [
     { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
-    { icon: Users, label: "Tutores", href: "/dashboard/mentores", badge: null },
-    { icon: UsersRound, label: "Tutees", href: "/dashboard/mentees", badge: null },
-    { icon: MessageSquare, label: "Solicitudes", href: "/dashboard/requests", badge: null },
+    { icon: Users, label: "Tutores", href: "/dashboard/tutor", badge: null },
+    { icon: UsersRound, label: "Tutorados", href: "/dashboard/tutorado", badge: null },
+    { icon: MessageSquare, label: "Request", href: "/dashboard/requests", badge: null },
   ];
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {
       return currentPath === "/dashboard" || currentPath === "/dashboard/";
     }
-    return currentPath.startsWith(href);
+
+    // For exact path matching to avoid conflicts between similar routes
+    return currentPath === href || currentPath.startsWith(href + "/");
   };
 
   return (

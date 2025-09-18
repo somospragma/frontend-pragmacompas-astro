@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { getDashboardStatistics } from "@/infrastructure/services/getDashboardStatistics";
 import type { DashboardStatistics } from "@/infrastructure/models/DashboardStatistics";
+import { getDashboardStatistics } from "@/infrastructure/services/getDashboardStatistics";
+import { useEffect, useState } from "react";
 
 interface Props {
   chapterId: string;
@@ -61,63 +61,17 @@ export default function DashboardStats({ chapterId }: Props) {
     return null;
   }
 
-  const totalRequests = Object.values(statistics.requestsByStatus).reduce((sum, count) => sum + count, 0);
-  const totalActiveTutors = statistics.activeTutorsByChapter.activeTutors;
+  const handlePendingRequestsClick = () => {
+    window.location.href = "/dashboard/requests";
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {/* Total Mentores */}
-      <div className="bg-card border border-border rounded-lg p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-2xl font-bold text-foreground">{totalActiveTutors}</p>
-            <p className="text-muted-foreground text-sm">Total Tutores</p>
-          </div>
-          <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-green-600">
-          {statistics.activeTutorsByChapter.activeTutors > 0 ? "Activos" : "Sin actividad"}
-        </div>
-      </div>
-
-      {/* Total Mentees */}
-      <div className="bg-card border border-border rounded-lg p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-2xl font-bold text-foreground">{totalRequests}</p>
-            <p className="text-muted-foreground text-sm">Total Tutees</p>
-          </div>
-          <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d={
-                  "M17 20h5v-2a3 3 0 00-5.356-1.857 M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857 " +
-                  "M7 20H2v-2a3 3 0 015.356-1.857 M7 20v-2c0-.656.126-1.283.356-1.857 m0 0a5.002 5.002 0 019.288 0 " +
-                  "M15 7a3 3 0 11-6 0 3 3 0 016 0 zm6 3a2 2 0 11-4 0 2 2 0 014 0z M7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                }
-              />
-            </svg>
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-muted-foreground">
-          {Math.round((statistics.requestsByStatus.Finalizada / totalRequests) * 100) || 0}% finalizadas
-        </div>
-      </div>
-
       {/* Solicitudes Pendientes */}
-      <div className="bg-card border border-border rounded-lg p-6">
+      <div
+        className="bg-card border border-border rounded-lg p-6 cursor-pointer hover:bg-card/80 transition-colors duration-200"
+        onClick={handlePendingRequestsClick}
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-2xl font-bold text-foreground">{statistics.requestsByStatus.Pendiente}</p>
@@ -156,6 +110,27 @@ export default function DashboardStats({ chapterId }: Props) {
           </div>
         </div>
         <div className="mt-2 text-xs text-green-600">Este mes</div>
+      </div>
+
+      {/* Solicitudes Canceladas */}
+      <div className="bg-card border border-border rounded-lg p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-2xl font-bold text-foreground">{statistics.requestsByStatus.Cancelada}</p>
+            <p className="text-muted-foreground text-sm">Solicitudes Canceladas</p>
+          </div>
+          <div className="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center">
+            <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        </div>
+        <div className="mt-2 text-xs text-red-600"></div>
       </div>
     </div>
   );

@@ -44,6 +44,7 @@ export default defineConfig({
           token.firstName = profile.given_name;
           token.lastName = profile.family_name;
           token.email = token.email;
+          token.chapterId = userValidation.data.chapter.id;
         } else {
           token.rol = "";
           token.userId = "";
@@ -64,6 +65,7 @@ export default defineConfig({
         (session as SessionUser).user.accessToken = token.accessToken as string | undefined;
         (session as SessionUser).user.firstName = token.firstName as string | undefined;
         (session as SessionUser).user.lastName = token.lastName as string | undefined;
+        (session as SessionUser).user.chapterId = token.chapterId as string | undefined;
       }
       return session;
     },
