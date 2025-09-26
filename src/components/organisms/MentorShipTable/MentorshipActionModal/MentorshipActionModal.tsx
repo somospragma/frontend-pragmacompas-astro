@@ -17,42 +17,47 @@ type Props = {
   isOpen: boolean;
   selectedRequest: MentorshipRequest;
   onOpenChange: () => void;
+  onRefetch: () => void;
 };
-const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props) => {
+const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetch }: Props) => {
   const userId = userStore.get().userId ?? "";
   const { next, previous, isLoading } = useMentorshipStates(
     selectedRequest.requestStatus,
     selectedRequest.id,
     userId,
     () => {
+      onRefetch();
       onOpenChange();
     }
   );
 
+  const handleClose = () => {
+    onOpenChange();
+  };
+
   const renderActions = () => {
     let rejectAction;
     let acceptAction;
+    let rejectHandler;
+
     switch (selectedRequest?.requestStatus) {
       case MentorshipStatus.PENDING:
       case MentorshipStatus.CONVERSING:
         rejectAction = "Rechazar";
+        rejectHandler = previous;
         acceptAction = "Aceptar";
         break;
       case MentorshipStatus.AVAILABLE:
         rejectAction = "Volver";
+        rejectHandler = handleClose;
         acceptAction = "Reunirse";
         break;
+      default:
+        return [];
     }
 
     return [
-      <Button
-        key={`reject-${selectedRequest?.id}`}
-        variant="outline"
-        disabled={isLoading}
-        onClick={() => {
-          previous();
-        }}
-      >
+      <Button key={`reject-${selectedRequest?.id}`} variant="outline" disabled={isLoading} onClick={rejectHandler}>
         {rejectAction}
       </Button>,
       ,
