@@ -10,6 +10,7 @@ import { renderState } from "../MentorShipTable";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import { MentorshipState, useMentorshipStates } from "@/shared/entities/mentorshipState";
 import { Button } from "@/components/ui/button";
+import { userStore } from "@/store/userStore";
 
 type Props = {
   isOpen: boolean;
@@ -17,9 +18,15 @@ type Props = {
   onOpenChange: () => void;
 };
 const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props) => {
-  const { next, previous, isLoading } = useMentorshipStates(selectedRequest.requestStatus, selectedRequest.id, () => {
-    onOpenChange();
-  });
+  const userId = userStore.get().userId ?? "";
+  const { next, previous, isLoading } = useMentorshipStates(
+    selectedRequest.requestStatus,
+    selectedRequest.id,
+    userId,
+    () => {
+      onOpenChange();
+    }
+  );
 
   const renderActions = () => {
     let rejectAction;
