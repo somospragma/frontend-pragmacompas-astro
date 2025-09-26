@@ -13,7 +13,13 @@ export const HISTORY_PAGE_CONFIG = {
     title: "Tutorías activas",
     emptyMessage: "No tienes tutorías activas en este momento",
     showActions: true,
-    status: [Status.Activa, MentorshipState.PENDING, MentorshipState.APPROVED],
+    status: [
+      MentorshipState.ACTIVE,
+      MentorshipState.PENDING,
+      MentorshipState.AVAILABLE,
+      MentorshipState.CONVERSING,
+      MentorshipState.CANCELLING,
+    ],
   },
   completed: {
     title: "Tutorías completadas",

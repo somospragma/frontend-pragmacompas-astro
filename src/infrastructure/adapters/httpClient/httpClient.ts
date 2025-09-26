@@ -3,7 +3,6 @@ import { useErrorStore } from "@/store/errorStore";
 import axios from "axios";
 
 const baseURL = import.meta.env.PUBLIC_API_URL;
-const apiKey = import.meta.env.PUBLIC_API_KEY;
 
 export const httpClient = axios.create({
   baseURL,
@@ -43,12 +42,9 @@ httpClient.interceptors.request.use(
         if (sessionResponse.ok) {
           const session = await sessionResponse.json();
 
-          if (session?.user?.googleId && session?.user?.userId !== "") {
+          if (session?.user?.googleId) {
             config.headers = config.headers || {};
             config.headers.Authorization = session.user.googleId;
-          } else {
-            config.headers = config.headers || {};
-            config.headers.Authorization = apiKey;
           }
         }
       } catch (error) {

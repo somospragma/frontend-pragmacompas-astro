@@ -30,7 +30,7 @@ export async function validateUser(userId: string): Promise<UserValidationRespon
     if (response.data && typeof response.data === "object" && "message" in response.data) {
       const responseWithMessage = response.data as { message?: string };
       if (responseWithMessage.message === "Usuario no registrado en el sistema") {
-        return false;
+        throw new Error("USER_NOT_REGISTERED");
       }
     }
 
@@ -47,6 +47,6 @@ export async function validateUser(userId: string): Promise<UserValidationRespon
       }
     }
     console.error("Error validating user:", error);
-    return false; // Return false for any validation errors
+    throw error;
   }
 }
