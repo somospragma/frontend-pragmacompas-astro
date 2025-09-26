@@ -25,7 +25,6 @@ export interface GetTutoringRequestsResponse {
 }
 
 export async function getTutoringRequests(params: GetTutoringRequestsParams) {
-  // Build query parameters dynamically
   const queryParams = new URLSearchParams();
 
   if (params.tuteeId) {
@@ -44,7 +43,6 @@ export async function getTutoringRequests(params: GetTutoringRequestsParams) {
     queryParams.append("chapterId", params.chapterId);
   }
 
-  // Build the final URL
   const baseUrl = "/api/v1/tutoring-requests";
   const url = queryParams.toString() ? `${baseUrl}?${queryParams.toString()}` : baseUrl;
 

@@ -62,21 +62,25 @@ export const useMentorshipStates = (
           objectives: "Objetivos de la tutoría",
         });
 
+        dispatch({ type: "SET_STATE", payload: newState });
+        window.location.href = "/history";
         return;
+      } else {
+        const { data } = await updateTutoringRequestStatus(mentorshipId, { status: newState });
+
+        if (data.requestStatus === MentorshipStatus.CONVERSING) {
+          window.open(`https://somos-pragma.slack.com/team/${data.tutee.slackId}`, "_blank");
+        }
+
+        dispatch({ type: "SET_STATE", payload: newState });
       }
-
-      const { data } = await updateTutoringRequestStatus(mentorshipId, { status: newState });
-
-      if (data.requestStatus === MentorshipStatus.CONVERSING) {
-        window.open(`https://somos-pragma.slack.com/team/${data.tutee.slackId}`, "_blank");
-      }
-
-      dispatch({ type: "SET_STATE", payload: newState });
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
-      finallyCallback();
+      if (!(state === MentorshipStatus.CONVERSING && newState === MentorshipStatus.ASSIGNED)) {
+        finallyCallback();
+      }
     }
   };
 

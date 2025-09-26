@@ -7,6 +7,7 @@ import {
 } from "@/shared/utils/enums/mentorshipsStateFilter";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
+import { DEFAULT_STYLE, STATUS_STYLES } from "@/shared/utils/constants/statusStyles";
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
@@ -15,29 +16,12 @@ interface Props {
 }
 
 export const renderState = (state?: MentorshipStatus) => {
-  return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs ${
-        state === MentorshipStatus.PENDING || state === MentorshipStatus.CONVERSING
-          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-          : state === MentorshipStatus.COMPLETED || state === MentorshipStatus.AVAILABLE
-            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-            : state === MentorshipStatus.CANCELLED || state === MentorshipStatus.CANCELLING
-              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-      }`}
-    >
-      {state}
-    </span>
-  );
+  const className = state ? STATUS_STYLES[state] : DEFAULT_STYLE;
+
+  return <span className={`px-3 py-1 rounded-full text-xs ${className}`}>{state}</span>;
 };
 
-export default function MentorshipTable({
-  mentorshipRequests,
-  title = "Solicitudes de Tutoría",
-  isDashboard,
-  refetch,
-}: Props) {
+const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría", isDashboard, refetch }: Props) => {
   const [selectedRequest, setSelectedRequest] = useState<MentorshipRequest>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -139,10 +123,14 @@ export default function MentorshipTable({
           selectedRequest={selectedRequest}
           onOpenChange={() => {
             setIsModalOpen(false);
+          }}
+          onRefetch={() => {
             refetch?.();
           }}
         />
       )}
     </>
   );
-}
+};
+
+export default MentorshipTable;
