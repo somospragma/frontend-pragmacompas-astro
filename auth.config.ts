@@ -1,4 +1,4 @@
-import { validateUser } from "@/infrastructure/services/validateUser";
+import { getOrCreateUser } from "@/infrastructure/services/getOrCreateUser";
 import Google from "@auth/core/providers/google";
 import { AUTH_GOOGLE_ID, AUTH_GOOGLE_SECRET } from "astro:env/server";
 import { defineConfig } from "auth-astro";
@@ -33,11 +33,12 @@ export default defineConfig({
     async jwt({ token, account, profile }) {
       // Capturar información adicional de Google durante el login
       if (account && profile) {
-        token.googleId = profile.sub ?? undefined; // Google User ID
-        token.googleClientId = account.providerAccountId; // ID de la cuenta del proveedor
-        token.accessToken = account.access_token; // Token de acceso (si necesitas hacer llamadas a Google APIs)
+        token.googleId = profile.sub ?? undefined;
+        token.googleClientId = account.providerAccountId;
+        token.accessToken = account.access_token;
 
-        const userValidation = await validateUser(profile.sub ?? "");
+        const userValidation = await getOrCreateUser(profile);
+
         if (userValidation && typeof userValidation === "object" && "data" in userValidation) {
           token.rol = userValidation.data.rol;
           token.userId = userValidation.data.id;

@@ -3,11 +3,12 @@ import { createTutoring } from "@/infrastructure/services/createTutoring";
 import { useReducer, useState } from "react";
 
 export enum MentorshipState {
+  ACTIVE = "Activa",
   PENDING = "Pendiente",
   AVAILABLE = "Disponible",
   CONVERSING = "Conversando",
   ASSIGNED = "Asignada",
-  CANCELLING = "En cancelación",
+  CANCELLING = "EnCancelacion",
   COMPLETED = "Finalizada",
   CANCELLED = "Cancelada",
 }
@@ -39,6 +40,7 @@ export const transitions: Record<MentorshipState, Partial<Record<ActionTypes, Me
   },
   [MentorshipState.COMPLETED]: {},
   [MentorshipState.CANCELLED]: {},
+  [MentorshipState.ACTIVE]: {},
 };
 
 const reducer = (state: MentorshipState, action: Action): MentorshipState => {
