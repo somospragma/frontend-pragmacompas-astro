@@ -20,7 +20,7 @@ export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
       chapter: request?.tutee?.chapter?.name ?? "",
       skills: request.skills.map((skill) => skill.name),
       status: request.requestStatus,
-      startDate: "",
+      startDate: dateAdapter(request.requestDate).format("DD [de] MMMM, YYYY"),
       action: getAvailableActions(request.requestStatus, UserRole.TUTEE, MentorshipType.REQUEST),
     });
   });

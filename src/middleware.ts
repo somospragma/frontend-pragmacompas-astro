@@ -5,6 +5,7 @@ import { getSession } from "auth-astro/server";
 import type { UserRole } from "./infrastructure/models/TutoringRequest";
 import { PROTECTED_ROUTES, ROLE_ROUTES, ROUTE_PATHS, ROLE_RESTRICTED_ROUTES } from "./shared/utils/enums/paths";
 import type { SessionUser } from "auth.config";
+import { UserRole as Role } from "./shared/utils/enums/role";
 
 export async function logAccess(context: APIContext, next: MiddlewareNext): Promise<Response> {
   console.log(`Ruta solicitada: ${context.url.pathname}`);
@@ -15,6 +16,9 @@ export async function authMiddleware(context: APIContext, next: MiddlewareNext):
   const session = (await getSession(context.request)) as SessionUser;
 
   if (session && context.url.pathname === ROUTE_PATHS.LOGIN.getHref()) {
+    if (session.user?.rol === Role.ADMINISTRADOR) {
+      return context.redirect(ROUTE_PATHS.DASHBOARD.getHref());
+    }
     return context.redirect(ROUTE_PATHS.HOME.getHref());
   }
 
@@ -35,12 +39,10 @@ export async function authMiddleware(context: APIContext, next: MiddlewareNext):
 
 export async function roleRedirectMiddleware(context: APIContext, next: MiddlewareNext): Promise<Response> {
   const session = (await getSession(context.request)) as SessionUser;
-
   // Only apply role-based redirection if user is authenticated and on a dashboard route
   if (session && session.user?.googleId && context.url.pathname.startsWith("/dashboard")) {
     try {
       const userRole = session.user?.rol as UserRole;
-
       const correctRoute = ROLE_ROUTES[userRole];
 
       // Allow navigation within dashboard subroutes for Administrador role

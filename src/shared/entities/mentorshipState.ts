@@ -1,4 +1,5 @@
 import { updateTutoringRequestStatus } from "@/infrastructure/services/updateTutoringRequestStatus";
+import { createTutoring } from "@/infrastructure/services/createTutoring";
 import { useReducer, useState } from "react";
 
 export enum MentorshipState {
@@ -52,6 +53,7 @@ const reducer = (state: MentorshipState, action: Action): MentorshipState => {
 export const useMentorshipStates = (
   initialState: MentorshipState,
   mentorshipId: string,
+  tutorId: string,
   finallyCallback: () => void
 ) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -62,6 +64,16 @@ export const useMentorshipStates = (
 
     setIsLoading(true);
     try {
+      if (state === MentorshipState.CONVERSING && newState === MentorshipState.ASSIGNED) {
+        await createTutoring({
+          tutoringRequestId: mentorshipId,
+          tutorId,
+          objectives: "Objetivos de la tutoría",
+        });
+
+        return;
+      }
+
       const { data } = await updateTutoringRequestStatus(mentorshipId, { status: newState });
 
       if (data.requestStatus === MentorshipState.CONVERSING) {

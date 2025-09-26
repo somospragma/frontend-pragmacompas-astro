@@ -154,6 +154,7 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
           isOpen={isCancellationModalOpen}
           onClose={closeCancellationModal}
           onSubmitCancellation={handleCancellation}
+          type={selectedCancellationItem?.type ?? MentorshipType.MENTORSHIP}
         />
       )}
     </div>
