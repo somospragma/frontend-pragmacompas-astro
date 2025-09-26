@@ -1,5 +1,4 @@
-import { MentorshipState } from "@/shared/entities/mentorshipState";
+import { MentorshipStatus } from "./mentorshipStatus";
+export const ADMIN_MENTORSHIP_STATE_FILTERS = [MentorshipStatus.PENDING];
 
-export const ADMIN_MENTORSHIP_STATE_FILTERS = [MentorshipState.PENDING];
-
-export const TUTOR_MENTORSHIP_STATE_FILTERS = [MentorshipState.AVAILABLE, MentorshipState.CONVERSING];
+export const TUTOR_MENTORSHIP_STATE_FILTERS = [MentorshipStatus.AVAILABLE, MentorshipStatus.CONVERSING];

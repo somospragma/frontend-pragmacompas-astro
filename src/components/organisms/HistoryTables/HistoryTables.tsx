@@ -12,7 +12,7 @@ import type { User } from "@/infrastructure/models/TutoringRequest";
 import { UserRole } from "@/shared/utils/enums/role";
 import { MentorshipAction } from "@/shared/utils/enums/mentorshipAction";
 import { updateTutoringRequestStatus } from "@/infrastructure/services/updateTutoringRequestStatus";
-import { MentorshipState } from "@/shared/entities/mentorshipState";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
 
 interface HistoryTablesProps {
@@ -96,7 +96,7 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
       switch (selectedCancellationItem.type) {
         case MentorshipType.REQUEST:
           await updateTutoringRequestStatus(selectedCancellationItem.id, {
-            status: MentorshipState.CANCELLED,
+            status: MentorshipStatus.CANCELLED,
           });
           break;
 
@@ -124,7 +124,6 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
         const columns = config.showActions
           ? HISTORY_TABLE_CONFIG
           : HISTORY_TABLE_CONFIG.filter((col) => col.key !== "action");
-
         const filteredData = data.filter((item) => config.status.some((status) => status === item.status));
 
         return (

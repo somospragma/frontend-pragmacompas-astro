@@ -1,12 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
-import { MentorshipState } from "@/shared/entities/mentorshipState";
 import MentorshipActionModal from "./MentorshipActionModal/MentorshipActionModal";
 import {
   ADMIN_MENTORSHIP_STATE_FILTERS,
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
@@ -14,15 +14,15 @@ interface Props {
   refetch?: () => void;
 }
 
-export const renderState = (state?: MentorshipState) => {
+export const renderState = (state?: MentorshipStatus) => {
   return (
     <span
       className={`px-3 py-1 rounded-full text-xs ${
-        state === MentorshipState.PENDING || state === MentorshipState.CONVERSING
+        state === MentorshipStatus.PENDING || state === MentorshipStatus.CONVERSING
           ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-          : state === MentorshipState.COMPLETED || state === MentorshipState.AVAILABLE
+          : state === MentorshipStatus.COMPLETED || state === MentorshipStatus.AVAILABLE
             ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-            : state === MentorshipState.CANCELLED || state === MentorshipState.CANCELLING
+            : state === MentorshipStatus.CANCELLED || state === MentorshipStatus.CANCELLING
               ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
               : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
       }`}

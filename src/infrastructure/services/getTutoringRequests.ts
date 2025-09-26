@@ -1,11 +1,11 @@
-import type { MentorshipState } from "@/shared/entities/mentorshipState";
 import { httpClient } from "../adapters/httpClient/httpClient";
 import type { TutoringRequest } from "../models/TutoringRequest";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 
 export interface GetTutoringRequestsParams {
   tuteeId?: string;
   skillId?: string;
-  status?: MentorshipState;
+  status?: MentorshipStatus;
   chapterId?: string;
 }
 

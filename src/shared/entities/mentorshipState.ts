@@ -1,59 +1,48 @@
 import { updateTutoringRequestStatus } from "@/infrastructure/services/updateTutoringRequestStatus";
 import { createTutoring } from "@/infrastructure/services/createTutoring";
 import { useReducer, useState } from "react";
-
-export enum MentorshipState {
-  ACTIVE = "Activa",
-  PENDING = "Pendiente",
-  AVAILABLE = "Disponible",
-  CONVERSING = "Conversando",
-  ASSIGNED = "Asignada",
-  CANCELLING = "EnCancelacion",
-  COMPLETED = "Finalizada",
-  CANCELLED = "Cancelada",
-}
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 
 type ActionTypes = "NEXT" | "PREVIOUS" | "CANCEL";
-type Action = { type: ActionTypes | "SET_STATE"; payload?: MentorshipState };
+type Action = { type: ActionTypes | "SET_STATE"; payload?: MentorshipStatus };
 
-// Explicit transitions
-export const transitions: Record<MentorshipState, Partial<Record<ActionTypes, MentorshipState>>> = {
-  [MentorshipState.PENDING]: {
-    NEXT: MentorshipState.AVAILABLE,
-    CANCEL: MentorshipState.CANCELLING,
+export const transitions: Record<MentorshipStatus, Partial<Record<ActionTypes, MentorshipStatus>>> = {
+  [MentorshipStatus.PENDING]: {
+    NEXT: MentorshipStatus.AVAILABLE,
+    CANCEL: MentorshipStatus.CANCELLING,
   },
-  [MentorshipState.AVAILABLE]: {
-    NEXT: MentorshipState.CONVERSING,
-    CANCEL: MentorshipState.CANCELLING,
+  [MentorshipStatus.AVAILABLE]: {
+    NEXT: MentorshipStatus.CONVERSING,
+    CANCEL: MentorshipStatus.CANCELLING,
   },
-  [MentorshipState.CONVERSING]: {
-    NEXT: MentorshipState.ASSIGNED,
-    PREVIOUS: MentorshipState.AVAILABLE,
-    CANCEL: MentorshipState.CANCELLING,
+  [MentorshipStatus.CONVERSING]: {
+    NEXT: MentorshipStatus.ASSIGNED,
+    PREVIOUS: MentorshipStatus.AVAILABLE,
+    CANCEL: MentorshipStatus.CANCELLING,
   },
-  [MentorshipState.ASSIGNED]: {
-    NEXT: MentorshipState.COMPLETED,
-    CANCEL: MentorshipState.CANCELLING,
+  [MentorshipStatus.ASSIGNED]: {
+    NEXT: MentorshipStatus.COMPLETED,
+    CANCEL: MentorshipStatus.CANCELLING,
   },
-  [MentorshipState.CANCELLING]: {
-    NEXT: MentorshipState.CANCELLED,
+  [MentorshipStatus.CANCELLING]: {
+    NEXT: MentorshipStatus.CANCELLED,
   },
-  [MentorshipState.COMPLETED]: {},
-  [MentorshipState.CANCELLED]: {},
-  [MentorshipState.ACTIVE]: {},
+  [MentorshipStatus.COMPLETED]: {},
+  [MentorshipStatus.CANCELLED]: {},
+  [MentorshipStatus.ACTIVE]: {},
 };
 
-const reducer = (state: MentorshipState, action: Action): MentorshipState => {
+const reducer = (state: MentorshipStatus, action: Action): MentorshipStatus => {
   if (action.type === "SET_STATE" && action.payload) {
     return action.payload;
   }
 
   const nextState = transitions[state]?.[action.type as ActionTypes];
-  return nextState ?? state; // if invalid transition → stay in current state
+  return nextState ?? state;
 };
 
 export const useMentorshipStates = (
-  initialState: MentorshipState,
+  initialState: MentorshipStatus,
   mentorshipId: string,
   tutorId: string,
   finallyCallback: () => void
@@ -61,12 +50,12 @@ export const useMentorshipStates = (
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isLoading, setIsLoading] = useState(false);
 
-  const updateState = async (newState: MentorshipState) => {
+  const updateState = async (newState: MentorshipStatus) => {
     if (isLoading) return;
 
     setIsLoading(true);
     try {
-      if (state === MentorshipState.CONVERSING && newState === MentorshipState.ASSIGNED) {
+      if (state === MentorshipStatus.CONVERSING && newState === MentorshipStatus.ASSIGNED) {
         await createTutoring({
           tutoringRequestId: mentorshipId,
           tutorId,
@@ -78,15 +67,13 @@ export const useMentorshipStates = (
 
       const { data } = await updateTutoringRequestStatus(mentorshipId, { status: newState });
 
-      if (data.requestStatus === MentorshipState.CONVERSING) {
+      if (data.requestStatus === MentorshipStatus.CONVERSING) {
         window.open(`https://somos-pragma.slack.com/team/${data.tutee.slackId}`, "_blank");
       }
 
-      // Only update local state after successful API call
       dispatch({ type: "SET_STATE", payload: newState });
     } catch (error) {
       console.error(error);
-      // Optionally show error to user
     } finally {
       setIsLoading(false);
       finallyCallback();
