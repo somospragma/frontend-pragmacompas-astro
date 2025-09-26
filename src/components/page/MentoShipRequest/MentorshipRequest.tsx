@@ -2,9 +2,9 @@ import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTa
 import { getTutoringRequests, type GetTutoringRequestsParams } from "@/infrastructure/services/getTutoringRequests";
 import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
 import { useEffect, useState } from "react";
-import { MentorshipState } from "@/shared/entities/mentorshipState";
 import { userStore } from "@/store/userStore";
 import { TUTOR_MENTORSHIP_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 
 // Transform TutoringRequest to match MentorshipTable's expected interface
 type MentorshipRequest = Omit<TutoringRequest, "tutee"> & {
@@ -28,7 +28,7 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
   const handleGetTutoringRequests = () => {
     const params: GetTutoringRequestsParams = {
       chapterId: userStore.get().chapterId,
-      status: isDashboard ? MentorshipState.PENDING : undefined,
+      status: isDashboard ? MentorshipStatus.PENDING : undefined,
     };
     getTutoringRequests(params).then((data) => {
       // Transform TutoringRequest[] to match MentorshipRequest interface
@@ -85,7 +85,7 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-foreground">
-                  {mentorshipRequests.filter((request) => request.requestStatus === MentorshipState.AVAILABLE).length}
+                  {mentorshipRequests.filter((request) => request.requestStatus === MentorshipStatus.AVAILABLE).length}
                 </p>
                 <p className="text-muted-foreground text-sm">Disponibles</p>
               </div>
@@ -100,7 +100,7 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold text-foreground">
-                  {mentorshipRequests.filter((request) => request.requestStatus === MentorshipState.CONVERSING).length}
+                  {mentorshipRequests.filter((request) => request.requestStatus === MentorshipStatus.CONVERSING).length}
                 </p>
                 <p className="text-muted-foreground text-sm">En conversación</p>
               </div>

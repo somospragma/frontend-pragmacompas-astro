@@ -3,8 +3,7 @@ import { getTutoringRequests, type GetTutoringRequestsParams } from "@/infrastru
 import type { TutoringRequest, UserRole } from "@/infrastructure/models/TutoringRequest";
 import type { SessionUser } from "auth.config";
 import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
-import type { MentorshipState } from "@/shared/entities/mentorshipState";
-
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 // Types
 interface MentorshipRequest {
   id: string;
@@ -24,7 +23,7 @@ interface MentorshipRequest {
     name: string;
   }[];
   needsDescription: string;
-  requestStatus: MentorshipState;
+  requestStatus: MentorshipStatus;
 }
 
 interface RequestWithMappedStatus {
@@ -88,7 +87,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
       }
 
       if (filter !== "all") {
-        params.status = reverseStatusMapping[filter] as MentorshipState;
+        params.status = reverseStatusMapping[filter] as MentorshipStatus;
       }
 
       const response = await getTutoringRequests(params);
@@ -109,7 +108,7 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
         },
         skills: request.skills,
         needsDescription: request.needsDescription,
-        requestStatus: request.requestStatus as MentorshipState,
+        requestStatus: request.requestStatus as MentorshipStatus,
       }));
 
       setMentorshipRequests(mappedMentorshipRequests);

@@ -2,7 +2,7 @@
 import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import MainLayout from "@/components/templates/MainLayout.astro";
-import { MentorshipState } from "@/shared/entities/mentorshipState";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 
 const mentorshipRequests = [
   {
@@ -25,7 +25,7 @@ const mentorshipRequests = [
       { id: "skills-3", name: "Next.js" },
     ],
     needsDescription: "Necesito ayuda con optimización de rendimiento en React",
-    requestStatus: MentorshipState.PENDING,
+    requestStatus: MentorshipStatus.PENDING,
   },
   {
     id: "90d713a1-dbe7-4fdd-b395-f775fb0ed306",
@@ -46,7 +46,7 @@ const mentorshipRequests = [
       { id: "skills-5", name: "Nuxt.js" },
     ],
     needsDescription: "Quiero aprender Vue.js desde cero",
-    requestStatus: MentorshipState.AVAILABLE,
+    requestStatus: MentorshipStatus.AVAILABLE,
   },
   {
     id: "90d713a1-dbe7-4fdd-b395-f775fb0ed307",
@@ -67,7 +67,7 @@ const mentorshipRequests = [
       { id: "skills-7", name: "Express" },
     ],
     needsDescription: "Necesito mejorar en arquitectura de APIs REST",
-    requestStatus: MentorshipState.CANCELLED,
+    requestStatus: MentorshipStatus.CANCELLED,
   },
 ] as MentorshipRequest[];
 ---

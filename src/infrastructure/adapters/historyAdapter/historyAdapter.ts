@@ -1,7 +1,7 @@
 import type { MyRequestsResponse, TutoringSession } from "../../models/TutoringRequest";
 import type { MentorshipData } from "@/shared/config/historyTableConfig";
 import { dateAdapter } from "../dateAdapter/dateAdapter";
-import { MentorshipState } from "@/shared/entities/mentorshipState";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { UserRole } from "@/shared/utils/enums/role";
 import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
 import { MentorshipAction } from "@/shared/utils/enums/mentorshipAction";
@@ -60,26 +60,28 @@ export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
   return result;
 }
 
-const getAvailableActions = (status: MentorshipState, userRoleInItem: UserRole, itemType: MentorshipType): string[] => {
-  if (status === MentorshipState.CANCELLING) {
-    return [];
-  }
-
+const getAvailableActions = (
+  status: MentorshipStatus,
+  userRoleInItem: UserRole,
+  itemType: MentorshipType
+): string[] => {
   const actions: string[] = [];
 
   switch (itemType) {
     case MentorshipType.REQUEST:
-      // Solo el tutorado puede cancelar su propia solicitud
       if (userRoleInItem === UserRole.TUTEE) {
         actions.push(MentorshipAction.CANCEL);
       }
       break;
 
     case MentorshipType.MENTORSHIP:
-      if (status === ("Activa" as MentorshipState)) {
-        // Ambos roles pueden cancelar y finalizar la mentoría activa
+      if (status === MentorshipStatus.ACTIVE) {
         actions.push(MentorshipAction.CANCEL);
         actions.push(MentorshipAction.COMPLETE);
+      }
+
+      if (status === MentorshipStatus.CANCELLING) {
+        actions.push(MentorshipAction.CANCEL);
       }
       break;
 

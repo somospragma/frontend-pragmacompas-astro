@@ -8,8 +8,9 @@ import {
 } from "@/components/molecules/Dialog/Dialog";
 import { renderState } from "../MentorShipTable";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
-import { MentorshipState, useMentorshipStates } from "@/shared/entities/mentorshipState";
+import { useMentorshipStates } from "@/shared/entities/mentorshipState";
 import { Button } from "@/components/ui/button";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { userStore } from "@/store/userStore";
 
 type Props = {
@@ -32,12 +33,12 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props)
     let rejectAction;
     let acceptAction;
     switch (selectedRequest?.requestStatus) {
-      case MentorshipState.PENDING:
-      case MentorshipState.CONVERSING:
+      case MentorshipStatus.PENDING:
+      case MentorshipStatus.CONVERSING:
         rejectAction = "Rechazar";
         acceptAction = "Aceptar";
         break;
-      case MentorshipState.AVAILABLE:
+      case MentorshipStatus.AVAILABLE:
         rejectAction = "Volver";
         acceptAction = "Reunirse";
         break;
