@@ -26,9 +26,6 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange }: Props)
     let acceptAction;
     switch (selectedRequest?.requestStatus) {
       case MentorshipState.PENDING:
-        rejectAction = "Rechazar";
-        acceptAction = "Aceptar";
-        break;
       case MentorshipState.CONVERSING:
         rejectAction = "Rechazar";
         acceptAction = "Aceptar";

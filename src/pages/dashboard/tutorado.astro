@@ -6,7 +6,6 @@ import { getSession } from "auth-astro/server";
 import type { SessionUser } from "auth.config";
 
 const session = (await getSession(Astro.request)) as SessionUser;
-console.log("session 22", session);
 ---
 
 <DashboardLayout>

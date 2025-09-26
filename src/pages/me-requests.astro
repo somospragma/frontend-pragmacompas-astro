@@ -1,9 +1,10 @@
 ---
-import MentorshipTable, { type MentorshipRequest } from "@/components/organisms/MentorShipTable/MentorShipTable";
+import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
+import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import MainLayout from "@/components/templates/MainLayout.astro";
 import { MentorshipState } from "@/shared/entities/mentorshipState";
 
-const mentorshipRequests: MentorshipRequest[] = [
+const mentorshipRequests = [
   {
     id: "90d713a1-dbe7-4fdd-b395-f775fb0ed305",
     tutee: {
@@ -45,7 +46,7 @@ const mentorshipRequests: MentorshipRequest[] = [
       { id: "skills-5", name: "Nuxt.js" },
     ],
     needsDescription: "Quiero aprender Vue.js desde cero",
-    requestStatus: MentorshipState.APPROVED,
+    requestStatus: MentorshipState.AVAILABLE,
   },
   {
     id: "90d713a1-dbe7-4fdd-b395-f775fb0ed307",
@@ -68,7 +69,7 @@ const mentorshipRequests: MentorshipRequest[] = [
     needsDescription: "Necesito mejorar en arquitectura de APIs REST",
     requestStatus: MentorshipState.CANCELLED,
   },
-];
+] as MentorshipRequest[];
 ---
 
 <MainLayout>

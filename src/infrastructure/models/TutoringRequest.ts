@@ -38,6 +38,7 @@ export interface TutoringRequest {
   skills: Skill[];
   needsDescription: string;
   requestStatus: TutoringRequestStatus;
+  requestDate: string;
 }
 
 export interface TutoringSession {

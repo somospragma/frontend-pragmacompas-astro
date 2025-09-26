@@ -9,6 +9,5 @@ interface SkillsResponse {
 
 export async function getSkills(): Promise<Skill[]> {
   const response = await httpClient.get<SkillsResponse>("/api/v1/skills");
-  console.log("✅ getSkills: Full response:", response.data);
-  return response.data.data; // Extraer el array de skills del campo 'data'
+  return response.data.data;
 }

@@ -9,14 +9,17 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/molecules/Dialog/Dialog";
+import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
 
 interface CancellationModalProps {
+  type: MentorshipType | string;
   isOpen: boolean;
   onClose: () => void;
   onSubmitCancellation: (reason: string) => Promise<void>;
 }
 
 const CancellationModal: React.FC<CancellationModalProps> = ({
+  type,
   isOpen,
   onClose,
   onSubmitCancellation,
@@ -45,11 +48,13 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
     }
   };
 
+  const cancelTitle = type === MentorshipType.REQUEST ? "Cancelar solicitud" : "Cancelar tutoría";
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-foreground">Cancelar tutoría</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 text-foreground">{cancelTitle}</DialogTitle>
           <DialogDescription>Esta acción no se puede deshacer</DialogDescription>
         </DialogHeader>
 
@@ -72,7 +77,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
-            Mantener tutoría
+            Mantener
           </Button>
           <Button
             variant="destructive"
@@ -80,7 +85,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
             disabled={reason.trim() === "" || isSubmitting}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Cancelando..." : "Confirmar Cancelación"}
+            {isSubmitting ? "Cancelando..." : "Confirmar"}
           </Button>
         </DialogFooter>
       </DialogContent>
