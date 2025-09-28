@@ -14,6 +14,7 @@ export interface MentorshipData {
   chapter: string;
   skills: string[];
   action: string[];
+  finalActUrl?: string;
 }
 
 export type CellValue = string | string[];

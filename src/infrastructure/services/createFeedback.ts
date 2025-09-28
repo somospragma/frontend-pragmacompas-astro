@@ -5,6 +5,7 @@ export interface CreateFeedbackBody {
   score: string;
   comments: string;
   evaluatorId: string;
+  finalActUrl?: string;
 }
 
 export interface CreateFeedbackResponse {

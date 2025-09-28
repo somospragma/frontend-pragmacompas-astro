@@ -50,11 +50,11 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
   const cancellationModalData = useMemo(() => {
     if (!selectedCancellationItem || !user.rol) return null;
 
-    const isTutor = user.rol === "Tutor";
+    const isTutor = user.rol === UserRole.TUTOR;
 
     return {
       participant: isTutor ? selectedCancellationItem.tutee : selectedCancellationItem.tutor,
-      role: isTutor ? "Tutorado" : "Tutor",
+      role: isTutor ? UserRole.TUTEE : UserRole.TUTOR,
     };
   }, [selectedCancellationItem, user]);
 
@@ -66,7 +66,7 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
     }
   };
 
-  const handleSubmitFeedback = async (score: number, comments: string) => {
+  const handleSubmitFeedback = async (score: number, comments: string, finalActUrl?: string) => {
     if (!selectedFeedbackItem?.id) {
       return;
     }
@@ -76,6 +76,7 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
         score: score.toString(),
         comments,
         evaluatorId: selectedFeedbackItem.evaluatorId,
+        finalActUrl,
       };
 
       await createFeedback(feedbackData);
