@@ -12,6 +12,9 @@ import { useMentorshipStates } from "@/shared/entities/mentorshipState";
 import { Button } from "@/components/ui/button";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { userStore } from "@/store/userStore";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
 
 type Props = {
   isOpen: boolean;
@@ -20,7 +23,15 @@ type Props = {
   onRefetch: () => void;
 };
 const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetch }: Props) => {
+  const [objectives, setObjectives] = useState("");
   const userId = userStore.get().userId ?? "";
+
+  useEffect(() => {
+    if (!isOpen) {
+      setObjectives("");
+    }
+  }, [isOpen]);
+
   const { next, previous, isLoading } = useMentorshipStates(
     selectedRequest.requestStatus,
     selectedRequest.id,
@@ -28,24 +39,30 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetc
     () => {
       onRefetch();
       onOpenChange();
-    }
+    },
+    objectives
   );
+
+  const handleAccept = () => {
+    next();
+  };
 
   const handleClose = () => {
     onOpenChange();
   };
 
   const renderActions = () => {
-    let rejectAction;
-    let acceptAction;
-    let rejectHandler;
-
+    let rejectAction, acceptAction, rejectHandler;
     switch (selectedRequest?.requestStatus) {
       case MentorshipStatus.PENDING:
-      case MentorshipStatus.CONVERSING:
         rejectAction = "Rechazar";
         rejectHandler = previous;
         acceptAction = "Aceptar";
+        break;
+      case MentorshipStatus.CONVERSING:
+        rejectAction = "Rechazar";
+        rejectHandler = previous;
+        acceptAction = "Aceptar Tutoría";
         break;
       case MentorshipStatus.AVAILABLE:
         rejectAction = "Volver";
@@ -55,33 +72,30 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetc
       default:
         return [];
     }
+    const isAcceptDisabled =
+      isLoading || (selectedRequest?.requestStatus === MentorshipStatus.CONVERSING && !objectives.trim());
 
     return [
       <Button key={`reject-${selectedRequest?.id}`} variant="outline" disabled={isLoading} onClick={rejectHandler}>
         {rejectAction}
       </Button>,
       ,
-      <Button
-        key={`accept-${selectedRequest?.id}`}
-        disabled={isLoading}
-        onClick={() => {
-          next();
-        }}
-      >
+      <Button key={`accept-${selectedRequest?.id}`} disabled={isAcceptDisabled} onClick={handleAccept}>
         {acceptAction}
       </Button>,
       ,
     ];
   };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Solicitud de tutoría</DialogTitle>
           <DialogDescription>Detalles de la solicitud de tutoría</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-primary font-semibold text-lg">
@@ -99,27 +113,38 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetc
           </div>
 
           <div className="space-y-2">
-            <div>
-              <span className="text-sm font-medium">Habilidades solicitadas:</span>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {selectedRequest?.skills.map((skill) => (
-                  <span key={skill.id} className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs">
-                    {skill.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <span className="text-sm font-medium">Descripción de necesidades:</span>
-              <p className="text-sm text-muted-foreground mt-1">{selectedRequest?.needsDescription}</p>
+            <h4 className="text-sm font-medium text-foreground">Habilidades solicitadas:</h4>
+            <div className="flex flex-wrap gap-2">
+              {selectedRequest?.skills.map((skill, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {skill.name}
+                </Badge>
+              ))}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Estado:</span>
-            {renderState(selectedRequest?.requestStatus)}
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Descripción de necesidades:</h4>
+            <p className="text-sm text-muted-foreground">{selectedRequest?.needsDescription}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Estado:</span>
+              {renderState(selectedRequest?.requestStatus)}
+            </div>
           </div>
+
+          {selectedRequest?.requestStatus === MentorshipStatus.CONVERSING && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-foreground">Objetivos:</h4>
+              <Textarea
+                placeholder="Comparte tus objetivos para esta tutoría..."
+                className="resize-none"
+                rows={4}
+                value={objectives}
+                onChange={(e) => setObjectives(e.target.value)}
+                required
+              />
+            </div>
+          )}
         </div>
 
         <DialogFooter>{renderActions()}</DialogFooter>

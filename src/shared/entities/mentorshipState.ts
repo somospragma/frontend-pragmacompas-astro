@@ -45,7 +45,8 @@ export const useMentorshipStates = (
   initialState: MentorshipStatus,
   mentorshipId: string,
   tutorId: string,
-  finallyCallback: () => void
+  finallyCallback: () => void,
+  objectives?: string
 ) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +60,7 @@ export const useMentorshipStates = (
         await createTutoring({
           tutoringRequestId: mentorshipId,
           tutorId,
-          objectives: "Objetivos de la tutoría",
+          objectives: objectives || "",
         });
 
         dispatch({ type: "SET_STATE", payload: newState });

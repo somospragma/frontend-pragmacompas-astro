@@ -39,11 +39,11 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
   const feedbackModalData = useMemo(() => {
     if (!selectedFeedbackItem || !user.rol) return null;
     const isTutor = selectedFeedbackItem.role === UserRole.TUTOR;
-
     return {
       participant: isTutor ? selectedFeedbackItem.tutee : selectedFeedbackItem.tutor,
       role: isTutor ? UserRole.TUTEE : UserRole.TUTOR,
       skills: selectedFeedbackItem.skills,
+      email: isTutor ? selectedFeedbackItem.tutorEmail : selectedFeedbackItem.tuteeEmail,
     };
   }, [selectedFeedbackItem, user]);
 
@@ -55,7 +55,6 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
     return {
       participant: isTutor ? selectedCancellationItem.tutee : selectedCancellationItem.tutor,
       role: isTutor ? "Tutorado" : "Tutor",
-      skills: selectedCancellationItem.skills,
     };
   }, [selectedCancellationItem, user]);
 

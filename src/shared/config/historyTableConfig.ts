@@ -5,7 +5,9 @@ export interface MentorshipData {
   type: string;
   role: UserRole;
   tutee: string;
+  tuteeEmail?: string;
   tutor: string;
+  tutorEmail?: string;
   evaluatorId: string;
   status: string;
   startDate: string;

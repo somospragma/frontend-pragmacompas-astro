@@ -19,6 +19,7 @@ interface FeedbackModalProps {
     participant: string;
     role: string;
     skills: string[];
+    email?: string;
   };
   onSubmitFeedback: (score: number, comments: string) => Promise<void>;
 }
@@ -69,6 +70,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             <div>
               <h3 className="text-lg font-semibold text-foreground">{mentorship.participant}</h3>
               <p className="text-muted-foreground">{mentorship.role}</p>
+              <p className="text-sm text-muted-foreground">{mentorship.email}</p>
             </div>
           </div>
 
