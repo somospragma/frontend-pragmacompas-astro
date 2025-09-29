@@ -20,42 +20,40 @@ import { userStore } from "@/store/userStore";
 const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
   const user = userStore.get();
-  const permissions = usePermissions(user.rol as string);
   const {
     isOpen: isFeedbackModalOpen,
     selectedItem: selectedFeedbackItem,
     openModal: openFeedbackModal,
     closeModal: closeFeedbackModal,
   } = useModalState<MentorshipData>();
-
   const {
     isOpen: isCancellationModalOpen,
     selectedItem: selectedCancellationItem,
     openModal: openCancellationModal,
     closeModal: closeCancellationModal,
   } = useModalState<MentorshipData>();
+  const myRole = selectedFeedbackItem?.myRole;
+  const permissions = usePermissions(myRole as string);
+  const isTutor = myRole === UserRole.TUTOR;
 
   const feedbackModalData = useMemo(() => {
-    if (!selectedFeedbackItem || !user.rol) return null;
-    const isTutor = selectedFeedbackItem.myRole === UserRole.TUTOR;
+    if (!selectedFeedbackItem) return null;
     return {
       participant: isTutor ? selectedFeedbackItem.tutee.name : selectedFeedbackItem.tutor.name,
-      myRole: selectedFeedbackItem.myRole,
+      participantRole: isTutor ? selectedFeedbackItem.tutee.role : selectedFeedbackItem.tutor.role,
+      myRole: myRole as string,
       skills: selectedFeedbackItem.skills,
       email: isTutor ? selectedFeedbackItem.tutor.email : selectedFeedbackItem.tutee.email,
     };
-  }, [selectedFeedbackItem, user]);
+  }, [selectedFeedbackItem]);
 
   const cancellationModalData = useMemo(() => {
-    if (!selectedCancellationItem || !user.rol) return null;
-
-    const isTutor = user.rol === UserRole.TUTOR;
-
+    if (!selectedCancellationItem) return null;
     return {
       participant: isTutor ? selectedCancellationItem.tutee : selectedCancellationItem.tutor,
       role: isTutor ? UserRole.TUTEE : UserRole.TUTOR,
     };
-  }, [selectedCancellationItem, user]);
+  }, [selectedCancellationItem]);
 
   const handleActionClick = (action: string, mentorship: MentorshipData) => {
     if (action === MentorshipAction.CANCEL) {
@@ -109,6 +107,7 @@ const HistoryTables: React.FC = () => {
           break;
 
         case MentorshipType.MENTORSHIP:
+          // TODO: arreglar esto si dejan que solo tutor y admin puedan cancelar tutoria
           await cancelTutoring(selectedCancellationItem.id, {
             userId: user.userId,
             comments,
@@ -126,13 +125,25 @@ const HistoryTables: React.FC = () => {
     }
   };
 
+  const getColumns = (config: { showActions: boolean; showType: boolean }) => {
+    let cols = [...HISTORY_TABLE_CONFIG];
+    if (!config.showActions) {
+      cols = cols.filter((col) => col.key !== "action");
+    }
+    if (!config.showType) {
+      cols = cols.filter((col) => col.key !== "type");
+    }
+    return cols;
+  };
+
   return (
     <div className="flex flex-col gap-12">
       {Object.entries(HISTORY_PAGE_CONFIG).map(([key, config]) => {
-        const columns = config.showActions
-          ? HISTORY_TABLE_CONFIG
-          : HISTORY_TABLE_CONFIG.filter((col) => col.key !== "action");
-        const filteredData = data.filter((item) => config.status.some((status) => status === item.status));
+        const columns = getColumns(config);
+        const filteredData = data.filter(
+          (item) =>
+            config.status.some((status) => status === item.status) && config.type.some((type) => type === item.type)
+        );
 
         return (
           <DataTable
