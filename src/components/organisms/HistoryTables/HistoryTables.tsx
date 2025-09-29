@@ -55,7 +55,7 @@ const HistoryTables: React.FC = () => {
     };
   }, [selectedCancellationItem]);
 
-  const handleActionClick = (action: string, mentorship: MentorshipData) => {
+  const handleModal = (action: string, mentorship: MentorshipData) => {
     if (action === MentorshipAction.CANCEL) {
       openCancellationModal(mentorship);
     } else if (action === MentorshipAction.COMPLETE) {
@@ -152,7 +152,7 @@ const HistoryTables: React.FC = () => {
             data={filteredData}
             emptyMessage={config.emptyMessage}
             loading={isLoading}
-            onActionClick={handleActionClick}
+            onActionClick={handleModal}
           />
         );
       })}

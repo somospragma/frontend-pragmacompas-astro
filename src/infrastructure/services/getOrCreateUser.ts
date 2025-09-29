@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Profile } from "@auth/core/types";
 import { postCreateUser } from "./postCreateUser";
 import { validateUser } from "./validateUser";
 
-export const getOrCreateUser = async (profile: Profile) => {
+export const getOrCreateUser = async (data: { email: string; googleUserId: string }) => {
   try {
-    return await validateUser(profile.sub ?? "");
+    return await validateUser(data.googleUserId);
   } catch (error: any) {
     if (error?.response?.status === 403) {
       await postCreateUser({
-        email: profile.email || "",
-        googleUserId: profile.sub || "",
+        email: data.email,
+        googleUserId: data.googleUserId,
       });
-      return await validateUser(profile.sub ?? "");
+      return await validateUser(data.googleUserId);
     }
     throw error;
   }

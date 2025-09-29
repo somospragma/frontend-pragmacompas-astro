@@ -37,7 +37,7 @@ export default defineConfig({
         token.googleClientId = account.providerAccountId;
         token.accessToken = account.access_token;
 
-        const userValidation = await getOrCreateUser(profile);
+        const userValidation = await getOrCreateUser({ email: profile.email || "", googleUserId: profile.sub || "" });
 
         if (userValidation && typeof userValidation === "object" && "data" in userValidation) {
           token.rol = userValidation.data.rol;
