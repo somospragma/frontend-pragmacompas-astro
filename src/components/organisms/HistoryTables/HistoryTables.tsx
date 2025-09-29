@@ -107,7 +107,6 @@ const HistoryTables: React.FC = () => {
           break;
 
         case MentorshipType.MENTORSHIP:
-          // TODO: arreglar esto si dejan que solo tutor y admin puedan cancelar tutoria
           await cancelTutoring(selectedCancellationItem.id, {
             userId: user.userId,
             comments,
@@ -144,7 +143,7 @@ const HistoryTables: React.FC = () => {
           (item) =>
             config.status.some((status) => status === item.status) && config.type.some((type) => type === item.type)
         );
-
+        console.log("filteredData", filteredData);
         return (
           <DataTable
             key={key}
