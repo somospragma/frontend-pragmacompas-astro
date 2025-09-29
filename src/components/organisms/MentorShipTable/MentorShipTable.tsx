@@ -6,20 +6,13 @@ import {
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
-import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
-import { DEFAULT_STYLE, STATUS_STYLES } from "@/shared/utils/constants/statusStyles";
+import { renderState } from "@/shared/utils/helpers/renderState";
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
   isDashboard?: boolean;
   refetch?: () => void;
 }
-
-export const renderState = (state?: MentorshipStatus) => {
-  const className = state ? STATUS_STYLES[state] : DEFAULT_STYLE;
-
-  return <span className={`px-3 py-1 rounded-full text-xs ${className}`}>{state}</span>;
-};
 
 const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría", isDashboard, refetch }: Props) => {
   const [selectedRequest, setSelectedRequest] = useState<MentorshipRequest>();
