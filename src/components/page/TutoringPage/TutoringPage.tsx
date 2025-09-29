@@ -1,10 +1,10 @@
-import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
 import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
 import { useEffect, useState } from "react";
 import { userStore } from "@/store/userStore";
 import { TUTORING_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { useStore } from "@nanostores/react";
+import TutoringTable from "@/components/organisms/TutoringTable";
 
 type TutoringPage = Omit<TutoringRequest, "tutee"> & {
   tutee: TutoringRequest["tutee"] & {
@@ -130,12 +130,7 @@ const TutoringPage = () => {
         </div>
       </div>
 
-      <MentorshipTable
-        isDashboard={true}
-        title="Tutorías"
-        mentorshipRequests={mentorshipRequests}
-        refetch={handleGetTutoringRequests}
-      />
+      <TutoringTable title="Tutorías" data={mentorshipRequests} refetch={handleGetTutoringRequests} />
     </div>
   );
 };

@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/molecules/Dialog/Dialog";
-import { renderState } from "../MentorShipTable";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import { useMentorshipStates } from "@/shared/entities/mentorshipState";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import { userStore } from "@/store/userStore";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
+import { renderState } from "@/shared/utils/helpers/renderState";
 
 type Props = {
   isOpen: boolean;
