@@ -57,7 +57,7 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetc
       case MentorshipStatus.PENDING:
         rejectAction = "Rechazar";
         rejectHandler = previous;
-        acceptAction = "Aceptar";
+        acceptAction = "Aprobar Tutoría";
         break;
       case MentorshipStatus.CONVERSING:
         rejectAction = "Rechazar";
@@ -123,7 +123,7 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetc
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <h4 className="text-sm font-medium">Descripción de necesidades:</h4>
             <p className="text-sm text-muted-foreground">{selectedRequest?.needsDescription}</p>
             <div className="flex items-center gap-2">

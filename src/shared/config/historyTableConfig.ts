@@ -66,6 +66,11 @@ export const HISTORY_TABLE_CONFIG: TableColumn[] = [
     cellType: "skills",
   },
   {
+    key: "type",
+    label: "Tipo",
+    cellType: "text",
+  },
+  {
     key: "status",
     label: "Estado",
     cellType: "badge",

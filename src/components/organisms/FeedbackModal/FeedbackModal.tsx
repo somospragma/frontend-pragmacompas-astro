@@ -19,6 +19,7 @@ interface FeedbackModalProps {
   onClose: () => void;
   mentorship: {
     participant: string;
+    participantRole: string;
     myRole: string;
     skills: string[];
     email?: string;
@@ -98,7 +99,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">{mentorship.participant}</h3>
-              <p className="text-muted-foreground">{mentorship.myRole}</p>
+              <p className="text-muted-foreground">{mentorship.participantRole}</p>
               <p className="text-sm text-muted-foreground">{mentorship.email}</p>
             </div>
           </div>
