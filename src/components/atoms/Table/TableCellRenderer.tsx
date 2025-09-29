@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CellValue, MentorshipData, TableColumn } from "@/shared/config/historyTableConfig";
 import { getStatusBadgeClasses, getVariantButtonClasses } from "@/shared/utils/helpers/tableCellStyles";
+import type { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
+import { displayStatus } from "@/shared/utils/helpers/displayStatus";
 
 interface TableCellRendererProps {
   value: CellValue;
@@ -22,9 +24,9 @@ export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, col
       return (
         <Badge
           variant="outline"
-          className={`font-medium px-3 py-1 rounded-full text-xs ${getStatusBadgeClasses(value)}`}
+          className={`font-medium px-3 py-1 rounded-full text-xs ${getStatusBadgeClasses(value as MentorshipStatus)}`}
         >
-          {value}
+          {displayStatus(value as MentorshipStatus)}
         </Badge>
       );
 
