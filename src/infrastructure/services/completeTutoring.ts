@@ -3,12 +3,12 @@ import type { Tutoring } from "../models/Tutoring";
 
 export interface CompleteTutoringBody {
   userId: string;
-  comments?: string;
+  finalActUrl: string;
 }
 
 export interface CompleteTutoringResponse {
   message: string;
-  data: Tutoring;
+  data: Tutoring; // TODO: mapear bien la respuesta
   timestamp: string;
 }
 

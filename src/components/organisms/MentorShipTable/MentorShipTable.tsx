@@ -86,7 +86,7 @@ const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría"
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-12 h-12 min-w-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-primary font-semibold">
                         {request.tutee?.firstName ? request.tutee.firstName.charAt(0) : "?"}
                         {request.tutee?.lastName ? request.tutee.lastName.charAt(0) : "?"}
@@ -98,7 +98,8 @@ const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría"
                       </h3>
                       <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
                       <p className="text-muted-foreground text-xs">
-                        {request.needsDescription} - Habilidades:{request.skills.map((skill) => skill.name).join(", ")}
+                        {request.needsDescription} - Habilidades:&nbsp;
+                        {request.skills.map((skill) => skill.name).join(", ")}
                       </p>
                     </div>
                   </div>
@@ -116,6 +117,7 @@ const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría"
           </div>
         )}
       </div>
+
       {selectedRequest && (
         <MentorshipActionModal
           key={`modal-${selectedRequest?.id}`}

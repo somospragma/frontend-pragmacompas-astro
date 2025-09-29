@@ -37,7 +37,7 @@ const PruebaServices: React.FC = () => {
   };
 
   const handleCompleteTutoring = async () => {
-    const res = await completeTutoring("tutoringId", { userId: "userId", comments: "Comentarios" });
+    const res = await completeTutoring("tutoringId", { userId: "userId", finalActUrl: "Comentarios" });
     setResult(res);
   };
 
