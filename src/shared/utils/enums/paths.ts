@@ -44,7 +44,7 @@ export const PROTECTED_ROUTES: string[] = [
 
 // Routes that require specific roles
 export const ROLE_RESTRICTED_ROUTES: Record<string, string[]> = {
-  [ROUTE_PATHS.REQUESTS.getHref()]: [UserRole.TUTOR],
+  [ROUTE_PATHS.REQUESTS.getHref()]: [UserRole.TUTOR, UserRole.ADMINISTRADOR],
 } as const;
 
 // Role-based route mapping

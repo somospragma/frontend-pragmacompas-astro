@@ -1,4 +1,4 @@
-import { BarChart, ChevronLeft, ChevronRight, Menu, Settings, Users, UsersRound, X } from "lucide-react";
+import { BarChart, Book, ChevronLeft, ChevronRight, Menu, Settings, Users, UsersRound, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface Props {
@@ -37,6 +37,7 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
     { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
     { icon: Users, label: "Tutores", href: "/dashboard/tutor", badge: null },
     { icon: UsersRound, label: "Tutorados", href: "/dashboard/tutorado", badge: null },
+    { icon: Book, label: "Tutorias", href: "/dashboard/tutoring", badge: null },
   ];
 
   const isActive = (href: string) => {

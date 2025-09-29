@@ -1,10 +1,10 @@
 ---
 import Footer from "@/components/organisms/Footer.astro";
 import Header from "@/components/organisms/Header.astro";
-import ProfileAlert from "@/components/organisms/ProfileAlert/ProfileAlert.tsx";
+import ProfileAlert from "@/components/organisms/ProfileAlert/ProfileAlert";
 import { Toaster } from "@/components/ui/toaster";
 import BaseLayout from "./BaseLayout.astro";
-import type { SessionUser } from "auth.config";
+import type { User } from "@/infrastructure/models/TutoringRequest";
 import { getSession } from "auth-astro/server";
 import { UserInitializer } from "@/components/organisms/UserInitializer/UserInitializer";
 
@@ -17,14 +17,15 @@ interface Props {
 }
 
 const {
-  title = "Arquetipo Astro",
-  description = "Arquetipo construido con Astro y React",
+  title = "PragmaCompas",
+  description = "Sistema de tutorias de Pragma",
   image = "https://astro.build/og/astro.jpg",
   hideHeader = false,
   hideFooter = false,
 } = Astro.props;
 
-const session = (await getSession(Astro.request)) as SessionUser;
+const session = await getSession(Astro.request);
+const user = session?.user as User;
 ---
 
 <BaseLayout title={title} description={description} image={image}>
@@ -44,7 +45,7 @@ const session = (await getSession(Astro.request)) as SessionUser;
   <div class="flex flex-col background min-h-screen w-full">
     <ProfileAlert client:load />
 
-    <UserInitializer user={session?.user} client:load />
+    <UserInitializer user={user} client:load />
 
     {!hideHeader && <Header />}
 

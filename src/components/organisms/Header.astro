@@ -3,13 +3,13 @@ import { getSession } from "auth-astro/server";
 import { ModeToggle } from "../molecules/ModalToggle/ModeToggle";
 import { UserMenu } from "../molecules/UserMenu";
 import type { SessionUser } from "auth.config";
-import { UserRole } from "@/shared/utils/enums/role";
+import { hasPermission } from "@/shared/utils/helpers/hasPermission";
+import { Permission } from "@/shared/utils/enums/permission";
 
 const session = (await getSession(Astro.request)) as SessionUser;
-const userRole = session?.user?.rol;
-
-const showMentoriasLink = userRole === UserRole.TUTOR || userRole === UserRole.ADMINISTRADOR;
-const showDashboardLink = userRole === UserRole.ADMINISTRADOR;
+const userRole = session?.user?.rol ?? "";
+const showMentoriasLink = hasPermission(userRole, Permission.VIEW_LINKED_MENTORIAS);
+const showDashboardLink = hasPermission(userRole, Permission.VIEW_LINKED_DASHBOARD);
 ---
 
 <header class="flex items-center justify-between border-b border-border bg-background px-6 py-4 w-full">

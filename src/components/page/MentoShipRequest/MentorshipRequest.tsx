@@ -5,17 +5,17 @@ import { useEffect, useState } from "react";
 import { userStore } from "@/store/userStore";
 import { TUTOR_MENTORSHIP_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
+import { useStore } from "@nanostores/react";
 
-// Transform TutoringRequest to match MentorshipTable's expected interface
 type MentorshipRequest = Omit<TutoringRequest, "tutee"> & {
   tutee: TutoringRequest["tutee"] & {
-    id: string; // Make id required
-    rol: string; // Make rol required
+    id: string;
+    rol: string;
     chapter: {
       id: string;
       name: string;
     };
-    slackId?: string; // Add slackId field
+    slackId?: string;
   };
 };
 
@@ -24,25 +24,26 @@ type Props = {
 };
 
 const MentorshipRequest = ({ isDashboard }: Props) => {
+  const user = useStore(userStore);
   const [mentorshipRequests, setMentorshipRequests] = useState<MentorshipRequest[]>([]);
+
   const handleGetTutoringRequests = () => {
     const params: GetTutoringRequestsParams = {
-      chapterId: userStore.get().chapterId,
+      chapterId: user.chapterId,
       status: isDashboard ? MentorshipStatus.PENDING : undefined,
     };
     getTutoringRequests(params).then((data) => {
-      // Transform TutoringRequest[] to match MentorshipRequest interface
       const transformedData: MentorshipRequest[] = data.data.map((request) => ({
         ...request,
         tutee: {
           ...request.tutee,
-          id: request.tutee.id || "", // Ensure id is always a string
-          rol: request.tutee.rol || "Tutorado", // Provide default role
+          id: request.tutee.id || "",
+          rol: request.tutee.rol || "Tutorado",
           chapter: {
             id: request.tutee?.chapter ? request.tutee.chapter.id : "",
             name: request.tutee?.chapter ? request.tutee.chapter.name : "",
           },
-          slackId: request.tutee.slackId || "", // Ensure slackId is always a string
+          slackId: request.tutee.slackId || "",
         },
       }));
       setMentorshipRequests(transformedData);
@@ -50,8 +51,10 @@ const MentorshipRequest = ({ isDashboard }: Props) => {
   };
 
   useEffect(() => {
-    handleGetTutoringRequests();
-  }, []);
+    if (user.chapterId) {
+      handleGetTutoringRequests();
+    }
+  }, [user.chapterId]);
 
   return (
     <div className="space-y-6">

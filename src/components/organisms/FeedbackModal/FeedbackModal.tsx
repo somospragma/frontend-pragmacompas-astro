@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -11,16 +12,18 @@ import {
   DialogFooter,
 } from "@/components/molecules/Dialog/Dialog";
 import { Star } from "lucide-react";
+import { usePermissions } from "@/shared/hooks/usePermissions";
 
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
   mentorship: {
     participant: string;
-    role: string;
+    myRole: string;
     skills: string[];
+    email?: string;
   };
-  onSubmitFeedback: (score: number, comments: string) => Promise<void>;
+  onSubmitFeedback: (score: number, comments: string, document?: string) => Promise<void>;
 }
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({
@@ -29,24 +32,51 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   mentorship,
   onSubmitFeedback,
 }: FeedbackModalProps) => {
-  const [score, setScore] = useState(0);
-  const [comment, setComment] = useState("");
+  const permissions = usePermissions(mentorship.myRole);
+  const isDocumentRequired = permissions.canViewActUrl();
+  const [formData, setFormData] = useState({
+    score: 0,
+    comment: "",
+    documentUrl: "",
+  });
   const [hoveredStar, setHoveredStar] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const updateFormData = (field: keyof typeof formData, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const resetForm = () => {
+    setFormData({ score: 0, comment: "", documentUrl: "" });
+    setHoveredStar(0);
+  };
+
   const handleSubmit = async () => {
-    if (score === 0) return;
+    if (formData.comment.trim() === "" || formData.score === 0) {
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await onSubmitFeedback(score, comment);
-      setScore(0);
-      setComment("");
+      await onSubmitFeedback(formData.score, formData.comment, formData.documentUrl);
+      resetForm();
     } catch (error) {
       console.error("Error submitting feedback:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleStarClick = (star: number) => {
+    const newScore = formData.score === star ? 0 : star;
+    updateFormData("score", newScore);
+    if (newScore === 0) setHoveredStar(0);
+  };
+
+  const isDisabled =
+    isSubmitting ||
+    formData.score === 0 ||
+    formData.comment.trim() === "" ||
+    (isDocumentRequired && formData.documentUrl.trim() === "");
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -68,7 +98,8 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">{mentorship.participant}</h3>
-              <p className="text-muted-foreground">{mentorship.role}</p>
+              <p className="text-muted-foreground">{mentorship.myRole}</p>
+              <p className="text-sm text-muted-foreground">{mentorship.email}</p>
             </div>
           </div>
 
@@ -89,14 +120,16 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
-                  onClick={() => setScore(star)}
+                  onClick={() => handleStarClick(star)}
                   onMouseEnter={() => setHoveredStar(star)}
                   onMouseLeave={() => setHoveredStar(0)}
                   className="p-1 transition-colors hover:bg-accent rounded"
                 >
                   <Star
                     className={`h-6 w-6 ${
-                      star <= (hoveredStar || score) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+                      star <= (hoveredStar || formData.score)
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-muted-foreground"
                     }`}
                   />
                 </button>
@@ -104,11 +137,24 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </div>
           </div>
 
+          {isDocumentRequired && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-foreground">Acta:</h4>
+              <Input
+                type="url"
+                value={formData.documentUrl}
+                onChange={(e) => updateFormData("documentUrl", e.target.value)}
+                placeholder="https://..."
+                className="resize-none"
+              />
+            </div>
+          )}
+
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-foreground">Comentario:</h4>
             <Textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              value={formData.comment}
+              onChange={(e) => updateFormData("comment", e.target.value)}
               placeholder="Comparte tu experiencia con esta tutoría..."
               className="resize-none"
               rows={4}
@@ -122,7 +168,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={score === 0 || isSubmitting}
+            disabled={isDisabled}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Enviando..." : "Enviar Evaluación"}

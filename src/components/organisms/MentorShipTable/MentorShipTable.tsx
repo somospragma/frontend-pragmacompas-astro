@@ -6,7 +6,7 @@ import {
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
-import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
+import { renderState } from "@/shared/utils/helpers/renderState";
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
@@ -14,30 +14,7 @@ interface Props {
   refetch?: () => void;
 }
 
-export const renderState = (state?: MentorshipStatus) => {
-  return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs ${
-        state === MentorshipStatus.PENDING || state === MentorshipStatus.CONVERSING
-          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-          : state === MentorshipStatus.COMPLETED || state === MentorshipStatus.AVAILABLE
-            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-            : state === MentorshipStatus.CANCELLED || state === MentorshipStatus.CANCELLING
-              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-              : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-      }`}
-    >
-      {state}
-    </span>
-  );
-};
-
-export default function MentorshipTable({
-  mentorshipRequests,
-  title = "Solicitudes de Tutoría",
-  isDashboard,
-  refetch,
-}: Props) {
+const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría", isDashboard, refetch }: Props) => {
   const [selectedRequest, setSelectedRequest] = useState<MentorshipRequest>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,7 +79,7 @@ export default function MentorshipTable({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-12 h-12 min-w-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-primary font-semibold">
                         {request.tutee?.firstName ? request.tutee.firstName.charAt(0) : "?"}
                         {request.tutee?.lastName ? request.tutee.lastName.charAt(0) : "?"}
@@ -114,7 +91,8 @@ export default function MentorshipTable({
                       </h3>
                       <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
                       <p className="text-muted-foreground text-xs">
-                        {request.needsDescription} - Habilidades:{request.skills.map((skill) => skill.name).join(", ")}
+                        {request.needsDescription} - Habilidades:&nbsp;
+                        {request.skills.map((skill) => skill.name).join(", ")}
                       </p>
                     </div>
                   </div>
@@ -132,6 +110,7 @@ export default function MentorshipTable({
           </div>
         )}
       </div>
+
       {selectedRequest && (
         <MentorshipActionModal
           key={`modal-${selectedRequest?.id}`}
@@ -139,10 +118,14 @@ export default function MentorshipTable({
           selectedRequest={selectedRequest}
           onOpenChange={() => {
             setIsModalOpen(false);
+          }}
+          onRefetch={() => {
             refetch?.();
           }}
         />
       )}
     </>
   );
-}
+};
+
+export default MentorshipTable;
