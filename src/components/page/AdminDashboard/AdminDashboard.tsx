@@ -1,6 +1,7 @@
 import { RoleRedirect } from "@/components/auth/RoleRedirect";
 import DashboardStats from "@/components/organisms/DashboardStats/DashboardStats";
 import type { UserRole } from "@/infrastructure/models/TutoringRequest";
+import MentorshipRequest from "../MentoShipRequest/MentorshipRequest";
 
 interface Props {
   userName?: string;
@@ -23,6 +24,8 @@ export default function AdminDashboard({ userName, userRole, chapterId }: Props)
 
         {/* Dashboard Stats */}
         {chapterId && <DashboardStats chapterId={chapterId} />}
+
+        <MentorshipRequest isDashboard />
       </div>
     </main>
   );
