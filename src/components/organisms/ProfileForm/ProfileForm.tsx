@@ -1,23 +1,19 @@
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { SENIORITY_OPTIONS } from "@/shared/utils/enums/seniority";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
-import { getBasicUserStatistics, type UserStatistics } from "@/infrastructure/services/getBasicUserStatistics";
 import { getChapters } from "@/infrastructure/services/getChapters";
 import { postCreateUser } from "@/infrastructure/services/postCreateUser";
 import { updateUser } from "@/infrastructure/services/updateUser";
 import { updateUserProfile, userStore } from "@/store/userStore";
 import { useStore } from "@nanostores/react";
-import { Loader2, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const ProfileForm = () => {
   const user = useStore(userStore);
+
   const [chapters, setChapters] = useState<{ id: string; name: string }[]>([]);
-  const [statistics, setStatistics] = useState<UserStatistics | null>(null);
 
   const [formData, setFormData] = useState({
     chapterId: user.chapterId || "",
@@ -25,7 +21,6 @@ export const ProfileForm = () => {
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [loading, setLoading] = useState(false);
   const [initialValidationShown, setInitialValidationShown] = useState(false);
 
   useEffect(() => {
@@ -42,14 +37,6 @@ export const ProfileForm = () => {
     getChapters().then((res) => {
       setChapters(res as { id: string; name: string }[]);
     });
-
-    getBasicUserStatistics()
-      .then((stats) => {
-        setStatistics(stats);
-      })
-      .catch((error) => {
-        console.error("Error fetching statistics:", error);
-      });
   }, [user.id]);
 
   useEffect(() => {
@@ -85,8 +72,6 @@ export const ProfileForm = () => {
     e.preventDefault();
     if (!validate()) return;
 
-    setLoading(true);
-
     if (user?.userId === "") {
       await createUser();
       return;
@@ -116,8 +101,6 @@ export const ProfileForm = () => {
         description: "Algo salió mal, por favor intenta de nuevo más tarde.",
         duration: 4000,
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -139,6 +122,7 @@ export const ProfileForm = () => {
         <div className="flex items-center gap-6 mb-8 pb-6 border-b">
           <Avatar
             src={user?.image || undefined}
+            alt={getInitials(user?.firstName || null)}
             fallback={getInitials(user?.firstName || null)}
             size="xl"
             className="ring-2 ring-border"
@@ -159,20 +143,8 @@ export const ProfileForm = () => {
               <Label htmlFor="chapter" className="text-sm font-medium text-foreground">
                 Chapter <span className="text-destructive">*</span>
               </Label>
-              <div className="max-w-md">
-                <Select
-                  options={chapters.map((c) => ({ value: c.id, label: c.name }))}
-                  value={formData.chapterId}
-                  onValueChange={(value) => {
-                    setFormData({ ...formData, chapterId: value });
-                    // Limpiar error cuando el usuario selecciona un valor
-                    if (errors.chapterId) {
-                      setErrors({ ...errors, chapterId: "" });
-                    }
-                  }}
-                  placeholder="Selecciona un chapter"
-                  className={errors.chapterId ? "border-destructive focus:ring-destructive" : ""}
-                />
+              <div className="max-w-md p-2 border rounded-md ">
+                <p>{chapters.find((c) => c.id === formData.chapterId)?.name}</p>
               </div>
               {errors.chapterId && <p className="text-sm text-destructive">{errors.chapterId}</p>}
             </div>
@@ -181,74 +153,13 @@ export const ProfileForm = () => {
               <Label htmlFor="seniority" className="text-sm font-medium text-foreground">
                 Seniority <span className="text-destructive">*</span>
               </Label>
-              <div className="max-w-md">
-                <Select
-                  options={SENIORITY_OPTIONS}
-                  value={formData.seniority}
-                  onValueChange={(value) => {
-                    setFormData({ ...formData, seniority: value });
-                    if (errors.seniority) {
-                      setErrors({ ...errors, seniority: "" });
-                    }
-                  }}
-                  placeholder="Selecciona un nivel"
-                  className={errors.seniority ? "border-destructive focus:ring-destructive" : ""}
-                />
+              <div className="max-w-md p-2 border rounded-md ">
+                <p>{SENIORITY_OPTIONS.find((c) => c.value === formData.seniority)?.label}</p>
               </div>
               {errors.seniority && <p className="text-sm text-destructive">{errors.seniority}</p>}
             </div>
           </div>
-
-          <div className="flex justify-start pt-4">
-            <Button
-              type="submit"
-              className="px-8 py-2 h-10 text-sm rounded-full bg-primary hover:bg-primary/90 shadow-sm transition-all duration-200"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Actualizando...
-                </>
-              ) : (
-                "Actualizar Datos"
-              )}
-            </Button>
-          </div>
         </form>
-      </div>
-
-      {/* Statistics Section */}
-      <div className="w-full">
-        <h2 className="text-xl font-bold mb-6 text-foreground">Estadísticas</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6 text-center">
-              <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                Tutorías
-              </CardTitle>
-              <p className="text-3xl font-bold text-foreground">{statistics?.mentorshipsGiven ?? "??"}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6 text-center">
-              <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                Horas
-              </CardTitle>
-              <p className="text-3xl font-bold text-foreground">{statistics?.totalHours ?? "??"}</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border border-border shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-6 text-center">
-              <CardTitle className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wide">
-                Reseñas
-              </CardTitle>
-              <p className="text-3xl font-bold text-foreground">{statistics?.mentorshipsReceived ?? "??"}</p>
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
