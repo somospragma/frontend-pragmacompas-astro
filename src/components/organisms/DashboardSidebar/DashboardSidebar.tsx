@@ -1,15 +1,4 @@
-import {
-  BarChart,
-  Book,
-  ChevronLeft,
-  ChevronRight,
-  Menu,
-  MessageSquare,
-  Settings,
-  Users,
-  UsersRound,
-  X,
-} from "lucide-react";
+import { BarChart, Book, ChevronLeft, ChevronRight, Menu, Settings, Users, UsersRound, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface Props {
@@ -48,7 +37,6 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
     { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
     { icon: Users, label: "Tutores", href: "/dashboard/tutor", badge: null },
     { icon: UsersRound, label: "Tutorados", href: "/dashboard/tutorado", badge: null },
-    { icon: MessageSquare, label: "Request", href: "/dashboard/requests", badge: null },
     { icon: Book, label: "Tutorias", href: "/dashboard/tutoring", badge: null },
   ];
 
@@ -102,25 +90,28 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
         <div className="flex items-center justify-between h-20 px-4 border-b border-gray-200 dark:border-slate-800">
           {!isCollapsed && (
             <div className="flex items-center">
-              <div className="size-6 text-primary">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="
-                      M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134
-                      C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462
-                      C2.19985 28.361 1.76794 23.9758 2.60947 19.7452
-                      C3.451 15.5145 5.52816 11.6284 8.57829 8.5783
-                      C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948
-                      C23.9758 1.76795 28.361 2.19986 32.3462 3.85057
-                      C36.3314 5.50129 39.7376 8.29668 42.134 11.8833
-                      C44.5305 15.4698 45.8096 19.6865 45.8096 24
-                      L24 24L24 45.8096Z
-                    "
-                    fill="currentColor"
-                  ></path>
-                </svg>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <a href="/">
+                      <img
+                        src="/pragma-compas-black.svg"
+                        alt="Logo Pragma"
+                        width="200"
+                        height="40"
+                        className="h-[40px] w-[200px] block dark:hidden"
+                      />
+                      <img
+                        src="/pragma-compas-white.svg"
+                        alt="Logo Pragma"
+                        width="200"
+                        height="40"
+                        className="h-[40px] w-[200px] hidden dark:block"
+                      />
+                    </a>
+                  </div>
+                </div>
               </div>
-              <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">Tutorías</span>
             </div>
           )}
 
