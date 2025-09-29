@@ -12,15 +12,14 @@ import {
   DialogFooter,
 } from "@/components/molecules/Dialog/Dialog";
 import { Star } from "lucide-react";
-import { userStore } from "@/store/userStore";
-import { UserRole } from "@/shared/utils/enums/role";
+import { usePermissions } from "@/shared/hooks/usePermissions";
 
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
   mentorship: {
     participant: string;
-    role: string;
+    myRole: string;
     skills: string[];
     email?: string;
   };
@@ -33,7 +32,8 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   mentorship,
   onSubmitFeedback,
 }: FeedbackModalProps) => {
-  const userRole = userStore.get().rol ?? "";
+  const permissions = usePermissions(mentorship.myRole);
+  const isDocumentRequired = permissions.canViewActUrl();
   const [formData, setFormData] = useState({
     score: 0,
     comment: "",
@@ -72,6 +72,12 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     if (newScore === 0) setHoveredStar(0);
   };
 
+  const isDisabled =
+    isSubmitting ||
+    formData.score === 0 ||
+    formData.comment.trim() === "" ||
+    (isDocumentRequired && formData.documentUrl.trim() === "");
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -92,7 +98,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">{mentorship.participant}</h3>
-              <p className="text-muted-foreground">{mentorship.role}</p>
+              <p className="text-muted-foreground">{mentorship.myRole}</p>
               <p className="text-sm text-muted-foreground">{mentorship.email}</p>
             </div>
           </div>
@@ -131,7 +137,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </div>
           </div>
 
-          {userRole === UserRole.TUTOR && (
+          {isDocumentRequired && (
             <div className="space-y-2">
               <h4 className="text-sm font-medium text-foreground">Acta:</h4>
               <Input
@@ -162,7 +168,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={formData.score === 0 || formData.comment.trim() === "" || isSubmitting}
+            disabled={isDisabled}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Enviando..." : "Enviar Evaluación"}

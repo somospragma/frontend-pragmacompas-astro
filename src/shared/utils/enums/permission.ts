@@ -1,0 +1,15 @@
+import { UserRole } from "./role";
+
+export enum Permission {
+  COMPLETE_TUTORING = "COMPLETE_TUTORING",
+  VIEW_ACT_URL = "VIEW_ACT_URL",
+  VIEW_LINKED_MENTORIAS = "VIEW_LINKED_MENTORIAS",
+  VIEW_LINKED_DASHBOARD = "VIEW_LINKED_DASHBOARD",
+}
+
+export const PERMISSION_REQUIREMENTS = {
+  [Permission.COMPLETE_TUTORING]: UserRole.TUTOR,
+  [Permission.VIEW_ACT_URL]: UserRole.TUTOR,
+  [Permission.VIEW_LINKED_MENTORIAS]: UserRole.TUTOR,
+  [Permission.VIEW_LINKED_DASHBOARD]: UserRole.ADMINISTRADOR,
+};

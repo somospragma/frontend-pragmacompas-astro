@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { TableCellRenderer } from "../../atoms/Table/TableCellRenderer";
@@ -13,7 +14,10 @@ interface TableDataRowProps {
 export const TableDataRow: React.FC<TableDataRowProps> = ({ row, index, columns = [], onActionClick }) => (
   <TableRow key={`${row.id}-${index}`} className="border-border hover:bg-accent transition-colors">
     {columns.map((column) => {
-      const value = row[column.key];
+      const getNestedValue = (obj: any, path: string) => {
+        return path.split(".").reduce((acc, key) => acc?.[key], obj);
+      };
+      const value = getNestedValue(row, column.key);
 
       const getCellClassName = (): string => {
         if (column.cellType === "skills" || column.cellType === "button") {

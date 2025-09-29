@@ -8,20 +8,19 @@ import { useHistoryTables } from "@/shared/hooks/useHistoryTables";
 import { useModalState } from "@/shared/hooks/useModalState";
 import { createFeedback, type CreateFeedbackBody } from "@/infrastructure/services/createFeedback";
 import { cancelTutoring } from "@/infrastructure/services/cancelTutoring";
-import type { User } from "@/infrastructure/models/TutoringRequest";
 import { UserRole } from "@/shared/utils/enums/role";
 import { MentorshipAction } from "@/shared/utils/enums/mentorshipAction";
 import { updateTutoringRequestStatus } from "@/infrastructure/services/updateTutoringRequestStatus";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
+import { completeTutoring, type CompleteTutoringBody } from "@/infrastructure/services/completeTutoring";
+import { usePermissions } from "@/shared/hooks/usePermissions";
+import { userStore } from "@/store/userStore";
 
-interface HistoryTablesProps {
-  user: User;
-}
-
-const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
+const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
-
+  const user = userStore.get();
+  const permissions = usePermissions(user.rol as string);
   const {
     isOpen: isFeedbackModalOpen,
     selectedItem: selectedFeedbackItem,
@@ -38,12 +37,12 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
 
   const feedbackModalData = useMemo(() => {
     if (!selectedFeedbackItem || !user.rol) return null;
-    const isTutor = selectedFeedbackItem.role === UserRole.TUTOR;
+    const isTutor = selectedFeedbackItem.myRole === UserRole.TUTOR;
     return {
-      participant: isTutor ? selectedFeedbackItem.tutee : selectedFeedbackItem.tutor,
-      role: isTutor ? UserRole.TUTEE : UserRole.TUTOR,
+      participant: isTutor ? selectedFeedbackItem.tutee.name : selectedFeedbackItem.tutor.name,
+      myRole: selectedFeedbackItem.myRole,
       skills: selectedFeedbackItem.skills,
-      email: isTutor ? selectedFeedbackItem.tutorEmail : selectedFeedbackItem.tuteeEmail,
+      email: isTutor ? selectedFeedbackItem.tutor.email : selectedFeedbackItem.tutee.email,
     };
   }, [selectedFeedbackItem, user]);
 
@@ -75,11 +74,20 @@ const HistoryTables: React.FC<HistoryTablesProps> = ({ user }) => {
         tutoringId: selectedFeedbackItem?.id,
         score: score.toString(),
         comments,
-        evaluatorId: selectedFeedbackItem.evaluatorId,
-        finalActUrl,
+        evaluatorId: selectedFeedbackItem.tutor.id,
       };
 
       await createFeedback(feedbackData);
+
+      if (permissions.canCompleteTutoring() && finalActUrl?.trim()) {
+        const completeTutoringData: CompleteTutoringBody = {
+          userId: selectedFeedbackItem.tutor.id,
+          finalActUrl,
+        };
+
+        await completeTutoring(selectedFeedbackItem.id, completeTutoringData);
+      }
+
       closeFeedbackModal();
       await refetch();
     } catch (error) {

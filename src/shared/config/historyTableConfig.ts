@@ -3,24 +3,30 @@ import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 export interface MentorshipData {
   id: string;
   type: string;
-  role: UserRole;
-  tutee: string;
-  tuteeEmail?: string;
-  tutor: string;
-  tutorEmail?: string;
-  evaluatorId: string;
+  myRole: UserRole;
+  tutee: {
+    name: string;
+    email?: string;
+    role: UserRole;
+    id: string;
+  };
+  tutor: {
+    name: string;
+    email?: string;
+    role: UserRole;
+    id: string;
+  };
   status: string;
   startDate: string;
   chapter: string;
   skills: string[];
   action: string[];
-  finalActUrl?: string;
 }
 
 export type CellValue = string | string[];
 
 export interface TableColumn {
-  key: keyof MentorshipData;
+  key: string;
   label: string;
   className?: string;
   cellType?: "text" | "badge" | "skills" | "button";
@@ -28,19 +34,19 @@ export interface TableColumn {
 
 export const HISTORY_TABLE_CONFIG: TableColumn[] = [
   {
-    key: "tutor",
+    key: "tutor.name",
     label: "Tutor",
     className: "font-medium",
     cellType: "text",
   },
   {
-    key: "tutee",
+    key: "tutee.name",
     label: "Tutorado",
     className: "font-medium",
     cellType: "text",
   },
   {
-    key: "role",
+    key: "myRole",
     label: "Mi Rol",
     cellType: "text",
   },
