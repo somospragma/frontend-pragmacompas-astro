@@ -5,6 +5,8 @@ import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { UserRole } from "@/shared/utils/enums/role";
 import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
 import { MentorshipAction } from "@/shared/utils/enums/mentorshipAction";
+import { hasPermission } from "@/shared/utils/helpers/hasPermission";
+import { Permission } from "@/shared/utils/enums/permission";
 
 export function historyAdapter(data: MyRequestsResponse): MentorshipData[] {
   const result: MentorshipData[] = [];
@@ -104,7 +106,13 @@ const getAvailableActions = (
     case MentorshipType.MENTORSHIP:
       if (status === MentorshipStatus.ACTIVE) {
         actions.push(MentorshipAction.CANCEL);
-        actions.push(MentorshipAction.COMPLETE);
+        actions.push(MentorshipAction.FEEDBACK);
+
+        const canComplete = hasPermission(userRoleInItem, Permission.COMPLETE_TUTORING);
+
+        if (canComplete) {
+          actions.push(MentorshipAction.COMPLETE);
+        }
       }
 
       if (status === MentorshipStatus.CANCELLING) {
