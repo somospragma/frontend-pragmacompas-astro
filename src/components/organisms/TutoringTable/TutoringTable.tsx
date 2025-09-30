@@ -1,33 +1,33 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { useState } from "react";
-import { ADMIN_MENTORSHIP_STATE_FILTERS, TUTORING_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
+import { TUTORING_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
 import { useModalState } from "@/shared/hooks/useModalState";
 import TutoringDetailModal from "../TutoringDetailModal";
-import type TutoringPage from "@/components/page/TutoringPage/TutoringPage";
 import { renderState } from "@/shared/utils/helpers/renderState";
+import type { Tutoring } from "@/infrastructure/models/Tutoring";
+import { useTutoringFilters } from "@/shared/hooks/useTutoringFilters";
+import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 
 interface Props {
-  data: TutoringPage[];
+  data: Tutoring[];
   title: string;
   refetch?: () => void;
 }
 
 const TutoringTable: React.FC<Props> = ({ data, title }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("Todos los estados");
+  const { searchTerm, setSearchTerm, selectedStatus, setSelectedStatus, filteredData } = useTutoringFilters(data);
   const { isOpen, openModal, closeModal } = useModalState();
 
-  const filteredData = data.filter((item) => {
-    const fullName = `${item.tutee.firstName} ${item.tutee.lastName}`;
-    const matchesSearch =
-      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.tutee.chapter.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const handleModal = (tutoring: Tutoring) => {
+    if (tutoring.status == MentorshipStatus.COMPLETED) {
+      openModal(tutoring);
+    }
 
-    const matchesStatus = selectedStatus === "Todos los estados" || item.requestStatus === selectedStatus;
-    const matchesByRol = ADMIN_MENTORSHIP_STATE_FILTERS.some((state) => state === item.requestStatus);
+    if (tutoring.status == MentorshipStatus.CANCELLING) {
+      openModal(tutoring);
+    }
 
-    return matchesSearch && matchesStatus && matchesByRol;
-  });
+    return;
+  };
 
   return (
     <div className="space-y-6">
@@ -61,7 +61,7 @@ const TutoringTable: React.FC<Props> = ({ data, title }) => {
           <Card
             key={request.id}
             className="bg-card border border-border cursor-pointer hover:bg-accent transition-colors"
-            onClick={() => openModal(request)}
+            onClick={() => handleModal(request)}
           >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -78,13 +78,13 @@ const TutoringTable: React.FC<Props> = ({ data, title }) => {
                     </h3>
                     <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
                     <p className="text-muted-foreground text-xs">
-                      {request.needsDescription} - Habilidades:&nbsp;
+                      {request.objectives} - Habilidades:&nbsp;
                       {request.skills.map((skill: { name: string }) => skill.name).join(", ")}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">{renderState(request.requestStatus)}</div>
+                <div className="flex items-center gap-4">{renderState(request.status)}</div>
               </div>
             </CardContent>
           </Card>
@@ -93,7 +93,7 @@ const TutoringTable: React.FC<Props> = ({ data, title }) => {
 
       {filteredData.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">No se encontraron solicitudes que coincidan con los filtros.</p>
+          <p className="text-muted-foreground">No se encontraron tutorías que coincidan con los filtros.</p>
         </div>
       )}
 

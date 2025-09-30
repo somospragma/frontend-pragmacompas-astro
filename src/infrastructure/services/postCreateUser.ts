@@ -1,10 +1,10 @@
 import { httpClient } from "../adapters/httpClient/httpClient";
 import type { User } from "../models/TutoringRequest";
 
-export const postCreateUser = async (user: User) => {
+export const postCreateUser = async (data: { email: string; googleUserId: string }) => {
   try {
     const response = await httpClient.post<User>(`/api/v1/users`, {
-      ...user,
+      ...data,
     });
     return response.data;
   } catch (error: unknown) {

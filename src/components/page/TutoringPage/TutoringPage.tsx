@@ -1,83 +1,47 @@
-import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
 import { useEffect, useState } from "react";
 import { userStore } from "@/store/userStore";
 import { TUTORING_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { useStore } from "@nanostores/react";
 import TutoringTable from "@/components/organisms/TutoringTable";
+import { getTutoring } from "@/infrastructure/services/getTutorings";
+import type { Tutoring } from "@/infrastructure/models/Tutoring";
 
-type TutoringPage = Omit<TutoringRequest, "tutee"> & {
-  tutee: TutoringRequest["tutee"] & {
-    id: string;
-    rol: string;
-    chapter: {
-      id: string;
-      name: string;
-    };
-    slackId?: string;
-  };
-};
-
-const TutoringPage = () => {
+const TutoringPage: React.FC = () => {
   const user = useStore(userStore);
-  const [mentorshipRequests, setMentorshipRequests] = useState<TutoringPage[]>([]);
+  const [tutoringData, setTutoringData] = useState<Tutoring[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleGetTutoringRequests = () => {
-    const data = {
-      data: [
-        {
-          id: "1",
-          requestStatus: MentorshipStatus.COMPLETED,
-          requestDate: "2023-10-01T00:00:00Z",
-          skills: [{ name: "JavaScript" }, { name: "React" }],
-          needsDescription: "Necesito ayuda con React",
-          tutee: {
-            id: "t1",
-            firstName: "Juan",
-            lastName: "Pérez",
-            email: "juan.perez@example.com",
-            rol: "Tutorado",
-            slackId: "U123456",
-            chapter: {
-              id: "c1",
-              name: "Capítulo 1",
-            },
-          },
-        },
-      ],
-    };
-    const transformedData = data.data.map((request) => ({
-      ...request,
-      needsDescription: request.needsDescription || "",
-      tutee: {
-        ...request.tutee,
-        id: request.tutee.id || "",
-        rol: request.tutee.rol || "Tutorado",
-        chapter: {
-          id: request.tutee?.chapter ? request.tutee.chapter.id : "",
-          name: request.tutee?.chapter ? request.tutee.chapter.name : "",
-        },
-        slackId: request.tutee.slackId || "",
-      },
-    })) as TutoringPage[];
+  const loadTutoringData = async () => {
+    if (!user.chapterId) return;
 
-    setMentorshipRequests(transformedData);
+    setIsLoading(true);
+
+    try {
+      const response = await getTutoring({ chapterId: user.chapterId });
+      setTutoringData(response.data);
+    } catch (error) {
+      console.error("Error loading tutoring data:", error);
+      setTutoringData([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     if (user.chapterId) {
-      handleGetTutoringRequests();
+      loadTutoringData();
     }
   }, [user.chapterId]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-card border border-border rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {mentorshipRequests.filter((request) => TUTORING_STATE_FILTERS.includes(request.requestStatus)).length}
+                {tutoringData.filter((request) => TUTORING_STATE_FILTERS.includes(request.status)).length}
               </p>
               <p className="text-muted-foreground text-sm">Total Tutorías</p>
             </div>
@@ -97,7 +61,7 @@ const TutoringPage = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {mentorshipRequests.filter((request) => request.requestStatus === MentorshipStatus.COMPLETED).length}
+                {tutoringData.filter((request) => request.status === MentorshipStatus.COMPLETED).length}
               </p>
               <p className="text-muted-foreground text-sm">Completadas</p>
             </div>
@@ -112,7 +76,7 @@ const TutoringPage = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {mentorshipRequests.filter((request) => request.requestStatus === MentorshipStatus.CANCELLED).length}
+                {tutoringData.filter((request) => request.status === MentorshipStatus.CANCELLED).length}
               </p>
               <p className="text-muted-foreground text-sm">Canceladas</p>
             </div>
@@ -130,7 +94,13 @@ const TutoringPage = () => {
         </div>
       </div>
 
-      <TutoringTable title="Tutorías" data={mentorshipRequests} refetch={handleGetTutoringRequests} />
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <TutoringTable title="Tutorías" data={tutoringData} refetch={loadTutoringData} />
+      )}
     </div>
   );
 };
