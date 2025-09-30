@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo } from "react";
 import { HISTORY_TABLE_CONFIG, type MentorshipData } from "@/shared/config/historyTableConfig";
 import DataTable from "../DataTable/DataTable";
@@ -16,28 +17,42 @@ import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
 import { completeTutoring, type CompleteTutoringBody } from "@/infrastructure/services/completeTutoring";
 import { usePermissions } from "@/shared/hooks/usePermissions";
 import { userStore } from "@/store/userStore";
+import CompleteModal from "../CompleteModal";
+import { toast } from "sonner";
 
 const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
   const user = userStore.get();
+
   const {
     isOpen: isFeedbackModalOpen,
     selectedItem: selectedFeedbackItem,
     openModal: openFeedbackModal,
     closeModal: closeFeedbackModal,
   } = useModalState<MentorshipData>();
+
   const {
     isOpen: isCancellationModalOpen,
     selectedItem: selectedCancellationItem,
     openModal: openCancellationModal,
     closeModal: closeCancellationModal,
   } = useModalState<MentorshipData>();
-  const myRole = selectedFeedbackItem?.myRole;
-  const permissions = usePermissions(myRole as string);
-  const isTutor = myRole === UserRole.TUTOR;
+
+  const {
+    isOpen: isCompleteModalOpen,
+    selectedItem: selectedCompleteItem,
+    openModal: openCompleteModal,
+    closeModal: closeCompleteModal,
+  } = useModalState<MentorshipData>();
+
+  const permissions = usePermissions(selectedCompleteItem?.myRole as string);
 
   const feedbackModalData = useMemo(() => {
     if (!selectedFeedbackItem) return null;
+
+    const myRole = selectedFeedbackItem?.myRole;
+    const isTutor = myRole === UserRole.TUTOR;
+
     return {
       participant: isTutor ? selectedFeedbackItem.tutee.name : selectedFeedbackItem.tutor.name,
       participantRole: isTutor ? selectedFeedbackItem.tutee.role : selectedFeedbackItem.tutor.role,
@@ -47,23 +62,47 @@ const HistoryTables: React.FC = () => {
     };
   }, [selectedFeedbackItem]);
 
-  const cancellationModalData = useMemo(() => {
-    if (!selectedCancellationItem) return null;
-    return {
-      participant: isTutor ? selectedCancellationItem.tutee : selectedCancellationItem.tutor,
-      role: isTutor ? UserRole.TUTEE : UserRole.TUTOR,
-    };
-  }, [selectedCancellationItem]);
-
   const handleModal = (action: string, mentorship: MentorshipData) => {
     if (action === MentorshipAction.CANCEL) {
       openCancellationModal(mentorship);
-    } else if (action === MentorshipAction.COMPLETE) {
+    }
+
+    if (action === MentorshipAction.FEEDBACK) {
       openFeedbackModal(mentorship);
+    }
+
+    if (action === MentorshipAction.COMPLETE) {
+      openCompleteModal(mentorship);
     }
   };
 
-  const handleSubmitFeedback = async (score: number, comments: string, finalActUrl?: string) => {
+  const handleSubmitComplete = async (documentUrl: string) => {
+    if (permissions.canCompleteTutoring() && documentUrl?.trim() && selectedCompleteItem) {
+      const completeTutoringData: CompleteTutoringBody = {
+        userId: selectedCompleteItem.tutor.id,
+        finalActUrl: documentUrl,
+      };
+
+      try {
+        await completeTutoring(selectedCompleteItem.id, completeTutoringData);
+      } catch (error: any) {
+        const errorMessage = error?.response?.data?.message;
+        const feedbackError =
+          errorMessage === "No se puede completar la tutoría porque falta el feedback del tutee" ||
+          errorMessage === "No se puede completar la tutoría porque falta el feedback del tutor";
+
+        if (error?.response?.status === 400 && feedbackError) {
+          toast(errorMessage);
+          return;
+        }
+        toast("Error al completar la tutoría", {
+          description: errorMessage || "Ocurrió un error inesperado.",
+        });
+      }
+    }
+  };
+
+  const handleSubmitFeedback = async (score: number, comments: string) => {
     if (!selectedFeedbackItem?.id) {
       return;
     }
@@ -76,16 +115,6 @@ const HistoryTables: React.FC = () => {
       };
 
       await createFeedback(feedbackData);
-
-      if (permissions.canCompleteTutoring() && finalActUrl?.trim()) {
-        const completeTutoringData: CompleteTutoringBody = {
-          userId: selectedFeedbackItem.tutor.id,
-          finalActUrl,
-        };
-
-        await completeTutoring(selectedFeedbackItem.id, completeTutoringData);
-      }
-
       closeFeedbackModal();
       await refetch();
     } catch (error) {
@@ -143,7 +172,6 @@ const HistoryTables: React.FC = () => {
           (item) =>
             config.status.some((status) => status === item.status) && config.type.some((type) => type === item.type)
         );
-        console.log("filteredData", filteredData);
         return (
           <DataTable
             key={key}
@@ -166,12 +194,18 @@ const HistoryTables: React.FC = () => {
         />
       )}
 
-      {cancellationModalData && (
-        <CancellationModal
-          isOpen={isCancellationModalOpen}
-          onClose={closeCancellationModal}
-          onSubmitCancellation={handleCancellation}
-          type={selectedCancellationItem?.type ?? MentorshipType.MENTORSHIP}
+      <CancellationModal
+        isOpen={isCancellationModalOpen}
+        onClose={closeCancellationModal}
+        onSubmitCancellation={handleCancellation}
+        type={selectedCancellationItem?.type ?? MentorshipType.MENTORSHIP}
+      />
+
+      {permissions.canCompleteTutoring() && (
+        <CompleteModal
+          isOpen={isCompleteModalOpen}
+          onClose={closeCompleteModal}
+          onSubmitComplete={handleSubmitComplete}
         />
       )}
     </div>

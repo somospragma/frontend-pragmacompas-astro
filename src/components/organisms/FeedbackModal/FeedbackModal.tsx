@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +11,6 @@ import {
   DialogFooter,
 } from "@/components/molecules/Dialog/Dialog";
 import { Star } from "lucide-react";
-import { usePermissions } from "@/shared/hooks/usePermissions";
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -24,7 +22,7 @@ interface FeedbackModalProps {
     skills: string[];
     email?: string;
   };
-  onSubmitFeedback: (score: number, comments: string, document?: string) => Promise<void>;
+  onSubmitFeedback: (score: number, comments: string) => Promise<void>;
 }
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({
@@ -33,12 +31,9 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   mentorship,
   onSubmitFeedback,
 }: FeedbackModalProps) => {
-  const permissions = usePermissions(mentorship.myRole);
-  const isDocumentRequired = permissions.canViewActUrl();
   const [formData, setFormData] = useState({
     score: 0,
     comment: "",
-    documentUrl: "",
   });
   const [hoveredStar, setHoveredStar] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,7 +43,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   };
 
   const resetForm = () => {
-    setFormData({ score: 0, comment: "", documentUrl: "" });
+    setFormData({ score: 0, comment: "" });
     setHoveredStar(0);
   };
 
@@ -58,7 +53,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     }
     setIsSubmitting(true);
     try {
-      await onSubmitFeedback(formData.score, formData.comment, formData.documentUrl);
+      await onSubmitFeedback(formData.score, formData.comment);
       resetForm();
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -73,12 +68,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     if (newScore === 0) setHoveredStar(0);
   };
 
-  const isDisabled =
-    isSubmitting ||
-    formData.score === 0 ||
-    formData.comment.trim() === "" ||
-    (isDocumentRequired && formData.documentUrl.trim() === "");
-
+  const isDisabled = isSubmitting || formData.score === 0 || formData.comment.trim() === "";
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -138,19 +128,6 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </div>
           </div>
 
-          {isDocumentRequired && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-foreground">Acta:</h4>
-              <Input
-                type="url"
-                value={formData.documentUrl}
-                onChange={(e) => updateFormData("documentUrl", e.target.value)}
-                placeholder="https://..."
-                className="resize-none"
-              />
-            </div>
-          )}
-
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-foreground">Comentario:</h4>
             <Textarea
@@ -172,7 +149,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
             disabled={isDisabled}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Enviando..." : "Enviar Evaluación"}
+            {isSubmitting ? "Enviando..." : "Enviar"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { httpClient } from "../adapters/httpClient/httpClient";
 import type { Tutoring } from "../models/Tutoring";
 
@@ -13,6 +14,10 @@ export interface CompleteTutoringResponse {
 }
 
 export async function completeTutoring(tutoringId: string, body: CompleteTutoringBody) {
-  const { data } = await httpClient.patch<CompleteTutoringResponse>(`/api/v1/tutorings/${tutoringId}/complete`, body);
-  return data;
+  try {
+    const { data } = await httpClient.patch<CompleteTutoringResponse>(`/api/v1/tutorings/${tutoringId}/complete`, body);
+    return data;
+  } catch (error: any) {
+    throw error;
+  }
 }
