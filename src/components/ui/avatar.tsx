@@ -18,6 +18,8 @@ const sizeClasses = {
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ className, src, alt, fallback, size = "md", ...props }, ref) => {
+    const imgSrc = src && `https://d3jvm6ee97l28q.cloudfront.net/images/users_avatar/${src.replaceAll(".", "_")}_REDONDA.png`
+    console.log(imgSrc)
     return (
       <div
         ref={ref}
@@ -28,9 +30,9 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         )}
         {...props}
       >
-        {src ? (
+        {imgSrc ? (
           <img
-            src={src}
+            src={imgSrc}
             alt={alt || "Avatar"}
             className="aspect-square h-full w-full object-cover"
           />

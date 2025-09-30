@@ -1,3 +1,4 @@
+import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -5,7 +6,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLogout } from "@/shared/hooks/useLogout";
-import { cn } from "@/shared/utils/style";
 import type { User } from "@auth/core/types";
 import { ChevronDown, LogOut, User as UserIcon } from "lucide-react";
 import { useState } from "react";
@@ -45,19 +45,14 @@ export const UserMenu = ({ user }: UserMenuProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors duration-200">
-          {user?.image ? (
-            <img src={user.image} alt="Usuario" className="h-8 w-8 rounded-full" />
-          ) : (
-            <div
-              className={cn(
-                "h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600",
-                "flex items-center justify-center text-xs font-medium",
-                "text-gray-700 dark:text-gray-300"
-              )}
-            >
-              {getInitials(user?.name)}
-            </div>
-          )}
+          <Avatar
+            src={user?.email || undefined}
+            alt={getInitials(user?.name || null)}
+            fallback={getInitials(user?.name || null)}
+            size="md"
+            className="ring-2 ring-border"
+          />
+
           <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-300">{user?.name}</span>
           <ChevronDown size={16} className="text-gray-400 dark:text-gray-500" />
         </div>
