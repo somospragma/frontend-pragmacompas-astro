@@ -121,7 +121,7 @@ export const ProfileForm = () => {
         {/* Profile Info - Horizontal Layout */}
         <div className="flex items-center gap-6 mb-8 pb-6 border-b">
           <Avatar
-            src={user?.image || undefined}
+            src={user?.email || undefined}
             alt={getInitials(user?.firstName || null)}
             fallback={getInitials(user?.firstName || null)}
             size="xl"
