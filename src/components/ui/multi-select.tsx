@@ -22,6 +22,32 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
   ({ options, value = [], onValueChange, placeholder, className, disabled }, ref) => {
     const [isOpen, setIsOpen] = React.useState(false)
     const [search, setSearch] = React.useState("")
+    const multiSelectRef = React.useRef<HTMLDivElement>(null)
+
+    // Hook para detectar clics fuera del componente
+    React.useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (multiSelectRef.current && !multiSelectRef.current.contains(event.target as Node)) {
+          setIsOpen(false)
+        }
+      }
+
+      const handleEscape = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setIsOpen(false)
+        }
+      }
+
+      if (isOpen) {
+        document.addEventListener('mousedown', handleClickOutside)
+        document.addEventListener('keydown', handleEscape)
+      }
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }, [isOpen])
 
     const filteredOptions = options.filter(option =>
       option.label.toLowerCase().includes(search.toLowerCase())
@@ -41,7 +67,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     const selectedOptions = options.filter(option => value.includes(option.value))
 
     return (
-      <div className="relative" ref={ref}>
+      <div className="relative" ref={multiSelectRef}>
         <div
           className={cn(
             "flex min-h-9 w-full flex-wrap items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring",
@@ -78,6 +104,12 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onFocus={() => setIsOpen(true)}
+              onBlur={(e) => {
+                // Solo cerrar si el foco no se mueve a una opción del dropdown
+                if (!multiSelectRef.current?.contains(e.relatedTarget as Node)) {
+                  setIsOpen(false)
+                }
+              }}
               disabled={disabled}
             />
           </div>

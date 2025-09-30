@@ -20,6 +20,32 @@ export interface SelectProps {
 const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
   ({ options, value, onValueChange, placeholder, className, disabled }, ref) => {
     const [isOpen, setIsOpen] = React.useState(false)
+    const selectRef = React.useRef<HTMLDivElement>(null)
+
+    // Hook para detectar clics fuera del componente
+    React.useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+          setIsOpen(false)
+        }
+      }
+
+      const handleEscape = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setIsOpen(false)
+        }
+      }
+
+      if (isOpen) {
+        document.addEventListener('mousedown', handleClickOutside)
+        document.addEventListener('keydown', handleEscape)
+      }
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }, [isOpen])
 
     const selectedOption = options.find(option => option.value === value)
 
@@ -29,7 +55,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     }
 
     return (
-      <div className="relative">
+      <div ref={selectRef} className="relative">
         <button
           ref={ref}
           type="button"
@@ -38,6 +64,12 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             className
           )}
           onClick={() => setIsOpen(!isOpen)}
+          onBlur={(e) => {
+            // Solo cerrar si el foco no se mueve a una opción del dropdown
+            if (!selectRef.current?.contains(e.relatedTarget as Node)) {
+              setIsOpen(false)
+            }
+          }}
           disabled={disabled}
         >
           <span className={cn(!selectedOption && "text-muted-foreground")}>
