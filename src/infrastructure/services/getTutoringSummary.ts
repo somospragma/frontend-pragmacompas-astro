@@ -8,6 +8,6 @@ interface TutoringResponse {
 }
 
 export async function getTutoringSummary(tutoringId: string) {
-  const { data } = await httpClient.get<TutoringResponse>(`/api/v1/tutorings/${tutoringId}/details`);
-  return data;
+  const { data } = await httpClient.get<TutoringResponse>(`/api/v1/tutorings/${tutoringId}/detail`);
+  return data.data;
 }

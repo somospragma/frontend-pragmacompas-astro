@@ -6,6 +6,8 @@ import { renderState } from "@/shared/utils/helpers/renderState";
 import type { Tutoring } from "@/infrastructure/models/Tutoring";
 import { useTutoringFilters } from "@/shared/hooks/useTutoringFilters";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
+import { useState } from "react";
+import { UserRole } from "@/shared/utils/enums/role";
 
 interface Props {
   data: Tutoring[];
@@ -15,18 +17,14 @@ interface Props {
 
 const TutoringTable: React.FC<Props> = ({ data, title }) => {
   const { searchTerm, setSearchTerm, selectedStatus, setSelectedStatus, filteredData } = useTutoringFilters(data);
-  const { isOpen, openModal, closeModal } = useModalState();
+  const { isOpen, openModal, closeModal } = useModalState<Tutoring>();
+  const [selectedTutoringId, setSelectedTutoringId] = useState<string | null>(null);
 
   const handleModal = (tutoring: Tutoring) => {
-    if (tutoring.status == MentorshipStatus.COMPLETED) {
+    if (tutoring.status === MentorshipStatus.COMPLETED || tutoring.status === MentorshipStatus.CANCELLED) {
+      setSelectedTutoringId(tutoring.id);
       openModal(tutoring);
     }
-
-    if (tutoring.status == MentorshipStatus.CANCELLING) {
-      openModal(tutoring);
-    }
-
-    return;
   };
 
   return (
@@ -68,15 +66,15 @@ const TutoringTable: React.FC<Props> = ({ data, title }) => {
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 min-w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-primary font-semibold">
-                      {request.tutee?.firstName ? request.tutee.firstName.charAt(0) : "?"}
-                      {request.tutee?.lastName ? request.tutee.lastName.charAt(0) : "?"}
+                      {request.tutor?.firstName ? request.tutor.firstName.charAt(0) : "?"}
+                      {request.tutor?.lastName ? request.tutor.lastName.charAt(0) : "?"}
                     </span>
                   </div>
                   <div>
                     <h3 className="text-foreground font-semibold">
-                      {request.tutee?.firstName} {request.tutee?.lastName}
+                      {request.tutor?.firstName} {request.tutor?.lastName}
                     </h3>
-                    <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
+                    <p className="text-muted-foreground text-xs">{`${request.tutor?.chapter?.name} | ${UserRole.TUTOR}`}</p>
                     <p className="text-muted-foreground text-xs">
                       {request.objectives} - Habilidades:&nbsp;
                       {request.skills.map((skill: { name: string }) => skill.name).join(", ")}
@@ -97,7 +95,7 @@ const TutoringTable: React.FC<Props> = ({ data, title }) => {
         </div>
       )}
 
-      <TutoringDetailModal isOpen={isOpen} onClose={closeModal} />
+      <TutoringDetailModal isOpen={isOpen} onClose={closeModal} tutoringId={selectedTutoringId} />
     </div>
   );
 };

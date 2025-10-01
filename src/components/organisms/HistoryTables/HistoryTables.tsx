@@ -21,7 +21,6 @@ import CompleteModal from "../CompleteModal";
 import { toast } from "sonner";
 
 const HistoryTables: React.FC = () => {
-  console.log("🚀 [DEPLOY CHECK 0]");
   const { data, isLoading, refetch } = useHistoryTables();
   const user = userStore.get();
 
@@ -86,18 +85,17 @@ const HistoryTables: React.FC = () => {
 
       try {
         await completeTutoring(selectedCompleteItem.id, completeTutoringData);
+        closeCompleteModal();
+        await refetch();
       } catch (error: any) {
         const errorMessage = error?.response?.data?.message;
-        const feedbackError =
-          errorMessage === "No se puede completar la tutoría porque falta el feedback del tutee" ||
-          errorMessage === "No se puede completar la tutoría porque falta el feedback del tutor";
 
-        if (error?.response?.status === 400 && feedbackError) {
+        if (error?.response?.status === 400) {
           toast(errorMessage);
           return;
         }
-        toast("Error al completar la tutoría", {
-          description: errorMessage || "Ocurrió un error inesperado.",
+        toast("Ocurrió un error inesperado.", {
+          description: errorMessage,
         });
       }
     }
