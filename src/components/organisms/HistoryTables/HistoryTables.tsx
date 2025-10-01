@@ -21,6 +21,7 @@ import CompleteModal from "../CompleteModal";
 import { toast } from "sonner";
 
 const HistoryTables: React.FC = () => {
+  console.log("🚀 [DEPLOY CHECK 0]");
   const { data, isLoading, refetch } = useHistoryTables();
   const user = userStore.get();
 
