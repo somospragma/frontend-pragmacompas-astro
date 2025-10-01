@@ -12,6 +12,6 @@ export interface PostCreateChapterResponse {
 }
 
 export async function postCreateChapter(body: PostCreateChapterBody) {
-  const { data } = await httpClient.post<PostCreateChapterResponse>("/api/chapter/", body);
+  const { data } = await httpClient.post<PostCreateChapterResponse>("/api/chapter", body);
   return data;
 }

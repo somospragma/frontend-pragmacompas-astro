@@ -8,6 +8,6 @@ export interface GetChaptersResponse {
 }
 
 export async function getChapters(): Promise<Chapter[]> {
-  const { data } = await httpClient.get<GetChaptersResponse>("/api/v1/chapter/");
+  const { data } = await httpClient.get<GetChaptersResponse>("/api/v1/chapter");
   return data.data;
 }
