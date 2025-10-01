@@ -2,11 +2,16 @@
 import { useErrorStore } from "@/store/errorStore";
 import axios from "axios";
 
-const baseURL = import.meta.env.PUBLIC_API_URL;
+// Usar proxy en cliente para evitar mixed-content
+// En servidor, usar la URL directa del backend
+const baseURL =
+  typeof window === "undefined"
+    ? import.meta.env.PUBLIC_API_URL // Server-side: puede usar HTTP
+    : "/api/proxy"; // Client-side: usa el proxy HTTPS
 
 export const httpClient = axios.create({
   baseURL,
-  timeout: 5000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
