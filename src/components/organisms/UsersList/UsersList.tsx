@@ -207,65 +207,68 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                 </td>
               </tr>
             ) : (
-              users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                        {user.firstName?.charAt(0).toUpperCase() || "U"}
+              users.map((user) => {
+                if (userType === "Tutor" && user.rol !== "Tutor") return null; // Skip tutors without a role
+                return (
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                          {user.firstName?.charAt(0).toUpperCase() || "U"}
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">{user.firstName}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">{user.lastName}</div>
+                        </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">{user.firstName}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">{user.lastName}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 dark:text-white">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {(() => {
-                      const seniorityInfo = getSeniorityInfo(user.seniority);
-                      return (
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 dark:text-white">{user.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {(() => {
+                        const seniorityInfo = getSeniorityInfo(user.seniority);
+                        return (
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${seniorityInfo.colorClasses}`}
+                          >
+                            {seniorityInfo.label}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${seniorityInfo.colorClasses}`}
+                          className={
+                            "inline-flex px-2 py-1 text-xs font-semibold rounded-full " +
+                            "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                          }
                         >
-                          {seniorityInfo.label}
+                          {user.rol || userType}
                         </span>
-                      );
-                    })()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-2">
-                      <span
-                        className={
-                          "inline-flex px-2 py-1 text-xs font-semibold rounded-full " +
-                          "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-                        }
-                      >
-                        {user.rol || userType}
-                      </span>
+                        <button
+                          onClick={() => handleChangeRole(user)}
+                          className={
+                            "text-xs text-blue-600 hover:text-blue-900 " +
+                            "dark:text-blue-400 dark:hover:text-blue-300 underline"
+                          }
+                        >
+                          Cambiar
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
-                        onClick={() => handleChangeRole(user)}
-                        className={
-                          "text-xs text-blue-600 hover:text-blue-900 " +
-                          "dark:text-blue-400 dark:hover:text-blue-300 underline"
-                        }
+                        onClick={() => handleViewUser(user)}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                       >
-                        Cambiar
+                        Ver
                       </button>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleViewUser(user)}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                    >
-                      Ver
-                    </button>
-                  </td>
-                </tr>
-              ))
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
