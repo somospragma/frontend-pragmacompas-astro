@@ -45,7 +45,7 @@ export default defineConfig({
           token.firstName = profile.given_name;
           token.lastName = profile.family_name;
           token.email = token.email;
-          token.chapterId = userValidation.data.chapter.id;
+          token.chapterId = userValidation.data.chapter?.id;
         } else {
           token.rol = "";
           token.userId = "";

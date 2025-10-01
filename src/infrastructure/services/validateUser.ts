@@ -7,7 +7,7 @@ export interface UserValidationResponse {
     firstName: string;
     lastName: string;
     email: string;
-    chapter: {
+    chapter?: {
       id: string;
       name: string;
     };
