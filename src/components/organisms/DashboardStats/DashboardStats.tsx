@@ -38,8 +38,8 @@ export default function DashboardStats({ chapterId }: Props) {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="bg-card border border-border rounded-lg p-6 animate-pulse">
             <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
             <div className="h-8 bg-muted rounded w-1/2"></div>
@@ -66,7 +66,7 @@ export default function DashboardStats({ chapterId }: Props) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Solicitudes Pendientes */}
       <div
         className="bg-card border border-border rounded-lg p-6 cursor-pointer hover:bg-card/80 transition-colors duration-200"

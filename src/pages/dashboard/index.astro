@@ -10,7 +10,6 @@ const session = (await getSession(Astro.request)) as SessionUser;
 
 <DashboardLayout>
   <AdminDashboard
-    userName={session?.user?.firstName + " " + session?.user?.lastName}
     userRole={(session?.user?.rol as UserRole) ?? undefined}
     chapterId={session?.user?.chapterId}
     client:load

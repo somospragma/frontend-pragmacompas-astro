@@ -73,8 +73,8 @@ const TutoringDetailModal: React.FC<TutoringDetailModal> = ({ isOpen, onClose, t
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="w-full max-w-full sm:max-w-2xl h-[100dvh] sm:h-[90vh] flex flex-col gap-0 p-4 sm:p-6">
-        <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="flex items-center gap-2 text-foreground">Detalle de Tutoría</DialogTitle>
+        <DialogHeader className="flex-shrink-0 text-left">
+          <DialogTitle className="flex gap-2 text-foreground">Detalle de Tutoría</DialogTitle>
           <DialogDescription>Sesión completada - Feedback completo</DialogDescription>
         </DialogHeader>
 

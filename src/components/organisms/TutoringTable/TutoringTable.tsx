@@ -29,9 +29,9 @@ const TutoringTable: React.FC<Props> = ({ data, title }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col items-start gap-4 md:flex-row">
         <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 w-full md:flex-row md:justify-end flex-1">
           <input
             className="bg-input rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             type="text"
