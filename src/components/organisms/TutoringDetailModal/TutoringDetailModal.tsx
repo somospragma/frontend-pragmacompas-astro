@@ -72,7 +72,7 @@ const TutoringDetailModal: React.FC<TutoringDetailModal> = ({ isOpen, onClose, t
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl h-[90vh] flex flex-col">
+      <DialogContent className="w-full max-w-full sm:max-w-2xl h-[100dvh] sm:h-[90vh] flex flex-col gap-0 p-4 sm:p-6">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-foreground">Detalle de Tutoría</DialogTitle>
           <DialogDescription>Sesión completada - Feedback completo</DialogDescription>
@@ -82,8 +82,8 @@ const TutoringDetailModal: React.FC<TutoringDetailModal> = ({ isOpen, onClose, t
           <TutoringDetailSkeleton />
         ) : (
           tutoring && (
-            <ScrollArea className="flex-1">
-              <div className="pr-4 space-y-6">
+            <ScrollArea className="flex-1 min-h-0">
+              <div className="pr-4 pt-4 space-y-6">
                 <div className="space-y-3">
                   <ParticipantCard user={tutoring.tutee} role={UserRole.TUTEE} />
                 </div>
@@ -165,7 +165,7 @@ const TutoringDetailModal: React.FC<TutoringDetailModal> = ({ isOpen, onClose, t
           )
         )}
 
-        <DialogFooter className="flex-shrink-0 mt-4">
+        <DialogFooter className="flex-shrink-0 pt-4">
           <Button onClick={onClose} variant="outline">
             Cerrar
           </Button>
