@@ -4,10 +4,7 @@ import axios from "axios";
 
 // Usar proxy en cliente para evitar mixed-content
 // En servidor, usar la URL directa del backend
-const baseURL =
-  typeof window === "undefined"
-    ? import.meta.env.PUBLIC_API_URL // Server-side: puede usar HTTP
-    : "/api/proxy"; // Client-side: usa el proxy HTTPS
+const baseURL = typeof window === "undefined" ? import.meta.env.PUBLIC_API_URL : "/api/proxy";
 
 export const httpClient = axios.create({
   baseURL,

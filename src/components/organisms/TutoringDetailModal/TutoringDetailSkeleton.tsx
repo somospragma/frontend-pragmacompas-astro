@@ -53,7 +53,6 @@ export const TutoringDetailSkeleton: React.FC = () => {
         <div className="space-y-4">
           <Skeleton className="h-4 w-36" />
 
-          {/* Feedback Card 1 */}
           <div className="bg-slate-800/30 rounded-lg border border-slate-700/30 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <Skeleton className="h-5 w-48" />
