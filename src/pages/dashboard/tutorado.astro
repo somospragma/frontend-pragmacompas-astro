@@ -3,6 +3,7 @@ import SectionHeader from "@/components/atoms/SectionHeader";
 import UsersList from "@/components/organisms/UsersList/UsersList.tsx";
 import UsersStats from "@/components/organisms/UsersStats/UsersStats.tsx";
 import DashboardLayout from "@/components/templates/DashboardLayout.astro";
+import { UserRole } from "@/shared/utils/enums/role";
 import { getSession } from "auth-astro/server";
 import type { SessionUser } from "auth.config";
 
@@ -16,7 +17,7 @@ const session = (await getSession(Astro.request)) as SessionUser;
     <div>
       <UsersStats
         chapterId={session?.user?.chapterId || ""}
-        userType="Tutorado"
+        userType={UserRole.TUTEE}
         label="Tutorados Activos"
         iconColor="green"
         client:load

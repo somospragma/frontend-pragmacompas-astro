@@ -12,14 +12,14 @@ const session = (await getSession(Astro.request)) as SessionUser;
 
 <DashboardLayout>
   <div class="space-y-10">
-    <SectionHeader description="Administra y supervisa a todos los tutores del capítulo" />
+    <SectionHeader description="Administra y supervisa a los administradores" />
 
     <div>
       <UsersStats
         chapterId={session?.user?.chapterId || ""}
-        userType={UserRole.TUTOR}
-        label="Tutores Activos"
-        iconColor="blue"
+        userType={UserRole.ADMINISTRADOR}
+        label="Administradores Activos"
+        iconColor="yellow"
         client:load
       />
     </div>

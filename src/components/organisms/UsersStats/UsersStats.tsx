@@ -3,12 +3,13 @@ import { getUsers } from "@/infrastructure/services/getUsers";
 import type { User } from "@/infrastructure/models/TutoringRequest";
 import StatCard from "@/components/atoms/StatCard";
 import { Users2 } from "lucide-react";
+import type { UserRole } from "@/shared/utils/enums/role";
 
 interface Props {
   chapterId: string;
-  userType: "Tutorado" | "Tutor";
+  userType: UserRole;
   label: string;
-  iconColor: "green" | "blue";
+  iconColor: "green" | "blue" | "yellow";
 }
 
 export default function UsersStats({ chapterId, userType, label, iconColor }: Props) {
@@ -43,6 +44,10 @@ export default function UsersStats({ chapterId, userType, label, iconColor }: Pr
     blue: {
       bg: "bg-blue-500/10",
       text: "text-blue-500",
+    },
+    yellow: {
+      bg: "bg-yellow-500/10",
+      text: "text-yellow-500",
     },
   };
 
