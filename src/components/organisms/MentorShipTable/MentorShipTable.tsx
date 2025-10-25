@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import MentorshipActionModal from "./MentorshipActionModal/MentorshipActionModal";
 import {
@@ -6,7 +5,7 @@ import {
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
 import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
-import { renderState } from "@/shared/utils/helpers/renderState";
+import MentorshipItemCard from "@/components/molecules/MentorshipItemCard";
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
@@ -71,36 +70,15 @@ const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría"
 
         <div className="space-y-4">
           {filteredRequests.map((request) => (
-            <Card
+            <MentorshipItemCard
               key={request.id}
-              className="bg-card border border-border cursor-pointer hover:bg-accent transition-colors"
+              id={request.id}
+              user={request.tutee}
+              status={request.requestStatus}
+              description={request.needsDescription}
+              skills={request.skills}
               onClick={() => handleRequestClick(request)}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 min-w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-primary font-semibold">
-                        {request.tutee?.firstName ? request.tutee.firstName.charAt(0) : "?"}
-                        {request.tutee?.lastName ? request.tutee.lastName.charAt(0) : "?"}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="text-foreground font-semibold">
-                        {request.tutee?.firstName} {request.tutee?.lastName}
-                      </h3>
-                      <p className="text-muted-foreground text-xs">{request.tutee?.chapter?.name}</p>
-                      <p className="text-muted-foreground text-xs">
-                        {request.needsDescription} - Habilidades:&nbsp;
-                        {request.skills.map((skill) => skill.name).join(", ")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">{renderState(request.requestStatus)}</div>
-                </div>
-              </CardContent>
-            </Card>
+            />
           ))}
         </div>
 

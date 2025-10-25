@@ -1,13 +1,12 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { TUTORING_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
 import { useModalState } from "@/shared/hooks/useModalState";
 import TutoringDetailModal from "../TutoringDetailModal";
-import { renderState } from "@/shared/utils/helpers/renderState";
 import type { Tutoring } from "@/infrastructure/models/Tutoring";
 import { useTutoringFilters } from "@/shared/hooks/useTutoringFilters";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { useState } from "react";
 import { UserRole } from "@/shared/utils/enums/role";
+import MentorshipItemCard from "@/components/molecules/MentorshipItemCard";
 
 interface Props {
   data: Tutoring[];
@@ -56,36 +55,16 @@ const TutoringTable: React.FC<Props> = ({ data, title }) => {
 
       <div className="space-y-4">
         {filteredData.map((request) => (
-          <Card
+          <MentorshipItemCard
             key={request.id}
-            className="bg-card border border-border cursor-pointer hover:bg-accent transition-colors"
+            id={request.id}
+            user={request.tutor}
+            status={request.status}
+            description={request.objectives}
+            skills={request.skills}
+            additionalInfo={UserRole.TUTOR}
             onClick={() => handleModal(request)}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 min-w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-primary font-semibold">
-                      {request.tutor?.firstName ? request.tutor.firstName.charAt(0) : "?"}
-                      {request.tutor?.lastName ? request.tutor.lastName.charAt(0) : "?"}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-foreground font-semibold">
-                      {request.tutor?.firstName} {request.tutor?.lastName}
-                    </h3>
-                    <p className="text-muted-foreground text-xs">{`${request.tutor?.chapter?.name} | ${UserRole.TUTOR}`}</p>
-                    <p className="text-muted-foreground text-xs">
-                      {request.objectives} - Habilidades:&nbsp;
-                      {request.skills.map((skill: { name: string }) => skill.name).join(", ")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">{renderState(request.status)}</div>
-              </div>
-            </CardContent>
-          </Card>
+          />
         ))}
       </div>
 
