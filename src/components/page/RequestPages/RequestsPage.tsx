@@ -4,28 +4,18 @@ import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
 import type { SessionUser } from "auth.config";
 import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
-import { UserRole } from "@/shared/utils/enums/role";
 
-interface MentorshipRequest {
-  id: string;
-  tutee: {
+type MentorshipRequest = Omit<TutoringRequest, "tutee"> & {
+  tutee: TutoringRequest["tutee"] & {
     id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
+    rol: string;
     chapter: {
       id: string;
       name: string;
     };
-    rol: UserRole;
+    slackId?: string;
   };
-  skills: {
-    id: string;
-    name: string;
-  }[];
-  needsDescription: string;
-  requestStatus: MentorshipStatus;
-}
+};
 
 interface RequestWithMappedStatus {
   id: string;
@@ -95,21 +85,17 @@ export default function RequestsPage({ session }: { session: SessionUser }) {
 
       // Map TutoringRequest data to MentorshipRequest format
       const mappedMentorshipRequests: MentorshipRequest[] = response.data.map((request: TutoringRequest) => ({
-        id: request.id,
+        ...request,
         tutee: {
+          ...request.tutee,
           id: request.tutee.id || "",
-          firstName: request.tutee.firstName || "",
-          lastName: request.tutee.lastName || "",
-          email: request.tutee.email || "",
+          rol: request.tutee.rol || "Tutorado",
           chapter: {
-            id: request.tutee.chapterId || "",
-            name: "Chapter", // You may need to fetch this from another source
+            id: request.tutee.chapter?.id || "",
+            name: request.tutee.chapter?.name || "",
           },
-          rol: (request.tutee.rol as UserRole) || "Tutorado",
+          slackId: request.tutee.slackId || "",
         },
-        skills: request.skills,
-        needsDescription: request.needsDescription,
-        requestStatus: request.requestStatus as MentorshipStatus,
       }));
 
       setMentorshipRequests(mappedMentorshipRequests);
