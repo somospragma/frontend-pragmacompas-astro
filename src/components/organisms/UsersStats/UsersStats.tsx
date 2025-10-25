@@ -61,7 +61,7 @@ export default function UsersStats({ chapterId, userType, label, iconColor }: Pr
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8 max-w-sm">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between">
           <div>
