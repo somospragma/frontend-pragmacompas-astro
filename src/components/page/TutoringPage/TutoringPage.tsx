@@ -12,7 +12,7 @@ import SectionHeader from "@/components/atoms/SectionHeader";
 const TutoringPage: React.FC = () => {
   const user = useStore(userStore);
   const [tutoringData, setTutoringData] = useState<Tutoring[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadTutoringData = async () => {
     if (!user.chapterId) return;

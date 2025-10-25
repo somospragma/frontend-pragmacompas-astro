@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { renderState } from "@/shared/utils/helpers/renderState";
+import { ParticipantCard } from "@/components/molecules/ParticipantCard/ParticipantCard";
+import { UserRole } from "@/shared/utils/enums/role";
 
 type Props = {
   isOpen: boolean;
@@ -96,20 +98,8 @@ const MentorshipActionModal = ({ isOpen, selectedRequest, onOpenChange, onRefetc
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-primary font-semibold text-lg">
-                {selectedRequest?.tutee.firstName ? selectedRequest?.tutee.firstName.charAt(0) : "?"}
-                {selectedRequest?.tutee.lastName ? selectedRequest?.tutee.lastName.charAt(0) : "?"}
-              </span>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">
-                {selectedRequest?.tutee.firstName} {selectedRequest?.tutee.lastName}
-              </h3>
-              <p className="text-muted-foreground">{selectedRequest?.tutee.chapter.name}</p>
-              <p className="text-sm text-muted-foreground">{selectedRequest?.tutee.email}</p>
-            </div>
+          <div className="space-y-3">
+            <ParticipantCard user={selectedRequest.tutee} role={UserRole.TUTEE} />
           </div>
 
           <div className="space-y-2">
