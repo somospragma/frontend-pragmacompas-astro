@@ -7,6 +7,7 @@ import TutoringTable from "@/components/organisms/TutoringTable";
 import { getTutoring } from "@/infrastructure/services/getTutorings";
 import type { Tutoring } from "@/infrastructure/models/Tutoring";
 import StatCard from "@/components/atoms/StatCard";
+import SectionHeader from "@/components/atoms/SectionHeader";
 
 const TutoringPage: React.FC = () => {
   const user = useStore(userStore);
@@ -37,6 +38,8 @@ const TutoringPage: React.FC = () => {
 
   return (
     <div className="space-y-10">
+      <SectionHeader description="Historial y seguimiento de tutorías" />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard
           value={tutoringData.filter((request) => TUTORING_STATE_FILTERS.includes(request.status)).length}
