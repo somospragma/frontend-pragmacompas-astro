@@ -1,11 +1,12 @@
-import { useState } from "react";
 import { updateUserRole } from "@/infrastructure/services/updateUserRole";
 import type { User } from "@/infrastructure/models/TutoringRequest";
 import UserViewModal from "@/components/organisms/UserViewModal/UserViewModal";
 import RoleChangeModal from "@/components/organisms/RoleChangeModal/RoleChangeModal";
+import UserEditModal from "@/components/organisms/UserEditModal/UserEditModal";
 import { SENIORITY_OPTIONS } from "@/shared/utils/enums/seniority";
-import type { UserRole } from "@/shared/utils/enums/role";
+import { UserRole } from "@/shared/utils/enums/role";
 import { useUsersByRole } from "@/shared/hooks/useUsersByRole";
+import { useModalState } from "@/shared/hooks/useModalState";
 
 interface Props {
   chapterId: string;
@@ -15,9 +16,27 @@ interface Props {
 
 export default function UsersList({ chapterId, userType, title }: Props) {
   const { users, loading, error, refetch } = useUsersByRole({ chapterId, userType });
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [roleChangeModalOpen, setRoleChangeModalOpen] = useState(false);
+
+  const {
+    isOpen: viewModalOpen,
+    selectedItem: selectedViewUser,
+    openModal: openViewModal,
+    closeModal: closeViewModal,
+  } = useModalState<User>();
+
+  const {
+    isOpen: roleChangeModalOpen,
+    selectedItem: selectedRoleUser,
+    openModal: openRoleChangeModal,
+    closeModal: closeRoleChangeModal,
+  } = useModalState<User>();
+
+  const {
+    isOpen: editModalOpen,
+    selectedItem: selectedEditUser,
+    openModal: openEditModal,
+    closeModal: closeEditModal,
+  } = useModalState<User>();
 
   const getSeniorityInfo = (seniorityValue: string | undefined) => {
     if (!seniorityValue) {
@@ -27,7 +46,6 @@ export default function UsersList({ chapterId, userType, title }: Props) {
       };
     }
 
-    // Convert to string in case it's stored as a number
     const valueAsString = String(seniorityValue);
     const option = SENIORITY_OPTIONS.find((opt) => opt.value === valueAsString);
 
@@ -38,7 +56,6 @@ export default function UsersList({ chapterId, userType, title }: Props) {
       };
     }
 
-    // Color scale based on seniority progression
     const getColorClasses = (value: string) => {
       const numValue = parseInt(value);
 
@@ -73,23 +90,23 @@ export default function UsersList({ chapterId, userType, title }: Props) {
   };
 
   const handleViewUser = (user: User) => {
-    setSelectedUser(user);
-    setViewModalOpen(true);
+    openViewModal(user);
+  };
+
+  const handleEditUser = (user: User) => {
+    openEditModal(user);
   };
 
   const handleChangeRole = (user: User) => {
-    setSelectedUser(user);
-    setRoleChangeModalOpen(true);
+    openRoleChangeModal(user);
   };
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
     try {
       await updateUserRole({ id: userId, role: newRole });
-      // Reload the users list to ensure proper filtering
       await refetch();
     } catch (error) {
       console.error("Error updating user role:", error);
-      // You might want to show a toast notification here
     }
   };
 
@@ -242,12 +259,20 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleViewUser(user)}
-                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        Ver
-                      </button>
+                      <div className="flex items-center space-x-3">
+                        <button
+                          onClick={() => handleViewUser(user)}
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          Ver
+                        </button>
+                        <button
+                          onClick={() => handleEditUser(user)}
+                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                        >
+                          Editar
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -257,14 +282,14 @@ export default function UsersList({ chapterId, userType, title }: Props) {
         </table>
       </div>
 
-      {/* Modals */}
-      <UserViewModal isOpen={viewModalOpen} onClose={() => setViewModalOpen(false)} user={selectedUser} />
+      <UserViewModal isOpen={viewModalOpen} onClose={closeViewModal} user={selectedViewUser} />
       <RoleChangeModal
         isOpen={roleChangeModalOpen}
-        onClose={() => setRoleChangeModalOpen(false)}
-        user={selectedUser}
+        onClose={closeRoleChangeModal}
+        user={selectedRoleUser}
         onRoleChange={handleRoleChange}
       />
+      <UserEditModal isOpen={editModalOpen} onClose={closeEditModal} user={selectedEditUser} onUserUpdated={refetch} />
     </div>
   );
 }

@@ -7,6 +7,7 @@ export interface UpdateUserBody {
   lastName?: string;
   chapterId?: string;
   seniority?: string;
+  activeTutoringLimit?: number;
 }
 
 export async function updateUser(body: UpdateUserBody) {
