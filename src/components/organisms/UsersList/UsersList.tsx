@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { getUsers } from "@/infrastructure/services/getUsers";
+import { useState } from "react";
 import { updateUserRole } from "@/infrastructure/services/updateUserRole";
 import type { User } from "@/infrastructure/models/TutoringRequest";
 import UserViewModal from "@/components/organisms/UserViewModal/UserViewModal";
 import RoleChangeModal from "@/components/organisms/RoleChangeModal/RoleChangeModal";
 import { SENIORITY_OPTIONS } from "@/shared/utils/enums/seniority";
 import type { UserRole } from "@/shared/utils/enums/role";
+import { useUsersByRole } from "@/shared/hooks/useUsersByRole";
 
 interface Props {
   chapterId: string;
@@ -14,9 +14,7 @@ interface Props {
 }
 
 export default function UsersList({ chapterId, userType, title }: Props) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { users, loading, error, refetch } = useUsersByRole({ chapterId, userType });
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [roleChangeModalOpen, setRoleChangeModalOpen] = useState(false);
@@ -74,26 +72,6 @@ export default function UsersList({ chapterId, userType, title }: Props) {
     };
   };
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const fetchedUsers = await getUsers({ rol: userType, chapterId });
-        setUsers(fetchedUsers);
-      } catch (err) {
-        setError(`Error al cargar los ${userType === "Tutorado" ? "Tutees" : "Tutores"}`);
-        console.error("Error fetching users:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (chapterId) {
-      fetchUsers();
-    }
-  }, [chapterId, userType]);
-
   const handleViewUser = (user: User) => {
     setSelectedUser(user);
     setViewModalOpen(true);
@@ -108,8 +86,7 @@ export default function UsersList({ chapterId, userType, title }: Props) {
     try {
       await updateUserRole({ id: userId, role: newRole });
       // Reload the users list to ensure proper filtering
-      const fetchedUsers = await getUsers({ rol: userType, chapterId });
-      setUsers(fetchedUsers);
+      await refetch();
     } catch (error) {
       console.error("Error updating user role:", error);
       // You might want to show a toast notification here
@@ -214,7 +191,12 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                   <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                        <div
+                          className={
+                            "w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full " +
+                            "flex items-center justify-center text-white font-semibold text-sm"
+                          }
+                        >
                           {user.firstName?.charAt(0).toUpperCase() || "U"}
                         </div>
                         <div className="ml-4">

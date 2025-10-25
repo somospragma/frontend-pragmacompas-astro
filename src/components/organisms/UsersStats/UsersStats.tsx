@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
-import { getUsers } from "@/infrastructure/services/getUsers";
-import type { User } from "@/infrastructure/models/TutoringRequest";
 import StatCard from "@/components/atoms/StatCard";
 import { Users2 } from "lucide-react";
 import { UserRole } from "@/shared/utils/enums/role";
+import { useUsersByRole } from "@/shared/hooks/useUsersByRole";
 
 interface Props {
   chapterId: string;
@@ -13,30 +11,7 @@ interface Props {
 }
 
 export default function UsersStats({ chapterId, userType, label, iconColor }: Props) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        // Solo enviar chapterId si el userType NO es "Administrador"
-        const fetchedUsers = await getUsers({
-          rol: userType,
-          chapterId: userType === UserRole.ADMINISTRADOR ? undefined : chapterId,
-        });
-        setUsers(fetchedUsers);
-      } catch (err) {
-        console.error("Error fetching users:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (chapterId || userType === UserRole.ADMINISTRADOR) {
-      fetchUsers();
-    }
-  }, [chapterId, userType]);
+  const { users, loading } = useUsersByRole({ chapterId, userType });
 
   const activeUsers = users.length;
 
