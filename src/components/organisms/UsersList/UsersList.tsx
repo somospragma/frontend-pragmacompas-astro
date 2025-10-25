@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { getUsers } from "@/infrastructure/services/getUsers";
 import { updateUserRole } from "@/infrastructure/services/updateUserRole";
-import type { User, UserRole } from "@/infrastructure/models/TutoringRequest";
+import type { User } from "@/infrastructure/models/TutoringRequest";
 import UserViewModal from "@/components/organisms/UserViewModal/UserViewModal";
 import RoleChangeModal from "@/components/organisms/RoleChangeModal/RoleChangeModal";
 import { SENIORITY_OPTIONS } from "@/shared/utils/enums/seniority";
+import type { UserRole } from "@/shared/utils/enums/role";
 
 interface Props {
   chapterId: string;
-  userType: "Tutorado" | "Tutor";
+  userType: UserRole;
   title: string;
 }
 

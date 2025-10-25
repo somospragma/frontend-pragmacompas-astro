@@ -27,7 +27,7 @@ const session = (await getSession(Astro.request)) as SessionUser;
     <div>
       <UsersList
         chapterId={session?.user?.chapterId || ""}
-        userType="Tutorado"
+        userType={UserRole.TUTEE}
         title="Lista de Tutorados"
         client:load
       />

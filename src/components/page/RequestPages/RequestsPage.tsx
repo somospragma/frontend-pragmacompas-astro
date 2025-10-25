@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getTutoringRequests, type GetTutoringRequestsParams } from "@/infrastructure/services/getTutoringRequests";
-import type { TutoringRequest, UserRole } from "@/infrastructure/models/TutoringRequest";
+import type { TutoringRequest } from "@/infrastructure/models/TutoringRequest";
 import type { SessionUser } from "auth.config";
 import MentorshipTable from "@/components/organisms/MentorShipTable/MentorShipTable";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
-// Types
+import { UserRole } from "@/shared/utils/enums/role";
+
 interface MentorshipRequest {
   id: string;
   tutee: {

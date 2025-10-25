@@ -4,7 +4,7 @@ import {
   ADMIN_MENTORSHIP_STATE_FILTERS,
   TUTOR_MENTORSHIP_STATE_FILTERS,
 } from "@/shared/utils/enums/mentorshipsStateFilter";
-import type MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
+import MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import MentorshipItemCard from "@/components/molecules/MentorshipItemCard";
 interface Props {
   mentorshipRequests: MentorshipRequest[];

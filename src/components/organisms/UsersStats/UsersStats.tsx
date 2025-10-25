@@ -3,7 +3,7 @@ import { getUsers } from "@/infrastructure/services/getUsers";
 import type { User } from "@/infrastructure/models/TutoringRequest";
 import StatCard from "@/components/atoms/StatCard";
 import { Users2 } from "lucide-react";
-import type { UserRole } from "@/shared/utils/enums/role";
+import { UserRole } from "@/shared/utils/enums/role";
 
 interface Props {
   chapterId: string;
@@ -20,7 +20,11 @@ export default function UsersStats({ chapterId, userType, label, iconColor }: Pr
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const fetchedUsers = await getUsers({ rol: userType, chapterId });
+        // Solo enviar chapterId si el userType NO es "Administrador"
+        const fetchedUsers = await getUsers({
+          rol: userType,
+          chapterId: userType === UserRole.ADMINISTRADOR ? undefined : chapterId,
+        });
         setUsers(fetchedUsers);
       } catch (err) {
         console.error("Error fetching users:", err);
@@ -29,7 +33,7 @@ export default function UsersStats({ chapterId, userType, label, iconColor }: Pr
       }
     };
 
-    if (chapterId) {
+    if (chapterId || userType === UserRole.ADMINISTRADOR) {
       fetchUsers();
     }
   }, [chapterId, userType]);

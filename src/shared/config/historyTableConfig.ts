@@ -1,4 +1,4 @@
-import type { UserRole } from "@/infrastructure/models/TutoringRequest";
+import type { UserRole } from "../utils/enums/role";
 
 export interface MentorshipData {
   id: string;

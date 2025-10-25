@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { User, UserRole } from "@/infrastructure/models/TutoringRequest";
+import type { User } from "@/infrastructure/models/TutoringRequest";
+import { UserRole } from "@/shared/utils/enums/role";
 
 interface Props {
   isOpen: boolean;
@@ -21,7 +22,7 @@ const roleColors = {
 };
 
 export default function RoleChangeModal({ isOpen, onClose, user, onRoleChange }: Props) {
-  const [selectedRole, setSelectedRole] = useState<UserRole>(user?.rol || "Tutorado");
+  const [selectedRole, setSelectedRole] = useState<UserRole>(user?.rol || UserRole.TUTEE);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen || !user) return null;

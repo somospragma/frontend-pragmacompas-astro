@@ -1,5 +1,5 @@
-import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 import { ROLE_ROUTES, ROUTE_PATHS } from "./enums/paths";
+import type { UserRole } from "./enums/role";
 
 /**
  * Get the appropriate dashboard URL based on user role

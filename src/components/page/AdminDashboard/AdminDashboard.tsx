@@ -1,8 +1,8 @@
 import { RoleRedirect } from "@/components/auth/RoleRedirect";
 import DashboardStats from "@/components/organisms/DashboardStats/DashboardStats";
-import type { UserRole } from "@/infrastructure/models/TutoringRequest";
 import MentorshipRequest from "../MentoShipRequest/MentorshipRequest";
 import SectionHeader from "@/components/atoms/SectionHeader";
+import { UserRole } from "@/shared/utils/enums/role";
 
 interface Props {
   userRole?: UserRole;
