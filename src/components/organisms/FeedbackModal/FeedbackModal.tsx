@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -21,29 +22,36 @@ interface FeedbackModalProps {
     myRole: string;
     skills: string[];
     email?: string;
+    tutorId: string;
+    tutoringId: string;
   };
-  onSubmitFeedback: (score: number, comments: string) => Promise<void>;
+  currentUserId: string;
+  onSubmitFeedback: (score: number, comments: string, documentUrl?: string) => Promise<void>;
 }
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({
   isOpen,
   onClose,
   mentorship,
+  currentUserId,
   onSubmitFeedback,
 }: FeedbackModalProps) => {
   const [formData, setFormData] = useState({
     score: 0,
     comment: "",
+    documentUrl: "",
   });
   const [hoveredStar, setHoveredStar] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isTutor = mentorship.tutorId === currentUserId;
 
   const updateFormData = (field: keyof typeof formData, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const resetForm = () => {
-    setFormData({ score: 0, comment: "" });
+    setFormData({ score: 0, comment: "", documentUrl: "" });
     setHoveredStar(0);
   };
 
@@ -51,9 +59,14 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     if (formData.comment.trim() === "" || formData.score === 0) {
       return;
     }
+
+    if (isTutor && formData.documentUrl.trim() === "") {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await onSubmitFeedback(formData.score, formData.comment);
+      await onSubmitFeedback(formData.score, formData.comment, isTutor ? formData.documentUrl : undefined);
       resetForm();
     } catch (error) {
       console.error("Error submitting feedback:", error);
@@ -68,7 +81,12 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     if (newScore === 0) setHoveredStar(0);
   };
 
-  const isDisabled = isSubmitting || formData.score === 0 || formData.comment.trim() === "";
+  const isDisabled =
+    isSubmitting ||
+    formData.score === 0 ||
+    formData.comment.trim() === "" ||
+    (isTutor && formData.documentUrl.trim() === "");
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -127,6 +145,20 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
               ))}
             </div>
           </div>
+
+          {isTutor && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-foreground">Acta de finalización:</h4>
+              <Input
+                type="url"
+                value={formData.documentUrl}
+                onChange={(e) => updateFormData("documentUrl", e.target.value)}
+                placeholder="https://..."
+                className="resize-none"
+              />
+              <p className="text-xs text-muted-foreground">Como tutor, debes proporcionar el enlace del acta.</p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-foreground">Comentario:</h4>
