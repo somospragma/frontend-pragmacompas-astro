@@ -6,13 +6,11 @@ const title = "Historial";
 ---
 
 <MainLayout title={title}>
-  <main class="w-full max-w-7xl pt-8 pb-8 px-4 sm:px-6 lg:px-8 mx-auto">
-    <section class="flex flex-col gap-8 w-full">
-      <header>
-        <h1 class="text-3xl font-bold text-foreground">{title}</h1>
-      </header>
+  <section class="flex flex-col gap-8 w-full">
+    <header>
+      <h1 class="text-3xl font-bold text-foreground">{title}</h1>
+    </header>
 
-      <HistoryTables client:load />
-    </section>
-  </main>
+    <HistoryTables client:load />
+  </section>
 </MainLayout>
