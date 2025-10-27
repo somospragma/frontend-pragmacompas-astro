@@ -103,8 +103,7 @@ const getAvailableActions = (
 
     case MentorshipType.MENTORSHIP:
       if (status === MentorshipStatus.ACTIVE) {
-        actions.push(MentorshipAction.CANCEL);
-        actions.push(MentorshipAction.FEEDBACK);
+        actions.push(MentorshipAction.CANCEL, MentorshipAction.FEEDBACK);
       }
 
       if (status === MentorshipStatus.CANCELLING) {

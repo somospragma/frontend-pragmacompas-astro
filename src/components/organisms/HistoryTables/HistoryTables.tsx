@@ -18,10 +18,12 @@ import { completeTutoring, type CompleteTutoringBody } from "@/infrastructure/se
 import { userStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { getTutoringSummary } from "@/infrastructure/services/getTutoringSummary";
+import { useState } from "react";
 
 const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
   const user = userStore.get();
+  const [userAlreadyGaveFeedback, setUserAlreadyGaveFeedback] = useState(false);
 
   const {
     isOpen: isFeedbackModalOpen,
@@ -36,6 +38,11 @@ const HistoryTables: React.FC = () => {
     openModal: openCancellationModal,
     closeModal: closeCancellationModal,
   } = useModalState<MentorshipData>();
+
+  const handleCloseFeedbackModal = () => {
+    setUserAlreadyGaveFeedback(false);
+    closeFeedbackModal();
+  };
 
   const feedbackModalData = useMemo(() => {
     if (!selectedFeedbackItem) return null;
@@ -68,13 +75,17 @@ const HistoryTables: React.FC = () => {
           (feedback) => feedback.evaluator.id === user.userId
         );
 
-        if (userHasGivenFeedback) {
+        const isTutor = mentorship.tutor.id === user.userId;
+        const mentorshipCompleted = tutoringSummary.status === "Completada";
+
+        if (userHasGivenFeedback && !(isTutor && !mentorshipCompleted)) {
           toast.warning("Ya has dado feedback para esta tutoría", {
             description: "No es posible agregar más feedback.",
           });
           return;
         }
 
+        setUserAlreadyGaveFeedback(userHasGivenFeedback);
         openFeedbackModal(mentorship);
       } catch (error) {
         console.error("Error verificando feedbacks:", error);
@@ -88,6 +99,23 @@ const HistoryTables: React.FC = () => {
     }
     try {
       const isTutor = selectedFeedbackItem.tutor.id === user.userId;
+
+      if (userAlreadyGaveFeedback && isTutor && documentUrl) {
+        const completeTutoringData: CompleteTutoringBody = {
+          userId: selectedFeedbackItem.tutor.id,
+          finalActUrl: documentUrl,
+        };
+
+        await completeTutoring(selectedFeedbackItem.id, completeTutoringData);
+
+        handleCloseFeedbackModal();
+        await refetch();
+
+        toast.success("Mentoría completada exitosamente", {
+          description: "El acta ha sido registrada correctamente.",
+        });
+        return;
+      }
 
       const feedbackData: CreateFeedbackBody = {
         tutoringId: selectedFeedbackItem?.id,
@@ -107,13 +135,33 @@ const HistoryTables: React.FC = () => {
         await completeTutoring(selectedFeedbackItem.id, completeTutoringData);
       }
 
-      closeFeedbackModal();
+      handleCloseFeedbackModal();
       await refetch();
-      toast.success("Feedback enviado correctamente", {
-        description: isTutor ? "La mentoría ha sido finalizada." : undefined,
-      });
+
+      if (isTutor && documentUrl) {
+        toast.success("Feedback enviado y mentoría completada", {
+          description: "El acta ha sido registrada correctamente.",
+        });
+      } else {
+        toast.success("Feedback enviado correctamente", {
+          description: isTutor
+            ? "Podrás completar la mentoría cuando el tutorado también haya dado feedback."
+            : undefined,
+        });
+      }
     } catch (error: any) {
       console.error("Error submitting feedback:", error);
+      const errorMessage = error?.response?.data?.message || error.message;
+
+      if (error?.response?.status === 400 && errorMessage?.toLowerCase().includes("feedback")) {
+        toast.error("No se pudo completar la mentoría", {
+          description: "El tutorado aún no ha dado su feedback. Tu feedback se guardó correctamente.",
+        });
+      } else {
+        toast.error("Error al procesar el feedback", {
+          description: errorMessage || "Por favor, intenta nuevamente.",
+        });
+      }
     }
   };
 
@@ -183,9 +231,10 @@ const HistoryTables: React.FC = () => {
       {feedbackModalData && (
         <FeedbackModal
           isOpen={isFeedbackModalOpen}
-          onClose={closeFeedbackModal}
+          onClose={handleCloseFeedbackModal}
           mentorship={feedbackModalData}
           currentUserId={user.userId || ""}
+          userAlreadyGaveFeedback={userAlreadyGaveFeedback}
           onSubmitFeedback={handleSubmitFeedback}
         />
       )}
