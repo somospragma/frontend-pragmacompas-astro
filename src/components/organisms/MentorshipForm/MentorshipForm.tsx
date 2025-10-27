@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
+import useNotification from "@/hooks/useNotification";
 
 export default function MentorshipForm() {
   const [skills, setSkills] = useState<{ id: string; name: string }[]>([]);
@@ -26,6 +27,7 @@ export default function MentorshipForm() {
   const [needsDescription, setNeedsDescription] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+  const { doNotification } = useNotification();
 
   useEffect(() => {
     const loadData = async () => {
@@ -95,6 +97,8 @@ export default function MentorshipForm() {
       toast.success("¡Solicitud enviada exitosamente!", {
         description: "Te redirigiremos a la página principal",
       });
+
+      await doNotification("anderson.castano@pragma.com.co", "Nueva solicitud de tutoría");
 
       // Reset form
       setSelectedSkills([]);
@@ -180,7 +184,7 @@ export default function MentorshipForm() {
 
           <div className="space-y-2">
             <Label htmlFor="notes" className="text-sm font-medium">
-              Notas
+              ¿Qué quieres aprender?
             </Label>
             <Textarea
               id="notes"

@@ -19,10 +19,12 @@ import { usePermissions } from "@/shared/hooks/usePermissions";
 import { userStore } from "@/store/userStore";
 import CompleteModal from "../CompleteModal";
 import { toast } from "sonner";
+import useNotification from "@/hooks/useNotification";
 
 const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
   const user = userStore.get();
+  const { doNotification } = useNotification();
 
   const {
     isOpen: isFeedbackModalOpen,
@@ -132,6 +134,7 @@ const HistoryTables: React.FC = () => {
           await updateTutoringRequestStatus(selectedCancellationItem.id, {
             status: MentorshipStatus.CANCELLED,
           });
+          await doNotification("anderson.castano@pragma.com.co", "Cancelación de solicitud");
           break;
 
         case MentorshipType.MENTORSHIP:
