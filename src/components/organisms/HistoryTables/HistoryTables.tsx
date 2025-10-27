@@ -19,6 +19,7 @@ import { usePermissions } from "@/shared/hooks/usePermissions";
 import { userStore } from "@/store/userStore";
 import CompleteModal from "../CompleteModal";
 import { toast } from "sonner";
+import { getTutoringSummary } from "@/infrastructure/services/getTutoringSummary";
 
 const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
@@ -62,13 +63,32 @@ const HistoryTables: React.FC = () => {
     };
   }, [selectedFeedbackItem]);
 
-  const handleModal = (action: string, mentorship: MentorshipData) => {
+  const handleModal = async (action: string, mentorship: MentorshipData) => {
     if (action === MentorshipAction.CANCEL) {
       openCancellationModal(mentorship);
+      return;
     }
 
     if (action === MentorshipAction.FEEDBACK) {
-      openFeedbackModal(mentorship);
+      try {
+        const tutoringSummary = await getTutoringSummary(mentorship.id);
+
+        const userHasGivenFeedback = tutoringSummary.feedbacks?.some(
+          (feedback) => feedback.evaluator.id === user.userId
+        );
+
+        if (userHasGivenFeedback) {
+          toast.warning("Ya has dado feedback para esta tutoría", {
+            description: "No es posible agregar más feedback.",
+          });
+          return;
+        }
+
+        openFeedbackModal(mentorship);
+      } catch (error) {
+        console.error("Error verificando feedbacks:", error);
+      }
+      return;
     }
 
     if (action === MentorshipAction.COMPLETE) {
