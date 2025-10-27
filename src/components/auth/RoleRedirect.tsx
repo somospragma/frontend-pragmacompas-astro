@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getRoleBasedRoute } from "@/shared/utils/roleRedirect";
-import type { UserRole } from "@/infrastructure/models/TutoringRequest";
+import type { UserRole } from "@/shared/utils/enums/role";
 
 interface RoleRedirectProps {
   userRole: UserRole;

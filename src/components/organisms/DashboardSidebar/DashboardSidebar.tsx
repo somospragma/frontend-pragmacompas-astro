@@ -35,9 +35,10 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
 
   const menuItems = [
     { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
-    { icon: Users, label: "Tutores", href: "/dashboard/tutor", badge: null },
+    { icon: Book, label: "Tutorias", href: "/dashboard/tutorias", badge: null },
     { icon: UsersRound, label: "Tutorados", href: "/dashboard/tutorado", badge: null },
-    { icon: Book, label: "Tutorias", href: "/dashboard/tutoring", badge: null },
+    { icon: Users, label: "Tutores", href: "/dashboard/tutor", badge: null },
+    { icon: Users, label: "Administradores", href: "/dashboard/administradores", badge: null },
   ];
 
   const isActive = (href: string) => {

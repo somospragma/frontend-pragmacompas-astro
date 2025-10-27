@@ -15,10 +15,9 @@ import { updateTutoringRequestStatus } from "@/infrastructure/services/updateTut
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
 import { completeTutoring, type CompleteTutoringBody } from "@/infrastructure/services/completeTutoring";
-import { usePermissions } from "@/shared/hooks/usePermissions";
 import { userStore } from "@/store/userStore";
-import CompleteModal from "../CompleteModal";
 import { toast } from "sonner";
+import { getTutoringSummary } from "@/infrastructure/services/getTutoringSummary";
 
 const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
@@ -38,15 +37,6 @@ const HistoryTables: React.FC = () => {
     closeModal: closeCancellationModal,
   } = useModalState<MentorshipData>();
 
-  const {
-    isOpen: isCompleteModalOpen,
-    selectedItem: selectedCompleteItem,
-    openModal: openCompleteModal,
-    closeModal: closeCompleteModal,
-  } = useModalState<MentorshipData>();
-
-  const permissions = usePermissions(selectedCompleteItem?.myRole as string);
-
   const feedbackModalData = useMemo(() => {
     if (!selectedFeedbackItem) return null;
 
@@ -59,64 +49,70 @@ const HistoryTables: React.FC = () => {
       myRole: myRole as string,
       skills: selectedFeedbackItem.skills,
       email: isTutor ? selectedFeedbackItem.tutor.email : selectedFeedbackItem.tutee.email,
+      tutorId: selectedFeedbackItem.tutor.id,
+      tutoringId: selectedFeedbackItem.id,
     };
   }, [selectedFeedbackItem]);
 
-  const handleModal = (action: string, mentorship: MentorshipData) => {
+  const handleModal = async (action: string, mentorship: MentorshipData) => {
     if (action === MentorshipAction.CANCEL) {
       openCancellationModal(mentorship);
+      return;
     }
 
     if (action === MentorshipAction.FEEDBACK) {
-      openFeedbackModal(mentorship);
-    }
-
-    if (action === MentorshipAction.COMPLETE) {
-      openCompleteModal(mentorship);
-    }
-  };
-
-  const handleSubmitComplete = async (documentUrl: string) => {
-    if (permissions.canCompleteTutoring() && documentUrl?.trim() && selectedCompleteItem) {
-      const completeTutoringData: CompleteTutoringBody = {
-        userId: selectedCompleteItem.tutor.id,
-        finalActUrl: documentUrl,
-      };
-
       try {
-        await completeTutoring(selectedCompleteItem.id, completeTutoringData);
-        closeCompleteModal();
-        await refetch();
-      } catch (error: any) {
-        const errorMessage = error?.response?.data?.message;
+        const tutoringSummary = await getTutoringSummary(mentorship.id);
 
-        if (error?.response?.status === 400) {
-          toast(errorMessage);
+        const userHasGivenFeedback = tutoringSummary.feedbacks?.some(
+          (feedback) => feedback.evaluator.id === user.userId
+        );
+
+        if (userHasGivenFeedback) {
+          toast.warning("Ya has dado feedback para esta tutoría", {
+            description: "No es posible agregar más feedback.",
+          });
           return;
         }
-        toast("Ocurrió un error inesperado.", {
-          description: errorMessage,
-        });
+
+        openFeedbackModal(mentorship);
+      } catch (error) {
+        console.error("Error verificando feedbacks:", error);
       }
     }
   };
 
-  const handleSubmitFeedback = async (score: number, comments: string) => {
+  const handleSubmitFeedback = async (score: number, comments: string, documentUrl?: string) => {
     if (!selectedFeedbackItem?.id) {
       return;
     }
     try {
+      const isTutor = selectedFeedbackItem.tutor.id === user.userId;
+
       const feedbackData: CreateFeedbackBody = {
         tutoringId: selectedFeedbackItem?.id,
         score: score.toString(),
         comments,
-        evaluatorId: selectedFeedbackItem.tutor.id,
+        evaluatorId: user.userId || "",
       };
 
       await createFeedback(feedbackData);
+
+      if (isTutor && documentUrl) {
+        const completeTutoringData: CompleteTutoringBody = {
+          userId: selectedFeedbackItem.tutor.id,
+          finalActUrl: documentUrl,
+        };
+
+        await completeTutoring(selectedFeedbackItem.id, completeTutoringData);
+      }
+
       closeFeedbackModal();
       await refetch();
-    } catch (error) {
+      toast.success("Feedback enviado correctamente", {
+        description: isTutor ? "La mentoría ha sido finalizada." : undefined,
+      });
+    } catch (error: any) {
       console.error("Error submitting feedback:", error);
     }
   };
@@ -189,6 +185,7 @@ const HistoryTables: React.FC = () => {
           isOpen={isFeedbackModalOpen}
           onClose={closeFeedbackModal}
           mentorship={feedbackModalData}
+          currentUserId={user.userId || ""}
           onSubmitFeedback={handleSubmitFeedback}
         />
       )}
@@ -199,14 +196,6 @@ const HistoryTables: React.FC = () => {
         onSubmitCancellation={handleCancellation}
         type={selectedCancellationItem?.type ?? MentorshipType.MENTORSHIP}
       />
-
-      {permissions.canCompleteTutoring() && (
-        <CompleteModal
-          isOpen={isCompleteModalOpen}
-          onClose={closeCompleteModal}
-          onSubmitComplete={handleSubmitComplete}
-        />
-      )}
     </div>
   );
 };

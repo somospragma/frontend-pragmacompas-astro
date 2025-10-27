@@ -2,10 +2,9 @@
 import type { APIContext, MiddlewareHandler, MiddlewareNext } from "astro";
 import { sequence } from "astro:middleware";
 import { getSession } from "auth-astro/server";
-import type { UserRole } from "./infrastructure/models/TutoringRequest";
 import { PROTECTED_ROUTES, ROLE_ROUTES, ROUTE_PATHS, ROLE_RESTRICTED_ROUTES } from "./shared/utils/enums/paths";
 import type { SessionUser } from "auth.config";
-import { UserRole as Role } from "./shared/utils/enums/role";
+import { UserRole as Role, UserRole } from "./shared/utils/enums/role";
 
 export async function logAccess(context: APIContext, next: MiddlewareNext): Promise<Response> {
   console.log(`Ruta solicitada: ${context.url.pathname}`);

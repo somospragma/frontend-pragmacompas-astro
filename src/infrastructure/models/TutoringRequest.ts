@@ -1,11 +1,11 @@
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
+import type { UserRole } from "@/shared/utils/enums/role";
 
 export interface Chapter {
   id: string;
   name: string;
 }
 
-export type UserRole = "Tutor" | "Tutorado" | "Administrador";
 export type TutoringRequestStatus = MentorshipStatus;
 
 export interface User {

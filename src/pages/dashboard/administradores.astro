@@ -12,14 +12,14 @@ const session = (await getSession(Astro.request)) as SessionUser;
 
 <DashboardLayout>
   <div class="space-y-10">
-    <SectionHeader description="Administra y supervisa a todos los tutorados del capítulo" />
+    <SectionHeader description="Administra y supervisa a los administradores" />
 
     <div>
       <UsersStats
         chapterId={session?.user?.chapterId || ""}
-        userType={UserRole.TUTEE}
-        label="Tutorados Activos"
-        iconColor="green"
+        userType={UserRole.ADMINISTRADOR}
+        label="Administradores Activos"
+        iconColor="yellow"
         client:load
       />
     </div>
@@ -27,8 +27,8 @@ const session = (await getSession(Astro.request)) as SessionUser;
     <div>
       <UsersList
         chapterId={session?.user?.chapterId || ""}
-        userType={UserRole.TUTEE}
-        title="Lista de Tutorados"
+        userType={UserRole.ADMINISTRADOR}
+        title="Lista de Administradores"
         client:load
       />
     </div>
