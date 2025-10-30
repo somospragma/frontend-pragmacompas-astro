@@ -39,7 +39,7 @@ const DataTable: React.FC<DataTableProps> = ({
               <TableHeaderRow columns={columns} />
             </TableHeader>
             <TableBody>
-              {loading && <TableLoadingState />}
+              {loading && <TableLoadingState columns={columns.length} />}
               {shouldShowEmpty && <TableEmptyState message={emptyMessage} />}
               {shouldShowData &&
                 data.map((row, index) => (
