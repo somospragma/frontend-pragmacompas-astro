@@ -6,9 +6,9 @@ const title = "Historial";
 ---
 
 <MainLayout title={title}>
-  <section class="flex flex-col gap-8 w-full">
+  <section class="flex flex-col gap-8 w-full" aria-labelledby="history-title">
     <header>
-      <h1 class="text-3xl font-bold text-foreground">{title}</h1>
+      <h1 id="history-title" class="text-3xl font-bold text-foreground">{title}</h1>
     </header>
 
     <HistoryTables client:load />

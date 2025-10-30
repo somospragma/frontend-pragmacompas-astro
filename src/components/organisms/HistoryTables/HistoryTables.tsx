@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { HISTORY_TABLE_CONFIG, type MentorshipData } from "@/shared/config/historyTableConfig";
 import DataTable from "../DataTable/DataTable";
 import { HISTORY_PAGE_CONFIG } from "@/shared/config/historyPageConfig";
@@ -18,12 +17,17 @@ import { completeTutoring, type CompleteTutoringBody } from "@/infrastructure/se
 import { userStore } from "@/store/userStore";
 import { toast } from "sonner";
 import { getTutoringSummary } from "@/infrastructure/services/getTutoringSummary";
-import { useState } from "react";
+import { type ApiError, getErrorMessage } from "@/shared/types/error.types";
+import { sanitizeInput, sanitizeUrl } from "@/shared/utils/sanitize";
+import { logger } from "@/shared/utils/logger";
+import { useAccessibilityAnnouncer } from "@/shared/hooks/useAccessibilityAnnouncer";
+import { AccessibilityAnnouncer } from "@/components/atoms/AccessibilityAnnouncer";
 
 const HistoryTables: React.FC = () => {
   const { data, isLoading, refetch } = useHistoryTables();
   const user = userStore.get();
   const [userAlreadyGaveFeedback, setUserAlreadyGaveFeedback] = useState(false);
+  const { announce, message: announceMessage } = useAccessibilityAnnouncer();
 
   const {
     isOpen: isFeedbackModalOpen,
@@ -61,6 +65,11 @@ const HistoryTables: React.FC = () => {
     };
   }, [selectedFeedbackItem]);
 
+  /**
+   * Handles modal actions (cancel or feedback)
+   * @param action - The action to perform
+   * @param mentorship - The mentorship data
+   */
   const handleModal = async (action: string, mentorship: MentorshipData) => {
     if (action === MentorshipAction.CANCEL) {
       openCancellationModal(mentorship);
@@ -88,22 +97,52 @@ const HistoryTables: React.FC = () => {
         setUserAlreadyGaveFeedback(userHasGivenFeedback);
         openFeedbackModal(mentorship);
       } catch (error) {
-        console.error("Error verificando feedbacks:", error);
+        logger.error("Error verificando feedbacks", error as Error, { mentorshipId: mentorship.id });
+        announce("Error al verificar feedbacks. Por favor, intenta nuevamente.");
+        toast.error("Error al verificar feedbacks", {
+          description: "Por favor, intenta nuevamente.",
+        });
       }
     }
   };
 
+  /**
+   * Handles feedback submission with optional document URL
+   * @param score - The feedback score (1-5)
+   * @param comments - User feedback comments (sanitized)
+   * @param documentUrl - Optional URL to final act document (sanitized)
+   */
   const handleSubmitFeedback = async (score: number, comments: string, documentUrl?: string) => {
     if (!selectedFeedbackItem?.id) {
       return;
     }
+
+    // Sanitize inputs
+    const sanitizedComments = sanitizeInput(comments);
+    const sanitizedDocumentUrl = documentUrl ? sanitizeUrl(documentUrl) : undefined;
+
+    // Validate sanitized inputs
+    if (!sanitizedComments || sanitizedComments.length === 0) {
+      toast.error("Comentarios inválidos", {
+        description: "Por favor, proporciona comentarios válidos.",
+      });
+      return;
+    }
+
+    if (documentUrl && !sanitizedDocumentUrl) {
+      toast.error("URL inválida", {
+        description: "La URL del documento no es válida.",
+      });
+      return;
+    }
+
     try {
       const isTutor = selectedFeedbackItem.tutor.id === user.userId;
 
-      if (userAlreadyGaveFeedback && isTutor && documentUrl) {
+      if (userAlreadyGaveFeedback && isTutor && sanitizedDocumentUrl) {
         const completeTutoringData: CompleteTutoringBody = {
           userId: selectedFeedbackItem.tutor.id,
-          finalActUrl: documentUrl,
+          finalActUrl: sanitizedDocumentUrl,
         };
 
         await completeTutoring(selectedFeedbackItem.id, completeTutoringData);
@@ -111,6 +150,7 @@ const HistoryTables: React.FC = () => {
         handleCloseFeedbackModal();
         await refetch();
 
+        announce("Mentoría completada exitosamente.");
         toast.success("Mentoría completada exitosamente", {
           description: "El acta ha sido registrada correctamente.",
         });
@@ -120,16 +160,16 @@ const HistoryTables: React.FC = () => {
       const feedbackData: CreateFeedbackBody = {
         tutoringId: selectedFeedbackItem?.id,
         score: score.toString(),
-        comments,
+        comments: sanitizedComments,
         evaluatorId: user.userId || "",
       };
 
       await createFeedback(feedbackData);
 
-      if (isTutor && documentUrl) {
+      if (isTutor && sanitizedDocumentUrl) {
         const completeTutoringData: CompleteTutoringBody = {
           userId: selectedFeedbackItem.tutor.id,
-          finalActUrl: documentUrl,
+          finalActUrl: sanitizedDocumentUrl,
         };
 
         await completeTutoring(selectedFeedbackItem.id, completeTutoringData);
@@ -138,22 +178,31 @@ const HistoryTables: React.FC = () => {
       handleCloseFeedbackModal();
       await refetch();
 
-      if (isTutor && documentUrl) {
+      if (isTutor && sanitizedDocumentUrl) {
+        announce("Feedback enviado y mentoría completada exitosamente.");
         toast.success("Feedback enviado y mentoría completada", {
           description: "El acta ha sido registrada correctamente.",
         });
       } else {
+        announce("Feedback enviado correctamente.");
         toast.success("Feedback enviado correctamente", {
           description: isTutor
             ? "Podrás completar la mentoría cuando el tutorado también haya dado feedback."
             : undefined,
         });
       }
-    } catch (error: any) {
-      console.error("Error submitting feedback:", error);
-      const errorMessage = error?.response?.data?.message || error.message;
+    } catch (error) {
+      logger.error("Error submitting feedback", error as Error, {
+        tutoringId: selectedFeedbackItem.id,
+        userId: user.userId,
+      });
 
-      if (error?.response?.status === 400 && errorMessage?.toLowerCase().includes("feedback")) {
+      const errorMessage = getErrorMessage(error);
+      const apiError = error as ApiError;
+
+      announce(`Error: ${errorMessage}`);
+
+      if (apiError?.response?.status === 400 && errorMessage?.toLowerCase().includes("feedback")) {
         toast.error("No se pudo completar la mentoría", {
           description: "El tutorado aún no ha dado su feedback. Tu feedback se guardó correctamente.",
         });
@@ -165,8 +214,22 @@ const HistoryTables: React.FC = () => {
     }
   };
 
+  /**
+   * Handles mentorship cancellation
+   * @param comments - Cancellation reason comments (sanitized)
+   */
   const handleCancellation = async (comments: string): Promise<void> => {
     if (!selectedCancellationItem?.id) {
+      return;
+    }
+
+    // Sanitize cancellation comments
+    const sanitizedComments = sanitizeInput(comments);
+
+    if (!sanitizedComments || sanitizedComments.length === 0) {
+      toast.error("Comentarios inválidos", {
+        description: "Por favor, proporciona un motivo válido para la cancelación.",
+      });
       return;
     }
 
@@ -181,7 +244,7 @@ const HistoryTables: React.FC = () => {
         case MentorshipType.MENTORSHIP:
           await cancelTutoring(selectedCancellationItem.id, {
             userId: user.userId,
-            comments,
+            comments: sanitizedComments,
           });
           break;
 
@@ -191,8 +254,23 @@ const HistoryTables: React.FC = () => {
 
       closeCancellationModal();
       await refetch();
+
+      announce("Mentoría cancelada exitosamente.");
+      toast.success("Cancelación exitosa", {
+        description: "La mentoría ha sido cancelada correctamente.",
+      });
     } catch (error) {
-      console.error("Error cancelling:", error);
+      logger.error("Error cancelling mentorship", error as Error, {
+        mentorshipId: selectedCancellationItem.id,
+        userId: user.userId,
+      });
+
+      const errorMessage = getErrorMessage(error);
+      announce(`Error al cancelar: ${errorMessage}`);
+
+      toast.error("Error al cancelar", {
+        description: errorMessage,
+      });
     }
   };
 
@@ -208,7 +286,10 @@ const HistoryTables: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-12" role="region" aria-label="Historial de mentorías">
+      {/* Screen reader announcements for actions */}
+      <AccessibilityAnnouncer message={announceMessage} />
+
       {Object.entries(HISTORY_PAGE_CONFIG).map(([key, config]) => {
         const columns = getColumns(config);
         const filteredData = data.filter(
