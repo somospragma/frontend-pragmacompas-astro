@@ -1,52 +1,48 @@
 import React from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { TableColumn } from "@/shared/config/historyTableConfig";
 
 interface TableLoadingStateProps {
-  columns?: number;
+  columns?: TableColumn[];
 }
 
 /**
  * TableLoadingState Component
  *
  * Displays an animated skeleton loading state for tables.
- * Shows two rows with skeleton structure matching the table columns.
+ * Shows two rows with skeleton structure matching the table columns and their types.
  *
- * @param columns - Number of columns to render (default: 4)
- * @returns Two skeleton rows with dynamic column structure
+ * @param columns - Array of table columns with their configuration
+ * @returns Two skeleton rows with structure matching column types
  */
-export const TableLoadingState: React.FC<TableLoadingStateProps> = ({ columns = 4 }) => {
-  const renderSkeletonCell = (columnIndex: number) => {
-    if (columnIndex === 0) {
-      return (
-        <TableCell key={columnIndex} className="w-1/2">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-[50%]" />
-            <Skeleton className="h-3 w-[65%]" />
-          </div>
-        </TableCell>
-      );
-    }
+export const TableLoadingState: React.FC<TableLoadingStateProps> = ({ columns = [] }) => {
+  const renderSkeletonCell = (column: TableColumn, columnIndex: number) => {
+    const cellType = column.cellType || "text";
 
-    if (columnIndex === columns - 1) {
-      return (
-        <TableCell key={columnIndex} className="w-[10%]">
-          <Skeleton className="h-8 w-8 rounded-md" />
-        </TableCell>
-      );
-    }
-
-    const isBadgeColumn = columnIndex % 2 === 1;
     return (
-      <TableCell key={columnIndex}>
-        {isBadgeColumn ? <Skeleton className="h-6 w-20 rounded-full" /> : <Skeleton className="h-4 w-24" />}
+      <TableCell key={columnIndex} className={column.className}>
+        {cellType === "text" && (
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-[60%]" />
+            <Skeleton className="h-3 w-[80%]" />
+          </div>
+        )}
+        {cellType === "badge" && <Skeleton className="h-6 w-20 rounded-full" />}
+        {cellType === "skills" && (
+          <div className="flex gap-2">
+            <Skeleton className="h-6 w-16 rounded-full" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+          </div>
+        )}
+        {cellType === "button" && <Skeleton className="h-8 w-8 rounded-md" />}
       </TableCell>
     );
   };
 
   const renderSkeletonRow = (rowIndex: number) => (
     <TableRow key={`skeleton-row-${rowIndex}`}>
-      {Array.from({ length: columns }).map((_, columnIndex) => renderSkeletonCell(columnIndex))}
+      {columns.map((column, columnIndex) => renderSkeletonCell(column, columnIndex))}
     </TableRow>
   );
 
