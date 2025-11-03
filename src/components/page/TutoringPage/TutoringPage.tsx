@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { userStore } from "@/store/userStore";
 import { TUTORING_STATE_FILTERS } from "@/shared/utils/enums/mentorshipsStateFilter";
 import { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
@@ -8,33 +8,68 @@ import { getTutoring } from "@/infrastructure/services/getTutorings";
 import type { Tutoring } from "@/infrastructure/models/Tutoring";
 import StatCard from "@/components/atoms/StatCard";
 import SectionHeader from "@/components/atoms/SectionHeader";
+import { toast } from "sonner";
+import { logger } from "@/shared/utils/logger";
+import { getErrorMessage } from "@/shared/types/error.types";
+import { useAccessibilityAnnouncer } from "@/shared/hooks/useAccessibilityAnnouncer";
+import { AccessibilityAnnouncer } from "@/components/atoms/AccessibilityAnnouncer";
 
 const TutoringPage: React.FC = () => {
   const user = useStore(userStore);
   const [tutoringData, setTutoringData] = useState<Tutoring[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { announce, message: announceMessage } = useAccessibilityAnnouncer();
 
-  const loadTutoringData = async () => {
-    if (!user.chapterId) return;
+  /**
+   * Loads tutoring data for the current chapter
+   */
+  const loadTutoringData = useCallback(async () => {
+    if (!user.chapterId) {
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
 
     try {
       const response = await getTutoring({ chapterId: user.chapterId });
       setTutoringData(response.data);
+
+      announce(`Tutorías cargadas: ${response.data.length} registros encontrados.`);
     } catch (error) {
-      console.error("Error loading tutoring data:", error);
+      logger.error("Error loading tutoring data", error as Error, {
+        chapterId: user.chapterId,
+        userId: user.userId,
+      });
+
+      const errorMessage = getErrorMessage(error);
+      announce(`Error al cargar tutorías: ${errorMessage}`);
+
+      toast.error("Error al cargar tutorías", {
+        description: errorMessage || "No se pudieron cargar las tutorías. Por favor, intenta nuevamente.",
+      });
+
       setTutoringData([]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user.chapterId, user.userId, announce]);
 
   useEffect(() => {
     if (user.chapterId) {
       loadTutoringData();
     }
-  }, [user.chapterId]);
+  }, [user.chapterId, loadTutoringData]);
+
+  // Memoize statistics to avoid recalculation on every render
+  const statistics = useMemo(
+    () => ({
+      total: tutoringData.filter((tutoring) => TUTORING_STATE_FILTERS.includes(tutoring.status)).length,
+      completed: tutoringData.filter((tutoring) => tutoring.status === MentorshipStatus.COMPLETED).length,
+      cancelled: tutoringData.filter((tutoring) => tutoring.status === MentorshipStatus.CANCELLED).length,
+    }),
+    [tutoringData]
+  );
 
   return (
     <div className="space-y-10">
@@ -42,7 +77,7 @@ const TutoringPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard
-          value={tutoringData.filter((request) => TUTORING_STATE_FILTERS.includes(request.status)).length}
+          value={statistics.total}
           label="Total Tutorías"
           icon={
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +94,7 @@ const TutoringPage: React.FC = () => {
         />
 
         <StatCard
-          value={tutoringData.filter((request) => request.status === MentorshipStatus.COMPLETED).length}
+          value={statistics.completed}
           label="Completadas"
           icon={
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +106,7 @@ const TutoringPage: React.FC = () => {
         />
 
         <StatCard
-          value={tutoringData.filter((request) => request.status === MentorshipStatus.CANCELLED).length}
+          value={statistics.cancelled}
           label="Canceladas"
           icon={
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,12 +124,15 @@ const TutoringPage: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-64">
+        <div className="flex items-center justify-center h-64" role="status" aria-live="polite">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <span className="sr-only">Cargando tutorías...</span>
         </div>
       ) : (
         <TutoringTable title="Tutorías" data={tutoringData} refetch={loadTutoringData} />
       )}
+
+      <AccessibilityAnnouncer message={announceMessage} />
     </div>
   );
 };
