@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -10,6 +10,12 @@ import {
   DialogFooter,
 } from "@/components/molecules/Dialog/Dialog";
 import { MentorshipType } from "@/shared/utils/enums/mentorshipType";
+import { toast } from "sonner";
+import { logger } from "@/shared/utils/logger";
+import { sanitizeInput } from "@/shared/utils/sanitize";
+import { useAccessibilityAnnouncer } from "@/shared/hooks/useAccessibilityAnnouncer";
+import { AccessibilityAnnouncer } from "@/components/atoms/AccessibilityAnnouncer";
+import { getErrorMessage } from "@/shared/types/error.types";
 
 interface CancellationModalProps {
   type: MentorshipType | string;
@@ -26,29 +32,84 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 }: CancellationModalProps) => {
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { announce, message: announceMessage } = useAccessibilityAnnouncer();
 
-  const handleSubmit = async () => {
-    if (reason.trim() === "") return;
+  // Memoize cancel title to avoid recalculation
+  const cancelTitle = useMemo(
+    () => (type === MentorshipType.REQUEST ? "Cancelar solicitud" : "Cancelar tutoría"),
+    [type]
+  );
+
+  /**
+   * Validates cancellation reason
+   * @returns true if valid, false otherwise
+   */
+  const validateReason = useCallback((): boolean => {
+    const sanitizedReason = sanitizeInput(reason);
+
+    if (!sanitizedReason || sanitizedReason.trim().length === 0) {
+      toast.error("Razón requerida", {
+        description: "Por favor, proporciona una razón para la cancelación.",
+      });
+      announce("Error: Debes proporcionar una razón para la cancelación.");
+      return false;
+    }
+
+    if (sanitizedReason.trim().length < 10) {
+      toast.error("Razón muy corta", {
+        description: "La razón debe tener al menos 10 caracteres.",
+      });
+      announce("Error: La razón debe ser más descriptiva.");
+      return false;
+    }
+
+    return true;
+  }, [reason, announce]);
+
+  /**
+   * Handles form submission
+   */
+  const handleSubmit = useCallback(async () => {
+    if (!validateReason()) {
+      return;
+    }
+
+    const sanitizedReason = sanitizeInput(reason);
     setIsSubmitting(true);
+
     try {
-      await onSubmitCancellation(reason);
+      await onSubmitCancellation(sanitizedReason);
       setReason("");
       onClose();
     } catch (error) {
-      console.error("Error submitting cancellation:", error);
+      logger.error("Error submitting cancellation", error as Error, {
+        type,
+        reasonLength: sanitizedReason.length,
+      });
+
+      const errorMessage = getErrorMessage(error);
+      announce(`Error: ${errorMessage}`);
+
+      toast.error("Error al procesar la cancelación", {
+        description: errorMessage || "Por favor, intenta nuevamente.",
+      });
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [validateReason, reason, onSubmitCancellation, announce, type, onClose]);
 
-  const handleClose = () => {
+  /**
+   * Handles dialog close
+   */
+  const handleClose = useCallback(() => {
     if (!isSubmitting) {
       setReason("");
       onClose();
     }
-  };
+  }, [isSubmitting, onClose]);
 
-  const cancelTitle = type === MentorshipType.REQUEST ? "Cancelar solicitud" : "Cancelar tutoría";
+  // Memoize button disabled state
+  const isDisabled = useMemo(() => reason.trim() === "" || isSubmitting, [reason, isSubmitting]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -70,8 +131,12 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
               className="resize-none"
               rows={4}
               maxLength={500}
+              aria-label="Razón de cancelación"
+              aria-required="true"
             />
-            <p className="text-xs text-muted-foreground">{reason.length}/500 caracteres</p>
+            <p className="text-xs text-muted-foreground" aria-live="polite">
+              {reason.length}/500 caracteres
+            </p>
           </div>
         </div>
 
@@ -82,12 +147,14 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
           <Button
             variant="destructive"
             onClick={handleSubmit}
-            disabled={reason.trim() === "" || isSubmitting}
+            disabled={isDisabled}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? "Cancelando..." : "Confirmar"}
           </Button>
         </DialogFooter>
+
+        <AccessibilityAnnouncer message={announceMessage} />
       </DialogContent>
     </Dialog>
   );

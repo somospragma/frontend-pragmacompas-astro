@@ -117,12 +117,12 @@ const HistoryTables: React.FC = () => {
       return;
     }
 
-    // Sanitize inputs
     const sanitizedComments = sanitizeInput(comments);
     const sanitizedDocumentUrl = documentUrl ? sanitizeUrl(documentUrl) : undefined;
 
-    // Validate sanitized inputs
-    if (!sanitizedComments || sanitizedComments.length === 0) {
+    const isTutor = selectedFeedbackItem.tutor.id === user.userId;
+
+    if (!userAlreadyGaveFeedback && (!sanitizedComments || sanitizedComments.length === 0)) {
       toast.error("Comentarios inválidos", {
         description: "Por favor, proporciona comentarios válidos.",
       });
@@ -137,8 +137,6 @@ const HistoryTables: React.FC = () => {
     }
 
     try {
-      const isTutor = selectedFeedbackItem.tutor.id === user.userId;
-
       if (userAlreadyGaveFeedback && isTutor && sanitizedDocumentUrl) {
         const completeTutoringData: CompleteTutoringBody = {
           userId: selectedFeedbackItem.tutor.id,
@@ -223,7 +221,6 @@ const HistoryTables: React.FC = () => {
       return;
     }
 
-    // Sanitize cancellation comments
     const sanitizedComments = sanitizeInput(comments);
 
     if (!sanitizedComments || sanitizedComments.length === 0) {
@@ -287,7 +284,6 @@ const HistoryTables: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-12" role="region" aria-label="Historial de mentorías">
-      {/* Screen reader announcements for actions */}
       <AccessibilityAnnouncer message={announceMessage} />
 
       {Object.entries(HISTORY_PAGE_CONFIG).map(([key, config]) => {

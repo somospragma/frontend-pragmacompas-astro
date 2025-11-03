@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,7 +58,61 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   const [urlError, setUrlError] = useState<string>("");
   const { announce, message: announceMessage } = useAccessibilityAnnouncer();
 
-  const isTutor = mentorship.tutorId === currentUserId;
+  const isTutor = useMemo(() => mentorship.tutorId === currentUserId, [mentorship.tutorId, currentUserId]);
+
+  const updateFormData = useCallback((field: keyof typeof formData, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  /**
+   * Validates URL format in real-time
+   * @param url - The URL to validate
+   * @returns Error message if invalid, empty string if valid
+   */
+  const validateUrlFormat = useCallback((url: string): string => {
+    if (!url || url.trim() === "") {
+      return "";
+    }
+
+    const trimmedUrl = url.trim();
+
+    if (!/^https?:\/\//i.test(trimmedUrl)) {
+      return "La URL debe comenzar con http:// o https://";
+    }
+
+    try {
+      new URL(trimmedUrl);
+      return "";
+    } catch {
+      return "Formato de URL inválido";
+    }
+  }, []);
+
+  /**
+   * Handles document URL change with real-time validation
+   * @param value - The new URL value
+   */
+  const handleUrlChange = useCallback(
+    (value: string) => {
+      updateFormData("documentUrl", value);
+      const error = validateUrlFormat(value);
+      setUrlError(error);
+
+      if (error) {
+        announce(`Error en URL: ${error}`);
+      }
+    },
+    [updateFormData, validateUrlFormat, announce]
+  );
+
+  /**
+   * Resets form to initial state
+   */
+  const resetForm = useCallback(() => {
+    setFormData({ score: 0, comment: "", documentUrl: "" });
+    setHoveredStar(0);
+    setUrlError("");
+  }, []);
 
   useEffect(() => {
     const checkTuteeFeedback = async () => {
@@ -98,61 +152,11 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     checkTuteeFeedback();
   }, [isOpen, mentorship.tutoringId, isTutor, currentUserId, announce]);
 
-  const updateFormData = (field: keyof typeof formData, value: string | number) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  /**
-   * Validates URL format in real-time
-   * @param url - The URL to validate
-   * @returns Error message if invalid, empty string if valid
-   */
-  const validateUrlFormat = (url: string): string => {
-    if (!url || url.trim() === "") {
-      return "";
-    }
-
-    const trimmedUrl = url.trim();
-
-    // Check if URL starts with http:// or https://
-    if (!/^https?:\/\//i.test(trimmedUrl)) {
-      return "La URL debe comenzar con http:// o https://";
-    }
-
-    // Basic URL structure validation
-    try {
-      new URL(trimmedUrl);
-      return "";
-    } catch {
-      return "Formato de URL inválido";
-    }
-  };
-
-  /**
-   * Handles document URL change with real-time validation
-   * @param value - The new URL value
-   */
-  const handleUrlChange = (value: string) => {
-    updateFormData("documentUrl", value);
-    const error = validateUrlFormat(value);
-    setUrlError(error);
-
-    if (error) {
-      announce(`Error en URL: ${error}`);
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({ score: 0, comment: "", documentUrl: "" });
-    setHoveredStar(0);
-    setUrlError("");
-  };
-
   /**
    * Validates form data and shows appropriate error messages
    * @returns true if validation passes, false otherwise
    */
-  const validateForm = (): boolean => {
+  const validateForm = useCallback((): boolean => {
     const sanitizedComment = sanitizeInput(formData.comment);
     const sanitizedUrl = formData.documentUrl ? sanitizeUrl(formData.documentUrl) : "";
 
@@ -220,9 +224,12 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     }
 
     return true;
-  };
+  }, [formData, userAlreadyGaveFeedback, canComplete, urlError, announce, isTutor]);
 
-  const handleSubmit = async () => {
+  /**
+   * Handles form submission
+   */
+  const handleSubmit = useCallback(async () => {
     if (!validateForm()) {
       return;
     }
@@ -285,25 +292,64 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [
+    validateForm,
+    formData,
+    userAlreadyGaveFeedback,
+    onSubmitFeedback,
+    isTutor,
+    canComplete,
+    announce,
+    resetForm,
+    mentorship.tutoringId,
+    currentUserId,
+  ]);
 
-  const handleStarClick = (star: number) => {
-    const newScore = formData.score === star ? 0 : star;
-    updateFormData("score", newScore);
-    if (newScore === 0) {
-      setHoveredStar(0);
-      announce("Puntuación eliminada");
-    } else {
-      announce(`Puntuación seleccionada: ${newScore} de 5 estrellas`);
-    }
-  };
+  /**
+   * Handles star rating click
+   */
+  const handleStarClick = useCallback(
+    (star: number) => {
+      const newScore = formData.score === star ? 0 : star;
+      updateFormData("score", newScore);
+      if (newScore === 0) {
+        setHoveredStar(0);
+        announce("Puntuación eliminada");
+      } else {
+        announce(`Puntuación seleccionada: ${newScore} de 5 estrellas`);
+      }
+    },
+    [formData.score, updateFormData, announce]
+  );
 
-  const isDisabled = userAlreadyGaveFeedback
-    ? isSubmitting || !canComplete || formData.documentUrl.trim() === "" || !!urlError
-    : isSubmitting ||
-      formData.score === 0 ||
-      formData.comment.trim() === "" ||
-      (isTutor && canComplete && (formData.documentUrl.trim() === "" || !!urlError));
+  const isDisabled = useMemo(
+    () =>
+      userAlreadyGaveFeedback
+        ? isSubmitting || !canComplete || formData.documentUrl.trim() === "" || !!urlError
+        : isSubmitting ||
+          formData.score === 0 ||
+          formData.comment.trim() === "" ||
+          (isTutor && canComplete && (formData.documentUrl.trim() === "" || !!urlError)),
+    [
+      userAlreadyGaveFeedback,
+      isSubmitting,
+      canComplete,
+      formData.documentUrl,
+      formData.score,
+      formData.comment,
+      urlError,
+      isTutor,
+    ]
+  );
+
+  const userInitials = useMemo(
+    () =>
+      mentorship.participant
+        .split(" ")
+        .map((n) => n[0])
+        .join(""),
+    [mentorship.participant]
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -322,12 +368,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="text-primary font-semibold text-lg">
-                {mentorship.participant
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </span>
+              <span className="text-primary font-semibold text-lg">{userInitials}</span>
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">{mentorship.participant}</h3>
