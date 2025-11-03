@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useAccessibilityAnnouncer } from "@/shared/hooks/useAccessibilityAnnouncer";
 
 describe("useAccessibilityAnnouncer", () => {
@@ -43,7 +43,7 @@ describe("useAccessibilityAnnouncer", () => {
     expect(result.current.message).toBe("");
   });
 
-  it("should auto-clear message after delay", async () => {
+  it("should auto-clear message after delay", () => {
     const { result } = renderHook(() => useAccessibilityAnnouncer(1000));
 
     act(() => {
@@ -56,9 +56,7 @@ describe("useAccessibilityAnnouncer", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    await waitFor(() => {
-      expect(result.current.message).toBe("");
-    });
+    expect(result.current.message).toBe("");
   });
 
   it("should not auto-clear when clearDelay is 0", async () => {
@@ -93,7 +91,7 @@ describe("useAccessibilityAnnouncer", () => {
     expect(result.current.message).toBe("Second message");
   });
 
-  it("should reset timer when new message is announced", async () => {
+  it("should reset timer when new message is announced", () => {
     const { result } = renderHook(() => useAccessibilityAnnouncer(1000));
 
     act(() => {
@@ -121,8 +119,6 @@ describe("useAccessibilityAnnouncer", () => {
       vi.advanceTimersByTime(500);
     });
 
-    await waitFor(() => {
-      expect(result.current.message).toBe("");
-    });
+    expect(result.current.message).toBe("");
   });
 });
