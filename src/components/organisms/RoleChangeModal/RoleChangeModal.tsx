@@ -1,12 +1,31 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import type { User } from "@/infrastructure/models/TutoringRequest";
 import { UserRole } from "@/shared/utils/enums/role";
 
+/**
+ * RoleChangeModal component allows administrators to change a user's role.
+ * Displays user information and provides radio buttons to select a new role.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <RoleChangeModal
+ *   isOpen={true}
+ *   onClose={() => setIsOpen(false)}
+ *   user={selectedUser}
+ *   onRoleChange={async (userId, newRole) => {
+ *     await updateUserRole(userId, newRole);
+ *     refetchUsers();
+ *   }}
+ * />
+ * ```
+ */
+
 interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  user: User | null;
-  onRoleChange: (userId: string, newRole: UserRole) => Promise<void>;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly user: User | null;
+  readonly onRoleChange: (userId: string, newRole: UserRole) => Promise<void>;
 }
 
 const roleDescriptions = {
@@ -25,10 +44,34 @@ export default function RoleChangeModal({ isOpen, onClose, user, onRoleChange }:
   const [selectedRole, setSelectedRole] = useState<UserRole>(user?.rol || UserRole.TUTEE);
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!isOpen || !user) return null;
+  // Reset selected role when user changes
+  useEffect(() => {
+    if (user?.rol) {
+      setSelectedRole(user.rol);
+    }
+  }, [user?.id, user?.rol]);
 
-  const handleRoleChange = async () => {
-    if (!user.id || selectedRole === user.rol) {
+  const userInitial = useMemo(() => {
+    return (user?.firstName?.charAt(0) || user?.lastName?.charAt(0) || "?").toUpperCase();
+  }, [user?.firstName, user?.lastName]);
+
+  const userName = useMemo(() => {
+    if (!user) return "Sin nombre";
+    return user.firstName && user.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user.firstName || user.lastName || "Sin nombre";
+  }, [user]);
+
+  const roleOptions = useMemo(() => Object.keys(roleDescriptions) as UserRole[], []);
+
+  const isRoleChanged = useMemo(() => selectedRole !== user?.rol, [selectedRole, user?.rol]);
+
+  const handleRoleSelection = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedRole(event.target.value as UserRole);
+  }, []);
+
+  const handleRoleChange = useCallback(async () => {
+    if (!user?.id || !isRoleChanged) {
       onClose();
       return;
     }
@@ -42,31 +85,34 @@ export default function RoleChangeModal({ isOpen, onClose, user, onRoleChange }:
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id, isRoleChanged, selectedRole, onRoleChange, onClose]);
+
+  if (!isOpen || !user) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="role-change-title"
+    >
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Cambiar Rol de Usuario</h3>
-        </div>
+        <header className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 id="role-change-title" className="text-lg font-semibold text-gray-900 dark:text-white">
+            Cambiar Rol de Usuario
+          </h3>
+        </header>
 
         <div className="p-6">
-          <div className="mb-6">
+          <section className="mb-6" aria-label="Información del usuario">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0 h-12 w-12">
-                <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center">
-                  <span className="text-lg font-medium text-white">
-                    {(user.firstName?.charAt(0) || user.lastName?.charAt(0) || "?").toUpperCase()}
-                  </span>
+                <div className="h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center" aria-hidden="true">
+                  <span className="text-lg font-medium text-white">{userInitial}</span>
                 </div>
               </div>
               <div className="ml-4">
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  {user.firstName && user.lastName
-                    ? `${user.firstName} ${user.lastName}`
-                    : user.firstName || user.lastName || "Sin nombre"}
-                </div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white">{userName}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
               </div>
             </div>
@@ -75,62 +121,73 @@ export default function RoleChangeModal({ isOpen, onClose, user, onRoleChange }:
               <span className="text-sm text-gray-600 dark:text-gray-400">Rol actual: </span>
               <span
                 className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${roleColors[user.rol || "Tutorado"]}`}
+                role="status"
+                aria-label={`Rol actual: ${user.rol || "Tutorado"}`}
               >
                 {user.rol || "Tutorado"}
               </span>
             </div>
-          </div>
+          </section>
 
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Seleccionar nuevo rol:</label>
+          <section aria-labelledby="role-selection-label">
+            <label id="role-selection-label" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Seleccionar nuevo rol:
+            </label>
 
-            <div className="space-y-3">
-              {(Object.keys(roleDescriptions) as UserRole[]).map((role) => (
+            <fieldset className="space-y-3 mt-4" aria-label="Opciones de rol">
+              {roleOptions.map((role) => (
                 <label key={role} className="flex items-start cursor-pointer">
                   <input
                     type="radio"
                     name="role"
                     value={role}
                     checked={selectedRole === role}
-                    onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+                    onChange={handleRoleSelection}
                     className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+                    aria-describedby={`role-desc-${role}`}
                   />
                   <div className="ml-3">
                     <div className="flex items-center">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${roleColors[role]} mr-2`}
+                        aria-hidden="true"
                       >
                         {role}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{roleDescriptions[role]}</p>
+                    <p id={`role-desc-${role}`} className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      {roleDescriptions[role]}
+                    </p>
                   </div>
                 </label>
               ))}
-            </div>
-          </div>
+            </fieldset>
+          </section>
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+        <footer className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
           <button
             onClick={onClose}
             disabled={isLoading}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 
                      hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md focus:outline-none focus:ring-2 
                      focus:ring-gray-500 disabled:opacity-50"
+            aria-label="Cancelar cambio de rol"
           >
             Cancelar
           </button>
           <button
             onClick={handleRoleChange}
-            disabled={isLoading || selectedRole === user.rol}
+            disabled={isLoading || !isRoleChanged}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 
                      rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50
                      disabled:cursor-not-allowed"
+            aria-label={isLoading ? "Cambiando rol" : "Confirmar cambio de rol"}
+            aria-busy={isLoading}
           >
             {isLoading ? "Cambiando..." : "Cambiar Rol"}
           </button>
-        </div>
+        </footer>
       </div>
     </div>
   );
