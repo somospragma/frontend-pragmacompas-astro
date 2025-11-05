@@ -1,3 +1,4 @@
+import { useMemo, useCallback } from "react";
 import { updateUserRole } from "@/infrastructure/services/updateUserRole";
 import type { User } from "@/infrastructure/models/TutoringRequest";
 import UserViewModal from "@/components/organisms/UserViewModal/UserViewModal";
@@ -8,10 +9,25 @@ import { UserRole } from "@/shared/utils/enums/role";
 import { useUsersByRole } from "@/shared/hooks/useUsersByRole";
 import { useModalState } from "@/shared/hooks/useModalState";
 
+/**
+ * UsersList component displays a list of users filtered by role (Tutee/Tutor).
+ * Provides actions to view, edit, and change user roles with optimized performance.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <UsersList
+ *   chapterId="chapter-123"
+ *   userType={UserRole.TUTEE}
+ *   title="Lista de Mentees"
+ * />
+ * ```
+ */
+
 interface Props {
-  chapterId: string;
-  userType: UserRole;
-  title: string;
+  readonly chapterId: string;
+  readonly userType: UserRole;
+  readonly title: string;
 }
 
 export default function UsersList({ chapterId, userType, title }: Props) {
@@ -38,7 +54,7 @@ export default function UsersList({ chapterId, userType, title }: Props) {
     closeModal: closeEditModal,
   } = useModalState<User>();
 
-  const getSeniorityInfo = (seniorityValue: string | undefined) => {
+  const getSeniorityInfo = useCallback((seniorityValue: string | undefined) => {
     if (!seniorityValue) {
       return {
         label: "No definido",
@@ -87,37 +103,61 @@ export default function UsersList({ chapterId, userType, title }: Props) {
       label: option.label,
       colorClasses: getColorClasses(valueAsString),
     };
-  };
+  }, []);
 
-  const handleViewUser = (user: User) => {
-    openViewModal(user);
-  };
+  const handleViewUser = useCallback(
+    (user: User) => {
+      openViewModal(user);
+    },
+    [openViewModal]
+  );
 
-  const handleEditUser = (user: User) => {
-    openEditModal(user);
-  };
+  const handleEditUser = useCallback(
+    (user: User) => {
+      openEditModal(user);
+    },
+    [openEditModal]
+  );
 
-  const handleChangeRole = (user: User) => {
-    openRoleChangeModal(user);
-  };
+  const handleChangeRole = useCallback(
+    (user: User) => {
+      openRoleChangeModal(user);
+    },
+    [openRoleChangeModal]
+  );
 
-  const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    try {
-      await updateUserRole({ id: userId, role: newRole });
-      await refetch();
-    } catch (error) {
-      console.error("Error updating user role:", error);
-    }
-  };
+  const handleRoleChange = useCallback(
+    async (userId: string, newRole: UserRole) => {
+      try {
+        await updateUserRole({ id: userId, role: newRole });
+        await refetch();
+      } catch (error) {
+        console.error("Error updating user role:", error);
+      }
+    },
+    [refetch]
+  );
+
+  const headerLabel = useMemo(() => {
+    return userType === "Tutorado" ? "Mentee" : "Mentor";
+  }, [userType]);
+
+  const emptyStateMessage = useMemo(() => {
+    const userTypeLabel = userType === "Tutorado" ? "mentees" : "mentores";
+    return {
+      title: `No hay ${userTypeLabel} disponibles`,
+      description: `Los ${userTypeLabel} aparecerán aquí cuando se registren.`,
+    };
+  }, [userType]);
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <header className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{title}</h2>
-        </div>
-        <div className="p-6">
-          <div className="animate-pulse space-y-4">
+        </header>
+        <section className="p-6" aria-label="Cargando usuarios">
+          <div className="animate-pulse space-y-4" aria-busy="true" aria-live="polite">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
@@ -128,48 +168,63 @@ export default function UsersList({ chapterId, userType, title }: Props) {
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </section>
+      </article>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <header className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{title}</h2>
-        </div>
-        <div className="p-6">
-          <div className="text-center text-red-600 dark:text-red-400">
+        </header>
+        <section className="p-6" aria-label="Error al cargar usuarios">
+          <div className="text-center text-red-600 dark:text-red-400" role="alert">
             <p>{error}</p>
           </div>
-        </div>
-      </div>
+        </section>
+      </article>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <header className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{title}</h2>
-      </div>
+      </header>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {userType === "Tutorado" ? "Mentee" : "Mentor"}
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
+                {headerLabel}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 Seniority
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 Rol
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 Acciones
               </th>
             </tr>
@@ -184,6 +239,7 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -192,12 +248,8 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                         d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    <p className="text-lg font-medium mb-2">
-                      No hay {userType === "Tutorado" ? "mentees" : "mentores"} disponibles
-                    </p>
-                    <p className="text-sm">
-                      Los {userType === "Tutorado" ? "mentees" : "mentores"} aparecerán aquí cuando se registren.
-                    </p>
+                    <p className="text-lg font-medium mb-2">{emptyStateMessage.title}</p>
+                    <p className="text-sm">{emptyStateMessage.description}</p>
                   </div>
                 </td>
               </tr>
@@ -244,6 +296,8 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                             "inline-flex px-2 py-1 text-xs font-semibold rounded-full " +
                             "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
                           }
+                          role="status"
+                          aria-label={`Rol actual: ${user.rol || userType}`}
                         >
                           {user.rol || userType}
                         </span>
@@ -253,6 +307,7 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                             "text-xs text-blue-600 hover:text-blue-900 " +
                             "dark:text-blue-400 dark:hover:text-blue-300 underline"
                           }
+                          aria-label={`Cambiar rol de ${user.firstName} ${user.lastName}`}
                         >
                           Cambiar
                         </button>
@@ -263,12 +318,14 @@ export default function UsersList({ chapterId, userType, title }: Props) {
                         <button
                           onClick={() => handleViewUser(user)}
                           className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          aria-label={`Ver detalles de ${user.firstName} ${user.lastName}`}
                         >
                           Ver
                         </button>
                         <button
                           onClick={() => handleEditUser(user)}
                           className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
+                          aria-label={`Editar información de ${user.firstName} ${user.lastName}`}
                         >
                           Editar
                         </button>
@@ -290,6 +347,6 @@ export default function UsersList({ chapterId, userType, title }: Props) {
         onRoleChange={handleRoleChange}
       />
       <UserEditModal isOpen={editModalOpen} onClose={closeEditModal} user={selectedEditUser} onUserUpdated={refetch} />
-    </div>
+    </article>
   );
 }

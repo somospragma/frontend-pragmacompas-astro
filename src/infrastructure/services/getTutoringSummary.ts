@@ -1,7 +1,7 @@
 import { httpClient } from "../adapters/httpClient/httpClient";
 import type { TutoringSummary } from "../models/TutoringSummary";
 
-interface TutoringResponse {
+export interface TutoringResponse {
   message: string;
   data: TutoringSummary;
   timestamp: string;
