@@ -17,11 +17,26 @@ import { useAccessibilityAnnouncer } from "@/shared/hooks/useAccessibilityAnnoun
 import { AccessibilityAnnouncer } from "@/components/atoms/AccessibilityAnnouncer";
 import { getErrorMessage } from "@/shared/types/error.types";
 
+/**
+ * CancellationModal component for handling mentorship/request cancellations
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <CancellationModal
+ *   type={MentorshipType.REQUEST}
+ *   isOpen={true}
+ *   onClose={() => setIsOpen(false)}
+ *   onSubmitCancellation={async (reason) => await cancelRequest(reason)}
+ * />
+ * ```
+ */
+
 interface CancellationModalProps {
-  type: MentorshipType | string;
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmitCancellation: (reason: string) => Promise<void>;
+  readonly type: MentorshipType | string;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly onSubmitCancellation: (reason: string) => Promise<void>;
 }
 
 const CancellationModal: React.FC<CancellationModalProps> = ({
@@ -33,6 +48,13 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { announce, message: announceMessage } = useAccessibilityAnnouncer();
+
+  /**
+   * Handles textarea change with sanitization
+   */
+  const handleReasonChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setReason(e.target.value);
+  }, []);
 
   // Memoize cancel title to avoid recalculation
   const cancelTitle = useMemo(
@@ -113,35 +135,39 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md" aria-describedby="dialog-description">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">{cancelTitle}</DialogTitle>
-          <DialogDescription>Esta acción no se puede deshacer</DialogDescription>
+          <DialogDescription id="dialog-description">Esta acción no se puede deshacer</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <section className="space-y-6" role="form" aria-label="Formulario de cancelación">
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-foreground">
-              Razón de cancelación: <span className="text-destructive">*</span>
+              Razón de cancelación:{" "}
+              <span className="text-destructive" aria-label="campo requerido">
+                *
+              </span>
             </h4>
             <Textarea
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={handleReasonChange}
               placeholder="Por favor, explica el motivo de la cancelación..."
               className="resize-none"
               rows={4}
               maxLength={500}
               aria-label="Razón de cancelación"
               aria-required="true"
+              aria-describedby="char-count"
             />
-            <p className="text-xs text-muted-foreground" aria-live="polite">
+            <p id="char-count" className="text-xs text-muted-foreground" aria-live="polite">
               {reason.length}/500 caracteres
             </p>
           </div>
-        </div>
+        </section>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>
+          <Button variant="outline" onClick={handleClose} disabled={isSubmitting} aria-label="Mantener y cerrar modal">
             Mantener
           </Button>
           <Button
@@ -149,6 +175,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({
             onClick={handleSubmit}
             disabled={isDisabled}
             className="disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Confirmar cancelación"
           >
             {isSubmitting ? "Cancelando..." : "Confirmar"}
           </Button>

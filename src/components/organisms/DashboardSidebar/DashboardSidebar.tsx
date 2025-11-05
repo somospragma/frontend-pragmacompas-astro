@@ -1,14 +1,68 @@
 import { BarChart, Book, ChevronLeft, ChevronRight, Menu, Settings, Users, UsersRound, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+/**
+ * DashboardSidebar component provides navigation for the dashboard
+ * with responsive mobile menu, collapse functionality, and active route highlighting
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <DashboardSidebar currentPath="/dashboard/tutorias" />
+ * ```
+ */
 
 interface Props {
-  currentPath?: string;
+  readonly currentPath?: string;
 }
 
 const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  /**
+   * Memoized menu items configuration
+   */
+  const menuItems = useMemo(
+    () => [
+      { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
+      { icon: Book, label: "Tutorias", href: "/dashboard/tutorias", badge: null },
+      { icon: UsersRound, label: "Tutorados", href: "/dashboard/tutorado", badge: null },
+      { icon: Users, label: "Tutores", href: "/dashboard/tutor", badge: null },
+      { icon: Users, label: "Administradores", href: "/dashboard/administradores", badge: null },
+    ],
+    []
+  );
+
+  /**
+   * Checks if a given href matches the current path
+   */
+  const isActive = useCallback(
+    (href: string) => {
+      if (href === "/dashboard") {
+        return currentPath === "/dashboard" || currentPath === "/dashboard/";
+      }
+
+      // For exact path matching to avoid conflicts between similar routes
+      return currentPath === href || currentPath.startsWith(href + "/");
+    },
+    [currentPath]
+  );
+
+  /**
+   * Toggles sidebar open/close state
+   */
+  const toggleSidebar = useCallback(() => {
+    setIsOpen((prev) => !prev);
+  }, []);
+
+  /**
+   * Toggles sidebar collapsed/expanded state
+   */
+  const toggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => !prev);
+  }, []);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -25,31 +79,6 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  const menuItems = [
-    { icon: BarChart, label: "Dashboard", href: "/dashboard", badge: null },
-    { icon: Book, label: "Tutorias", href: "/dashboard/tutorias", badge: null },
-    { icon: UsersRound, label: "Tutorados", href: "/dashboard/tutorado", badge: null },
-    { icon: Users, label: "Tutores", href: "/dashboard/tutor", badge: null },
-    { icon: Users, label: "Administradores", href: "/dashboard/administradores", badge: null },
-  ];
-
-  const isActive = (href: string) => {
-    if (href === "/dashboard") {
-      return currentPath === "/dashboard" || currentPath === "/dashboard/";
-    }
-
-    // For exact path matching to avoid conflicts between similar routes
-    return currentPath === href || currentPath.startsWith(href + "/");
-  };
-
   return (
     <>
       {/* Mobile menu button */}
@@ -58,12 +87,27 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
         className={`md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white dark:bg-gray-800 shadow-lg transition-colors duration-300 ${
           isOpen ? "hidden" : "block"
         }`}
+        aria-label="Abrir menú de navegación"
+        aria-expanded={isOpen}
       >
-        <Menu size={24} className="text-gray-900 dark:text-white" />
+        <Menu size={24} className="text-gray-900 dark:text-white" aria-hidden="true" />
       </button>
 
       {/* Sidebar overlay for mobile */}
-      {isMobile && isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-10" onClick={toggleSidebar} />}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10"
+          onClick={toggleSidebar}
+          role="button"
+          tabIndex={0}
+          aria-label="Cerrar menú"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              toggleSidebar();
+            }
+          }}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
@@ -86,6 +130,7 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
           flex
           flex-col
         `}
+        aria-label="Barra lateral de navegación del dashboard"
       >
         {/* Header with toggle button */}
         <div className="flex items-center justify-between h-20 px-4 border-b border-gray-200 dark:border-slate-800">
@@ -125,8 +170,10 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
               hover:bg-gray-100 dark:hover:bg-slate-800
               rounded-lg transition-colors duration-200
             "
+            aria-label={isCollapsed ? "Expandir barra lateral" : "Colapsar barra lateral"}
+            aria-expanded={!isCollapsed}
           >
-            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            {isCollapsed ? <ChevronRight size={20} aria-hidden="true" /> : <ChevronLeft size={20} aria-hidden="true" />}
           </button>
 
           {/* Mobile close button */}
@@ -134,14 +181,15 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
             <button
               onClick={toggleSidebar}
               className="p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white"
+              aria-label="Cerrar menú"
             >
-              <X size={24} />
+              <X size={24} aria-hidden="true" />
             </button>
           )}
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2" aria-label="Navegación principal del dashboard">
           {menuItems.map((item, index) => (
             <a
               key={index}
@@ -155,8 +203,10 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
                     : "text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800"
                 }
               `}
+              aria-label={item.label}
+              aria-current={isActive(item.href) ? "page" : undefined}
             >
-              <item.icon className={`w-5 h-5 ${!isCollapsed ? "mr-3" : ""}`} />
+              <item.icon className={`w-5 h-5 ${!isCollapsed ? "mr-3" : ""}`} aria-hidden="true" />
               {!isCollapsed && (
                 <>
                   <span className="flex-1">{item.label}</span>
@@ -166,6 +216,8 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
                       ml-auto px-2 py-1 text-xs rounded-full
                       ${item.badge === "New" ? "bg-green-500 text-white" : "bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-slate-300"}
                     `}
+                      role="status"
+                      aria-label={`${item.label} - ${item.badge}`}
                     >
                       {item.badge}
                     </span>
@@ -189,8 +241,10 @@ const DashboardSidebar: React.FC<Props> = ({ currentPath = "" }) => {
                   : "text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800"
               }
             `}
+            aria-label="Configuración"
+            aria-current={isActive("/dashboard/profile") ? "page" : undefined}
           >
-            <Settings className={`w-5 h-5 ${!isCollapsed ? "mr-3" : ""}`} />
+            <Settings className={`w-5 h-5 ${!isCollapsed ? "mr-3" : ""}`} aria-hidden="true" />
             {!isCollapsed && "Configuración"}
           </a>
         </div>

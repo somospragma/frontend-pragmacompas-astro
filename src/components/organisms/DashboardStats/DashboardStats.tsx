@@ -1,16 +1,39 @@
 import type { DashboardStatistics } from "@/infrastructure/models/DashboardStatistics";
 import { getDashboardStatistics } from "@/infrastructure/services/getDashboardStatistics";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import StatCard from "@/components/atoms/StatCard";
 
+/**
+ * DashboardStats component displays key statistics for the dashboard
+ * including pending requests, completed sessions, and cancelled requests
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <DashboardStats chapterId="chapter-123" />
+ * ```
+ */
+
 interface Props {
-  chapterId: string;
+  readonly chapterId: string;
 }
 
 export default function DashboardStats({ chapterId }: Props) {
   const [statistics, setStatistics] = useState<DashboardStatistics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Handles navigation to pending requests page
+   */
+  const handlePendingRequestsClick = useCallback(() => {
+    window.location.href = "/dashboard/requests";
+  }, []);
+
+  /**
+   * Memoized loading skeleton array
+   */
+  const loadingSkeletons = useMemo(() => [...Array(3)], []);
 
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -39,22 +62,31 @@ export default function DashboardStats({ chapterId }: Props) {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-card border border-border rounded-lg p-6 animate-pulse">
+      <section
+        className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
+        aria-busy="true"
+        aria-label="Cargando estadísticas"
+      >
+        {loadingSkeletons.map((_, i) => (
+          <div key={i} className="bg-card border border-border rounded-lg p-6 animate-pulse" role="status">
             <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
             <div className="h-8 bg-muted rounded w-1/2"></div>
+            <span className="sr-only">Cargando estadísticas...</span>
           </div>
         ))}
-      </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-8">
+      <section
+        className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-8"
+        role="alert"
+        aria-live="assertive"
+      >
         <p className="text-destructive">⚠️ {error}</p>
-      </div>
+      </section>
     );
   }
 
@@ -62,18 +94,14 @@ export default function DashboardStats({ chapterId }: Props) {
     return null;
   }
 
-  const handlePendingRequestsClick = () => {
-    window.location.href = "/dashboard/requests";
-  };
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" aria-label="Estadísticas del dashboard">
       {/* Solicitudes Pendientes */}
       <StatCard
         value={statistics.requestsByStatus.Pendiente}
         label="Solicitudes Pendientes"
         icon={
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -94,7 +122,7 @@ export default function DashboardStats({ chapterId }: Props) {
         value={statistics.tutoringsByStatus.Completada}
         label="Sesiones Completadas"
         icon={
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -114,7 +142,7 @@ export default function DashboardStats({ chapterId }: Props) {
         value={statistics.requestsByStatus.Cancelada}
         label="Solicitudes Canceladas"
         icon={
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -127,6 +155,6 @@ export default function DashboardStats({ chapterId }: Props) {
         iconColor="text-red-500"
         subtitleColor="text-red-600"
       />
-    </div>
+    </section>
   );
 }
