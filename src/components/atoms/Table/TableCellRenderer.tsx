@@ -7,11 +7,41 @@ import type { MentorshipStatus } from "@/shared/utils/enums/mentorshipStatus";
 import { displayStatus } from "@/shared/utils/helpers/displayStatus";
 
 interface TableCellRendererProps {
+  /** The value to be rendered in the cell */
   value: CellValue;
+  /** Column configuration object */
   column: TableColumn;
+  /** The complete row data object */
   row: MentorshipData;
+  /** Optional callback for button actions */
   onActionClick?: (action: string, mentorship: MentorshipData) => void;
 }
+
+/**
+ * TableCellRenderer component dynamically renders table cells based on type
+ *
+ * Supported cell types:
+ * - badge: Renders status badges with appropriate styling
+ * - skills: Renders arrays as comma-separated lists
+ * - button: Renders action buttons (single or multiple)
+ * - text: Renders plain text (default)
+ *
+ * Features:
+ * - Type-safe rendering
+ * - Accessibility support (ARIA labels)
+ * - Error handling for invalid values
+ * - Responsive button layouts
+ *
+ * @example
+ * ```tsx
+ * <TableCellRenderer
+ *   value={MentorshipStatus.ACTIVE}
+ *   column={{ key: "status", label: "Status", cellType: "badge" }}
+ *   row={mentorshipData}
+ *   onActionClick={(action, row) => handleAction(action, row)}
+ * />
+ * ```
+ */
 
 export const TableCellRenderer: React.FC<TableCellRendererProps> = ({ value, column, row, onActionClick }) => {
   const baseClassName = column.className || "";

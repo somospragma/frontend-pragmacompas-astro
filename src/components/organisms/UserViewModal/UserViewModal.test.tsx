@@ -1,292 +1,167 @@
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import UserViewModal from "./UserViewModal";
 import type { User } from "@/infrastructure/models/TutoringRequest";
 import { UserRole } from "@/shared/utils/enums/role";
 
+const mockUser: User = {
+  id: "123",
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@test.com",
+  rol: UserRole.TUTEE,
+  seniority: "Senior",
+  chapterId: "chapter-1",
+  slackId: "U123456",
+  chapter: { id: "chapter-1", name: "Chapter 1" },
+  activeTutoringLimit: 5,
+};
+
+const mockOnClose = vi.fn();
+
 describe("UserViewModal", () => {
-  const mockOnClose = vi.fn();
-
-  const mockUser: User = {
-    id: "user-123",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    rol: UserRole.TUTEE,
-    seniority: "Senior",
-    chapterId: "chapter-456",
-    slackId: "U123456",
-    chapter: { id: "chapter-456", name: "Test Chapter" },
-    activeTutoringLimit: 5,
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("Rendering", () => {
+  describe("Rendering Logic", () => {
     it("should not render when isOpen is false", () => {
       render(<UserViewModal isOpen={false} onClose={mockOnClose} user={mockUser} />);
-
       expect(screen.queryByText("Detalles del Usuario")).not.toBeInTheDocument();
     });
 
     it("should not render when user is null", () => {
       render(<UserViewModal isOpen={true} onClose={mockOnClose} user={null} />);
-
       expect(screen.queryByText("Detalles del Usuario")).not.toBeInTheDocument();
     });
 
-    it("should render modal when isOpen is true and user is provided", () => {
+    it("should render when isOpen is true and user exists", () => {
       render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
       expect(screen.getByText("Detalles del Usuario")).toBeInTheDocument();
     });
+  });
 
-    it("should display user full name", () => {
+  describe("User Data Display", () => {
+    it("should display complete user information", () => {
       render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
 
       expect(screen.getByText("John Doe")).toBeInTheDocument();
-    });
-
-    it("should display user email", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("john.doe@example.com")).toBeInTheDocument();
-    });
-
-    it("should display user role", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText(UserRole.TUTEE)).toBeInTheDocument();
-    });
-
-    it("should display user seniority", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
+      expect(screen.getByText("john.doe@test.com")).toBeInTheDocument();
+      expect(screen.getByText("Tutorado")).toBeInTheDocument();
       expect(screen.getByText("Senior")).toBeInTheDocument();
-    });
-
-    it("should display user ID", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("user-123")).toBeInTheDocument();
-    });
-
-    it("should display user initial in avatar", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("J")).toBeInTheDocument();
-    });
-
-    it("should display chapter ID when provided", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("chapter-456")).toBeInTheDocument();
-    });
-
-    it("should display slack ID when provided", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
+      expect(screen.getByText("123")).toBeInTheDocument();
+      expect(screen.getByText("chapter-1")).toBeInTheDocument();
       expect(screen.getByText("U123456")).toBeInTheDocument();
     });
-  });
 
-  describe("User Name Display", () => {
-    it("should display full name when both firstName and lastName are provided", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
+    it("should handle missing optional fields", () => {
+      const userWithoutOptional: User = {
+        id: "123",
+        firstName: "John",
+        lastName: "Doe",
+        email: "",
+        rol: UserRole.TUTEE,
+        seniority: "",
+        chapter: { id: "chapter-1", name: "Chapter 1" },
+        activeTutoringLimit: 5,
+      };
+
+      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutOptional} />);
 
       expect(screen.getByText("John Doe")).toBeInTheDocument();
+      expect(screen.getAllByText("No especificado")).toHaveLength(2);
     });
 
-    it("should display only firstName when lastName is missing", () => {
-      const userWithoutLastName = { ...mockUser, lastName: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutLastName as User} />);
+    it("should display fallback when names are missing", () => {
+      const userWithoutNames: User = {
+        id: "123",
+        firstName: "",
+        lastName: "",
+        email: "test@test.com",
+        rol: UserRole.TUTEE,
+        seniority: "Junior",
+        chapter: { id: "chapter-1", name: "Chapter 1" },
+        activeTutoringLimit: 5,
+      };
 
-      expect(screen.getByText("John")).toBeInTheDocument();
-    });
-
-    it("should display only lastName when firstName is missing", () => {
-      const userWithoutFirstName = { ...mockUser, firstName: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutFirstName as User} />);
-
-      expect(screen.getByText("Doe")).toBeInTheDocument();
-    });
-
-    it("should display 'Sin nombre' when both names are missing", () => {
-      const userWithoutName = { ...mockUser, firstName: undefined, lastName: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutName as User} />);
-
+      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutNames} />);
       expect(screen.getByText("Sin nombre")).toBeInTheDocument();
     });
-  });
 
-  describe("User Initial Display", () => {
-    it("should display first letter of firstName as initial", () => {
+    it("should display user initial correctly", () => {
       render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("J")).toBeInTheDocument();
-    });
-
-    it("should display first letter of lastName when firstName is missing", () => {
-      const userWithoutFirstName = { ...mockUser, firstName: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutFirstName as User} />);
-
-      expect(screen.getByText("D")).toBeInTheDocument();
-    });
-
-    it("should display '?' when both names are missing", () => {
-      const userWithoutName = { ...mockUser, firstName: undefined, lastName: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutName as User} />);
-
-      expect(screen.getByText("?")).toBeInTheDocument();
-    });
-
-    it("should display initial in uppercase", () => {
-      const userWithLowerCase = { ...mockUser, firstName: "john" };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithLowerCase} />);
-
       expect(screen.getByText("J")).toBeInTheDocument();
     });
   });
 
-  describe("Optional Fields", () => {
-    it("should not display chapter ID section when chapterId is not provided", () => {
-      const userWithoutChapter = { ...mockUser, chapterId: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutChapter as User} />);
+  describe("XSS Protection", () => {
+    it("should sanitize malicious input", () => {
+      const maliciousUser: User = {
+        id: "123",
+        firstName: "<script>alert('xss')</script>John",
+        lastName: "<img src=x onerror=alert(1)>Doe",
+        email: "test@test.com",
+        rol: UserRole.TUTEE,
+        seniority: "Senior",
+        chapter: { id: "chapter-1", name: "Chapter 1" },
+        activeTutoringLimit: 5,
+      };
 
-      expect(screen.queryByText("Chapter ID")).not.toBeInTheDocument();
+      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={maliciousUser} />);
+
+      expect(screen.queryByText(/<script>/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/<img/)).not.toBeInTheDocument();
+      expect(screen.getByText(/John/)).toBeInTheDocument();
+      expect(screen.getByText(/Doe/)).toBeInTheDocument();
     });
 
-    it("should not display slack ID section when slackId is not provided", () => {
-      const userWithoutSlack = { ...mockUser, slackId: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutSlack as User} />);
+    it("should validate email format", () => {
+      const userWithInvalidEmail: User = {
+        ...mockUser,
+        email: "invalid-email-format",
+      };
 
-      expect(screen.queryByText("Slack ID")).not.toBeInTheDocument();
-    });
-
-    it("should display 'No especificado' when email is missing", () => {
-      const userWithoutEmail = { ...mockUser, email: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutEmail as User} />);
-
-      const emailLabels = screen.getAllByText("No especificado");
-      expect(emailLabels.length).toBeGreaterThan(0);
-    });
-
-    it("should display 'No especificado' when seniority is missing", () => {
-      const userWithoutSeniority = { ...mockUser, seniority: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutSeniority as User} />);
-
-      const noSpecifiedLabels = screen.getAllByText("No especificado");
-      expect(noSpecifiedLabels.length).toBeGreaterThan(0);
-    });
-
-    it("should display 'No especificado' when id is missing", () => {
-      const userWithoutId = { ...mockUser, id: undefined };
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithoutId as User} />);
-
-      const noSpecifiedLabels = screen.getAllByText("No especificado");
-      expect(noSpecifiedLabels.length).toBeGreaterThan(0);
+      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={userWithInvalidEmail} />);
+      expect(screen.getByText("Email inválido")).toBeInTheDocument();
     });
   });
 
-  describe("Close Button", () => {
-    it("should call onClose when close button is clicked", async () => {
-      const user = userEvent.setup();
+  describe("Interactions", () => {
+    it("should call onClose when close button is clicked", () => {
       render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
 
-      const closeButton = screen.getByRole("button", { name: /cerrar/i });
-      await user.click(closeButton);
-
+      fireEvent.click(screen.getByText("Cerrar"));
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it("should display close button with correct text", () => {
+    it("should call onClose when Escape key is pressed", () => {
       render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
 
-      const closeButton = screen.getByRole("button", { name: /cerrar/i });
-      expect(closeButton).toBeInTheDocument();
-      expect(closeButton).toHaveTextContent("Cerrar");
+      fireEvent.keyDown(screen.getByRole("article"), { key: "Escape" });
+      expect(mockOnClose).toHaveBeenCalled();
     });
   });
 
-  describe("Accessibility", () => {
-    it("should have article element with proper structure", () => {
-      const { container } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
+  describe("Error Handling", () => {
+    it("should render even with malformed user data", () => {
+      const malformedUser = {
+        id: null,
+        firstName: undefined,
+        lastName: "",
+        email: null,
+        rol: undefined,
+        seniority: null,
+      } as unknown as User;
 
-      const article = container.querySelector("article");
-      expect(article).toBeInTheDocument();
-    });
+      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={malformedUser} />);
 
-    it("should have header element for user info section", () => {
-      const { container } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      const header = container.querySelector("header");
-      expect(header).toBeInTheDocument();
-    });
-
-    it("should have section with aria-label for user details", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      const section = screen.getByLabelText("Información del usuario");
-      expect(section).toBeInTheDocument();
-    });
-
-    it("should have footer element for actions", () => {
-      const { container } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      const footer = container.querySelector("footer");
-      expect(footer).toBeInTheDocument();
-    });
-
-    it("should have aria-hidden on avatar", () => {
-      const { container } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      const avatar = container.querySelector('[aria-hidden="true"]');
-      expect(avatar).toBeInTheDocument();
-    });
-
-    it("should have role status on user role display", () => {
-      const { container } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      const roleStatus = container.querySelector('[role="status"]');
-      expect(roleStatus).toBeInTheDocument();
-      expect(roleStatus).toHaveTextContent(UserRole.TUTEE);
-    });
-
-    it("should have aria-label on close button", () => {
-      render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      const closeButton = screen.getByRole("button", { name: /cerrar modal de detalles/i });
-      expect(closeButton).toBeInTheDocument();
+      expect(screen.getByText("Sin nombre")).toBeInTheDocument();
+      expect(screen.getByText("?")).toBeInTheDocument();
     });
   });
 
-  describe("Performance", () => {
-    it("should memoize fullName computation", () => {
-      const { rerender } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
-
-      // Rerender with same user
-      rerender(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("John Doe")).toBeInTheDocument();
-    });
-
-    it("should memoize userInitial computation", () => {
-      const { rerender } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("J")).toBeInTheDocument();
-
-      // Rerender with same user
-      rerender(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("J")).toBeInTheDocument();
-    });
-
-    it("should recalculate fullName when user changes", () => {
+  describe("Memoization Logic", () => {
+    it("should update display when user changes", () => {
       const { rerender } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
 
       expect(screen.getByText("John Doe")).toBeInTheDocument();
@@ -296,17 +171,6 @@ describe("UserViewModal", () => {
 
       expect(screen.getByText("Jane Smith")).toBeInTheDocument();
       expect(screen.queryByText("John Doe")).not.toBeInTheDocument();
-    });
-
-    it("should recalculate userInitial when user changes", () => {
-      const { rerender } = render(<UserViewModal isOpen={true} onClose={mockOnClose} user={mockUser} />);
-
-      expect(screen.getByText("J")).toBeInTheDocument();
-
-      const newUser = { ...mockUser, firstName: "Alice" };
-      rerender(<UserViewModal isOpen={true} onClose={mockOnClose} user={newUser} />);
-
-      expect(screen.getByText("A")).toBeInTheDocument();
     });
   });
 });

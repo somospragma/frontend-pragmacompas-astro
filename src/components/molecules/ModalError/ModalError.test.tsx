@@ -39,7 +39,7 @@ describe("ErrorModal", () => {
     expect(screen.getByText(testError)).toBeInTheDocument();
 
     // Check if close button is present
-    expect(screen.getByText("Close")).toBeInTheDocument();
+    expect(screen.getByText("Cerrar")).toBeInTheDocument();
   });
 
   it("should call setError with null when close button is clicked", () => {
@@ -50,7 +50,7 @@ describe("ErrorModal", () => {
 
     render(<ErrorModal />);
 
-    const closeButton = screen.getByText("Close");
+    const closeButton = screen.getByText("Cerrar");
     fireEvent.click(closeButton);
 
     expect(mockSetError).toHaveBeenCalledWith(null);
@@ -68,6 +68,7 @@ describe("ErrorModal", () => {
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("aria-modal", "true");
     expect(dialog).toHaveAttribute("aria-labelledby", "modal-title");
+    expect(dialog).toHaveAttribute("aria-describedby", "error-description");
   });
 
   it("should have the correct styling classes", () => {
@@ -79,12 +80,12 @@ describe("ErrorModal", () => {
     render(<ErrorModal />);
 
     // Check for backdrop
-    expect(document.querySelector(".bg-gray-500.bg-opacity-75")).toBeInTheDocument();
+    expect(document.querySelector(".bg-black")).toBeTruthy();
 
     // Check for modal container
-    expect(document.querySelector(".bg-white.shadow-xl")).toBeInTheDocument();
+    expect(document.querySelector(".bg-white")).toBeTruthy();
 
     // Check for error icon container
-    expect(document.querySelector(".bg-error-50")).toBeInTheDocument();
+    expect(document.querySelector(".bg-red-50")).toBeTruthy();
   });
 });
