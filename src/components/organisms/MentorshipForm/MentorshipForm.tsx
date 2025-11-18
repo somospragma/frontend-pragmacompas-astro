@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useStore } from "@nanostores/react";
 import { toast } from "sonner";
 import { getSkills } from "@/infrastructure/services/getSkills";
@@ -14,6 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
 
+/**
+ * Form component for creating mentorship requests with real-time validation and accessibility features.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <MentorshipForm />
+ * ```
+ */
 export default function MentorshipForm() {
   const [skills, setSkills] = useState<{ id: string; name: string }[]>([]);
   const [chapters, setChapters] = useState<{ id: string; name: string }[]>([]);
@@ -26,6 +35,14 @@ export default function MentorshipForm() {
   const [needsDescription, setNeedsDescription] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
+
+  const formId = useId();
+  const chapterFieldId = useId();
+  const skillsFieldId = useId();
+  const notesFieldId = useId();
+  const chapterErrorId = useId();
+  const skillsErrorId = useId();
+  const notesErrorId = useId();
 
   useEffect(() => {
     const loadData = async () => {
@@ -57,7 +74,11 @@ export default function MentorshipForm() {
     loadData();
   }, []);
 
-  const validate = () => {
+  const chapterOptions = useMemo(() => chapters.map((c) => ({ value: c.id, label: c.name })), [chapters]);
+
+  const skillOptions = useMemo(() => skills.map((s) => ({ value: s.id, label: s.name })), [skills]);
+
+  const validate = useCallback(() => {
     const newErrors: typeof errors = {};
     if (selectedSkills.length === 0) newErrors.skills = "Selecciona al menos una habilidad";
     if (!chapter) newErrors.chapter = "El chapter es requerido";
@@ -65,9 +86,9 @@ export default function MentorshipForm() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [selectedSkills.length, chapter, needsDescription]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!validate()) {
       toast.error("Error de validación", {
         description: "Por favor completa todos los campos requeridos",
@@ -96,13 +117,12 @@ export default function MentorshipForm() {
         description: "Te redirigiremos a la página principal",
       });
 
-      // Reset form
       setSelectedSkills([]);
       setChapter("");
       setNeedsDescription("");
 
       const homeUrl = ROUTE_PATHS.HISTORY.getHref();
-      window.location.href = homeUrl;
+      globalThis.location.href = homeUrl;
     } catch {
       toast.error("Error al enviar solicitud", {
         description: "Algo salió mal, por favor intenta de nuevo más tarde.",
@@ -110,30 +130,33 @@ export default function MentorshipForm() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [validate, user.userId, selectedSkills, needsDescription]);
 
-  // Mostrar estado de carga
+  const handleTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNeedsDescription(e.target.value);
+  }, []);
+
   if (dataLoading) {
     return (
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full max-w-2xl mx-auto" aria-busy="true" aria-live="polite">
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+            <Loader2 className="h-8 w-8 animate-spin mx-auto" aria-hidden="true" />
             <p className="text-muted-foreground">Cargando formulario...</p>
+            <span className="sr-only">Loading form data, please wait</span>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  // Mostrar error si hay problemas cargando datos
   if (dataError) {
     return (
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full max-w-2xl mx-auto" role="alert" aria-live="assertive">
         <CardContent className="py-12">
           <div className="text-center space-y-4">
             <p className="text-destructive">{dataError}</p>
-            <Button onClick={() => window.location.reload()} variant="outline">
+            <Button onClick={() => globalThis.location.reload()} variant="outline">
               Recargar página
             </Button>
           </div>
@@ -145,52 +168,72 @@ export default function MentorshipForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader className="pb-6 w-full">
-        <CardTitle className="text-2xl font-bold text-center">Solicitar tutoría</CardTitle>
+        <CardTitle id={formId} className="text-2xl font-bold text-center">
+          Solicitar tutoría
+        </CardTitle>
         <CardDescription className="text-center text-base mt-2">
           Completa el formulario para solicitar una sesión de tutoría.
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6 pb-6">
-        <form className="space-y-6">
+        <form className="space-y-6" aria-labelledby={formId} role="form">
           <div className="space-y-2">
-            <Label htmlFor="chapter" className="text-sm font-medium">
+            <Label htmlFor={chapterFieldId} className="text-sm font-medium">
               Chapter
             </Label>
             <Select
-              options={chapters.map((c) => ({ value: c.id, label: c.name }))}
+              options={chapterOptions}
               value={chapter}
               onValueChange={setChapter}
               placeholder="Selecciona un chapter"
+              aria-invalid={!!errors.chapter}
+              aria-describedby={errors.chapter ? chapterErrorId : undefined}
             />
-            {errors.chapter && <p className="text-sm text-destructive">{errors.chapter}</p>}
+            {errors.chapter && (
+              <p id={chapterErrorId} className="text-sm text-destructive" role="alert">
+                {errors.chapter}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="skills" className="text-sm font-medium">
+            <Label htmlFor={skillsFieldId} className="text-sm font-medium">
               Habilidades
             </Label>
             <MultiSelect
-              options={skills.map((s) => ({ value: s.id, label: s.name }))}
+              options={skillOptions}
               value={selectedSkills}
               onValueChange={setSelectedSkills}
               placeholder="Selecciona habilidades..."
+              aria-invalid={!!errors.skills}
+              aria-describedby={errors.skills ? skillsErrorId : undefined}
             />
-            {errors.skills && <p className="text-sm text-destructive">{errors.skills}</p>}
+            {errors.skills && (
+              <p id={skillsErrorId} className="text-sm text-destructive" role="alert">
+                {errors.skills}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-sm font-medium">
+            <Label htmlFor={notesFieldId} className="text-sm font-medium">
               Notas
             </Label>
             <Textarea
-              id="notes"
+              id={notesFieldId}
               placeholder="Describe en qué te gustaría recibir ayuda..."
               value={needsDescription}
-              onChange={(e) => setNeedsDescription(e.target.value)}
+              onChange={handleTextareaChange}
               rows={4}
               className="text-sm resize-none"
+              aria-invalid={!!errors.needsDescription}
+              aria-describedby={errors.needsDescription ? notesErrorId : undefined}
             />
-            {errors.needsDescription && <p className="text-sm text-destructive">{errors.needsDescription}</p>}
+            {errors.needsDescription && (
+              <p id={notesErrorId} className="text-sm text-destructive" role="alert">
+                {errors.needsDescription}
+              </p>
+            )}
           </div>
 
           <Button
@@ -199,11 +242,13 @@ export default function MentorshipForm() {
             className="w-full mt-6 h-10 text-base"
             disabled={loading}
             size="default"
+            aria-busy={loading}
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                 Enviando...
+                <span className="sr-only">Submitting mentorship request</span>
               </>
             ) : (
               "Enviar Solicitud"

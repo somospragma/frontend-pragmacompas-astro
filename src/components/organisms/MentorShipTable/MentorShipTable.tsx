@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback, useId } from "react";
 import MentorshipActionModal from "./MentorshipActionModal/MentorshipActionModal";
 import {
   ADMIN_MENTORSHIP_STATE_FILTERS,
@@ -6,6 +6,23 @@ import {
 } from "@/shared/utils/enums/mentorshipsStateFilter";
 import MentorshipRequest from "@/components/page/MentoShipRequest/MentorshipRequest";
 import MentorshipItemCard from "@/components/molecules/MentorshipItemCard";
+
+/**
+ * MentorshipTable component displays a filterable list of mentorship requests.
+ * Provides search and status filtering capabilities with modal interaction for request details.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <MentorshipTable
+ *   mentorshipRequests={requests}
+ *   title="My Requests"
+ *   isDashboard={true}
+ *   refetch={handleRefetch}
+ * />
+ * ```
+ */
+
 interface Props {
   mentorshipRequests: MentorshipRequest[];
   title?: string;
@@ -19,24 +36,55 @@ const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría"
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Todos los estados");
 
-  const handleRequestClick = (request: MentorshipRequest) => {
+  const searchInputId = useId();
+  const statusSelectId = useId();
+  const resultsLiveRegionId = useId();
+
+  const handleRequestClick = useCallback((request: MentorshipRequest) => {
     setSelectedRequest(request);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const filteredRequests = mentorshipRequests.filter((request) => {
-    const fullName = `${request.tutee.firstName} ${request.tutee.lastName}`;
-    const matchesSearch =
-      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.tutee.chapter.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, []);
 
-    const matchesStatus = selectedStatus === "Todos los estados" || request.requestStatus === selectedStatus;
-    const matchesByRol = isDashboard
-      ? ADMIN_MENTORSHIP_STATE_FILTERS.some((state) => state === request.requestStatus)
-      : TUTOR_MENTORSHIP_STATE_FILTERS.some((state) => state === request.requestStatus);
+  const handleStatusChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(e.target.value);
+  }, []);
 
-    return matchesSearch && matchesStatus && matchesByRol;
-  });
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
+
+  const handleRefetch = useCallback(() => {
+    refetch?.();
+  }, [refetch]);
+
+  const filteredRequests = useMemo(() => {
+    return mentorshipRequests.filter((request) => {
+      const fullName = `${request.tutee.firstName} ${request.tutee.lastName}`;
+      const matchesSearch =
+        fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.tutee.chapter.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus = selectedStatus === "Todos los estados" || request.requestStatus === selectedStatus;
+      const matchesByRol = isDashboard
+        ? ADMIN_MENTORSHIP_STATE_FILTERS.some((state) => state === request.requestStatus)
+        : TUTOR_MENTORSHIP_STATE_FILTERS.some((state) => state === request.requestStatus);
+
+      return matchesSearch && matchesStatus && matchesByRol;
+    });
+  }, [mentorshipRequests, searchTerm, selectedStatus, isDashboard]);
+
+  const resultsMessage = useMemo(() => {
+    if (filteredRequests.length === 0) {
+      return "No se encontraron solicitudes";
+    }
+    const count = filteredRequests.length;
+    const singular = count === 1 ? "solicitud encontrada" : "solicitudes encontradas";
+    return `${count} ${singular}`;
+  }, [filteredRequests.length]);
 
   return (
     <>
@@ -44,28 +92,46 @@ const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría"
         <div className="flex flex-col items-start gap-4 md:flex-row">
           <h1 className="text-3xl font-bold text-foreground">{title}</h1>
           <div className="flex flex-col gap-4 w-full md:flex-row md:justify-end flex-1">
-            <input
-              className="bg-input rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              type="text"
-              placeholder="Buscar solicitudes..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="flex flex-col gap-2">
+              <label htmlFor={searchInputId} className="sr-only">
+                Buscar solicitudes por nombre o capítulo
+              </label>
+              <input
+                id={searchInputId}
+                className="bg-input rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                type="text"
+                placeholder="Buscar solicitudes..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                aria-describedby={resultsLiveRegionId}
+              />
+            </div>
             {!isDashboard && (
-              <select
-                className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-              >
-                <option>Todos los estados</option>
-                {TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
+              <div className="flex flex-col gap-2">
+                <label htmlFor={statusSelectId} className="sr-only">
+                  Filtrar por estado
+                </label>
+                <select
+                  id={statusSelectId}
+                  className="bg-input rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  aria-describedby={resultsLiveRegionId}
+                >
+                  <option>Todos los estados</option>
+                  {TUTOR_MENTORSHIP_STATE_FILTERS.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+              </div>
             )}
           </div>
+        </div>
+
+        <div id={resultsLiveRegionId} className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {resultsMessage}
         </div>
 
         <div className="space-y-4">
@@ -91,15 +157,11 @@ const MentorshipTable = ({ mentorshipRequests, title = "Solicitudes de Tutoría"
 
       {selectedRequest && (
         <MentorshipActionModal
-          key={`modal-${selectedRequest?.id}`}
+          key={`modal-${selectedRequest.id}`}
           isOpen={isModalOpen}
           selectedRequest={selectedRequest}
-          onOpenChange={() => {
-            setIsModalOpen(false);
-          }}
-          onRefetch={() => {
-            refetch?.();
-          }}
+          onOpenChange={handleModalClose}
+          onRefetch={handleRefetch}
         />
       )}
     </>

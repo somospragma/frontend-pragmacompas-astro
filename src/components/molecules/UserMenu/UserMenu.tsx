@@ -108,7 +108,9 @@ export const UserMenu = ({ user }: UserMenuProps) => {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 
+                     dark:hover:bg-gray-700 rounded-lg p-2 transition-colors duration-200 
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           aria-label={`User menu for ${sanitizedName || "User"}`}
           aria-haspopup="menu"
           aria-expanded="false"
@@ -139,7 +141,9 @@ export const UserMenu = ({ user }: UserMenuProps) => {
             type="button"
             onClick={handleLogout}
             disabled={isLoading}
-            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
+            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 
+                       hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 
+                       focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
             aria-label={isLoading ? "Logging out..." : "Log out"}
           >
             <LogOut size={16} className="mr-2" aria-hidden="true" />

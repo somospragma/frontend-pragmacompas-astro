@@ -64,7 +64,7 @@ describe("HistoryTables Component", () => {
 
     it("should render with empty data", () => {
       render(<HistoryTables />);
-      expect(screen.getByRole("region")).toBeInTheDocument();
+      expect(screen.getByRole("region", { name: /historial de mentorías/i })).toBeInTheDocument();
     });
   });
 
@@ -105,7 +105,7 @@ describe("HistoryTables Component", () => {
       const { container } = render(<HistoryTables />);
 
       expect(container).toBeInTheDocument();
-      expect(screen.getByRole("region")).toBeInTheDocument();
+      expect(screen.getByRole("region", { name: /historial de mentorías/i })).toBeInTheDocument();
     });
 
     it("should show loading state", async () => {
@@ -118,7 +118,7 @@ describe("HistoryTables Component", () => {
 
       render(<HistoryTables />);
 
-      expect(screen.getByRole("region")).toBeInTheDocument();
+      expect(screen.getByRole("region", { name: /historial de mentorías/i })).toBeInTheDocument();
     });
   });
 
