@@ -13,13 +13,10 @@
 
 ## Paso 3: Generación de Reporte
 
-- Genera un reporte en formato Markdown en la carpeta 'reports', nombrado 'frontend_transversal_rules_report.md'. SI la carpeta reports no existe, créala.
+- Genera un reporte final en formato Markdown en la carpeta 'reports', nombrado 'componente_final_check.md' donde muestres el incremento de los criterios.
 - El reporte debe incluir:
-  - Una clasificación de cada criterio evaluado en un rango de 0 a 10.
   - Una clasificación general del cumplimiento (Porcentaje de criterios cumplidos).
   - Una tabla visual con los criterios evaluados y su estado (✔️ Cumple / ❌ No cumple / ⚠️ Parcial / N/A).
-  - Recomendaciones específicas para cada criterio no cumplido.
-  - Un resumen ejecutivo y pasos sugeridos para mejorar el cumplimiento.
 
 ### Ejemplo de tabla:
 
@@ -37,7 +34,7 @@
 
 - No omitas ningún criterio del recurso obtenido salvo que se te indique explícitamente lo contrario al finalizar este prompt.
 - Si algún criterio no aplica, indícalo como 'N/A'.
-- El reporte debe ser claro, visual y accionable para el desarrollador.
+- El reporte debe ser claro, visual y accionable para el desarrollador. Debe ser un resumen del reporte generado en el paso 3.
 - Mantén un tono profesional y objetivo en todo momento.
 - Se consiso y directo en los hallazgos y recomendaciones.
 - No realices ningún cambio ni ninguna otra acción en el repositorio más allá de la evaluación y generación del reporte.
