@@ -46,3 +46,24 @@ export function isValidInput(input: string): boolean {
   const sanitized = sanitizeInput(input);
   return sanitized.length > 0;
 }
+
+/**
+ * Validates and sanitizes a hexadecimal color code
+ * @param color - The color code to validate (e.g., "#ff0000" or "#fff")
+ * @returns Sanitized hex color or fallback color if invalid
+ */
+export function sanitizeHexColor(color: string): string {
+  if (!color) return "#1a1a2e";
+
+  const trimmedColor = color.trim();
+
+  // Validate hex color format (#RGB or #RRGGBB)
+  const hexPattern = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+
+  if (!hexPattern.test(trimmedColor)) {
+    console.warn(`[Sanitize] Invalid hex color format: ${color}. Using fallback.`);
+    return "#1a1a2e"; // Fallback to dark color
+  }
+
+  return trimmedColor;
+}
