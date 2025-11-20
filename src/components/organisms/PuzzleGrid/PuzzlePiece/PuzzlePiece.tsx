@@ -1,6 +1,7 @@
 import type { Account } from "@/shared/entities/account";
 import { ROUTE_PATHS } from "@/shared/utils/enums/paths";
 import { hexToRgba } from "@/shared/utils/helpers/hextToRgba";
+import { sanitizeHexColor, sanitizeInput } from "@/shared/utils/sanitize";
 import { motion } from "framer-motion";
 import { Brain, Globe, User } from "lucide-react";
 
@@ -20,15 +21,27 @@ interface Props {
 export const PuzzlePiece = ({ account, isActive, onHover, onLeave, shape }: Props) => {
   const { hasTopTab, hasBottomTab, hasLeftTab, hasRightTab } = shape;
 
+  // Sanitize inputs to prevent XSS attacks
+  const safeColor = sanitizeHexColor(account.bannerColorHex);
+  const safeName = sanitizeInput(account.name);
+  const safeIaTools = account.iaTools.map((tool) => sanitizeInput(tool)).filter((tool) => tool.length > 0);
+
   return (
-    <a href={ROUTE_PATHS.WORLD_PRAGMA_ACCOUNT.getHref({ id: account.id })}>
+    <a
+      href={ROUTE_PATHS.WORLD_PRAGMA_ACCOUNT.getHref({ id: account.id })}
+      aria-label={`Ver detalles de ${safeName} - ${account.totalFrontedsDevs} desarrolladores frontend`}
+      onFocus={onHover}
+      onBlur={onLeave}
+    >
       <div className="relative aspect-[4/3]">
         <svg
           width="100%"
           height="100%"
           viewBox="0 0 240 180"
           className="absolute inset-0 cursor-pointer"
-          style={{ filter: isActive ? `drop-shadow(0 0 8px ${account.bannerColorHex})` : "none" }}
+          role="img"
+          aria-label={`Pieza de puzzle para ${safeName}`}
+          style={{ filter: isActive ? `drop-shadow(0 0 8px ${safeColor})` : "none" }}
         >
           <motion.path
             d={`M 40,0
@@ -40,8 +53,8 @@ export const PuzzlePiece = ({ account, isActive, onHover, onLeave, shape }: Prop
             L 40,180
             ${hasLeftTab ? "L 0,140 L 15,120 C 25,110 25,90 15,80 L 0,60" : "L 0,140 L 15,140 C 35,140 35,100 15,100 L 0,100"}
             L 0,40 Z`}
-            fill={isActive ? hexToRgba(account.bannerColorHex, 0.9) : `rgba(26, 26, 46, 0.8)`}
-            stroke={account.bannerColorHex}
+            fill={isActive ? hexToRgba(safeColor, 0.9) : `rgba(26, 26, 46, 0.8)`}
+            stroke={safeColor}
             strokeWidth={isActive ? 2 : 0}
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
@@ -71,8 +84,8 @@ export const PuzzlePiece = ({ account, isActive, onHover, onLeave, shape }: Prop
                 45deg,
                 transparent,
                 transparent 10px,
-                ${account.bannerColorHex}20 10px,
-                ${account.bannerColorHex}20 20px
+                ${safeColor}20 10px,
+                ${safeColor}20 20px
               )`,
             }}
             variants={{
@@ -91,11 +104,11 @@ export const PuzzlePiece = ({ account, isActive, onHover, onLeave, shape }: Prop
             <motion.span
               className="text-xl font-bold block"
               variants={{
-                initial: { color: account.bannerColorHex, textShadow: "none" },
-                hover: { color: "#fff", textShadow: `0 0 8px ${account.bannerColorHex}` },
+                initial: { color: safeColor, textShadow: "none" },
+                hover: { color: "#fff", textShadow: `0 0 8px ${safeColor}` },
               }}
             >
-              {account.name}
+              {safeName}
             </motion.span>
 
             <motion.ul
@@ -119,7 +132,7 @@ export const PuzzlePiece = ({ account, isActive, onHover, onLeave, shape }: Prop
             >
               <li className="flex items-center justify-start gap-2 opacity-80">
                 <Brain className="w-4 h-4 min-w-4" />{" "}
-                <span className="text-start">IA tools: {account.iaTools.join(", ")}</span>
+                <span className="text-start">IA tools: {safeIaTools.join(", ")}</span>
               </li>
               <li className="flex items-center justify-start  gap-2 opacity-80">
                 <User className="w-4 h-4 min-w-4" />{" "}

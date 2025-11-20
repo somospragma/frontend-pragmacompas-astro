@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sanitizeInput, sanitizeUrl, isValidInput } from "@/shared/utils/sanitize";
+import { sanitizeInput, sanitizeUrl, isValidInput, sanitizeHexColor } from "@/shared/utils/sanitize";
 
 describe("sanitizeInput", () => {
   it("should remove HTML tags", () => {
@@ -106,5 +106,62 @@ describe("isValidInput", () => {
   it("should return true for input with special characters", () => {
     const result = isValidInput("Valid input with @#$%");
     expect(result).toBe(true);
+  });
+});
+
+describe("sanitizeHexColor", () => {
+  it("should accept valid 6-digit hex color", () => {
+    const result = sanitizeHexColor("#ff0000");
+    expect(result).toBe("#ff0000");
+  });
+
+  it("should accept valid 3-digit hex color", () => {
+    const result = sanitizeHexColor("#f00");
+    expect(result).toBe("#f00");
+  });
+
+  it("should accept uppercase hex color", () => {
+    const result = sanitizeHexColor("#FF0000");
+    expect(result).toBe("#FF0000");
+  });
+
+  it("should accept mixed case hex color", () => {
+    const result = sanitizeHexColor("#Ff00Aa");
+    expect(result).toBe("#Ff00Aa");
+  });
+
+  it("should trim whitespace", () => {
+    const result = sanitizeHexColor("  #ff0000  ");
+    expect(result).toBe("#ff0000");
+  });
+
+  it("should return fallback for invalid format without #", () => {
+    const result = sanitizeHexColor("ff0000");
+    expect(result).toBe("#1a1a2e");
+  });
+
+  it("should return fallback for invalid characters", () => {
+    const result = sanitizeHexColor("#gggggg");
+    expect(result).toBe("#1a1a2e");
+  });
+
+  it("should return fallback for wrong length", () => {
+    const result = sanitizeHexColor("#ff00");
+    expect(result).toBe("#1a1a2e");
+  });
+
+  it("should return fallback for empty string", () => {
+    const result = sanitizeHexColor("");
+    expect(result).toBe("#1a1a2e");
+  });
+
+  it("should return fallback for color with javascript injection attempt", () => {
+    const result = sanitizeHexColor("#ff0000; background: url(evil)");
+    expect(result).toBe("#1a1a2e");
+  });
+
+  it("should return fallback for color with XSS attempt", () => {
+    const result = sanitizeHexColor("#ff0000<script>alert('xss')</script>");
+    expect(result).toBe("#1a1a2e");
   });
 });

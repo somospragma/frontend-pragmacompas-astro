@@ -1,7 +1,7 @@
 import { httpClient } from "../adapters/httpClient/httpClient";
 import type { User } from "../models/TutoringRequest";
 
-export const postCreateUser = async (data: { email: string; googleUserId: string }) => {
+export const postCreateUser = async (data: Partial<User>) => {
   try {
     const response = await httpClient.post<User>(`/api/v1/users`, {
       ...data,
